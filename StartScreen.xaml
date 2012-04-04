@@ -1,0 +1,160 @@
+﻿<Page x:Class="Moto.StartScreen"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      mc:Ignorable="d" Height="480" Width="640" ShowsNavigationUI="False" IsEnabled="True" Visibility="Visible" Loaded="Page_Loaded" KeyDown="Page_KeyDown" Focusable="True">
+	<Page.Resources>
+		<Storyboard x:Key="OnLoaded1">
+			<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)" Storyboard.TargetName="motoLogoTransparent">
+				<EasingDoubleKeyFrame KeyTime="0" Value="16">
+					<EasingDoubleKeyFrame.EasingFunction>
+						<ExponentialEase EasingMode="EaseOut" Exponent="7"/>
+					</EasingDoubleKeyFrame.EasingFunction>
+				</EasingDoubleKeyFrame>
+			</DoubleAnimationUsingKeyFrames>
+			<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.Y)" Storyboard.TargetName="motoLogoTransparent">
+				<EasingDoubleKeyFrame KeyTime="0" Value="137.917">
+					<EasingDoubleKeyFrame.EasingFunction>
+						<ExponentialEase EasingMode="EaseOut" Exponent="7"/>
+					</EasingDoubleKeyFrame.EasingFunction>
+				</EasingDoubleKeyFrame>
+				<EasingDoubleKeyFrame KeyTime="0:0:1" Value="45">
+					<EasingDoubleKeyFrame.EasingFunction>
+						<ExponentialEase EasingMode="EaseOut" Exponent="7"/>
+					</EasingDoubleKeyFrame.EasingFunction>
+				</EasingDoubleKeyFrame>
+			</DoubleAnimationUsingKeyFrames>
+			<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="motoLogoTransparent">
+				<EasingDoubleKeyFrame KeyTime="0" Value="0.25"/>
+				<EasingDoubleKeyFrame KeyTime="0:0:1" Value="1"/>
+			</DoubleAnimationUsingKeyFrames>
+			<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleX)" Storyboard.TargetName="motoLogoTransparent">
+				<EasingDoubleKeyFrame KeyTime="0" Value="0.7">
+					<EasingDoubleKeyFrame.EasingFunction>
+						<ExponentialEase EasingMode="EaseOut" Exponent="7"/>
+					</EasingDoubleKeyFrame.EasingFunction>
+				</EasingDoubleKeyFrame>
+				<EasingDoubleKeyFrame KeyTime="0:0:1" Value="0.7">
+					<EasingDoubleKeyFrame.EasingFunction>
+						<ExponentialEase EasingMode="EaseOut" Exponent="7"/>
+					</EasingDoubleKeyFrame.EasingFunction>
+				</EasingDoubleKeyFrame>
+			</DoubleAnimationUsingKeyFrames>
+			<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(ScaleTransform.ScaleY)" Storyboard.TargetName="motoLogoTransparent">
+				<EasingDoubleKeyFrame KeyTime="0" Value="0.7">
+					<EasingDoubleKeyFrame.EasingFunction>
+						<ExponentialEase EasingMode="EaseOut" Exponent="7"/>
+					</EasingDoubleKeyFrame.EasingFunction>
+				</EasingDoubleKeyFrame>
+				<EasingDoubleKeyFrame KeyTime="0:0:1" Value="0.7">
+					<EasingDoubleKeyFrame.EasingFunction>
+						<ExponentialEase EasingMode="EaseOut" Exponent="7"/>
+					</EasingDoubleKeyFrame.EasingFunction>
+				</EasingDoubleKeyFrame>
+			</DoubleAnimationUsingKeyFrames>
+		</Storyboard>
+		<Storyboard x:Key="loadingMic" RepeatBehavior="1x" x:Name="loadingMic">
+			<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)" Storyboard.TargetName="image">
+				<EasingDoubleKeyFrame KeyTime="0" Value="-11"/>
+				<EasingDoubleKeyFrame KeyTime="0:0:4" Value="-11">
+					<EasingDoubleKeyFrame.EasingFunction>
+						<BackEase EasingMode="EaseIn" Amplitude="2"/>
+					</EasingDoubleKeyFrame.EasingFunction>
+				</EasingDoubleKeyFrame>
+			</DoubleAnimationUsingKeyFrames>
+			<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.Y)" Storyboard.TargetName="image">
+				<EasingDoubleKeyFrame KeyTime="0" Value="-8"/>
+				<EasingDoubleKeyFrame KeyTime="0:0:4" Value="-8">
+					<EasingDoubleKeyFrame.EasingFunction>
+						<BackEase EasingMode="EaseIn" Amplitude="2"/>
+					</EasingDoubleKeyFrame.EasingFunction>
+				</EasingDoubleKeyFrame>
+			</DoubleAnimationUsingKeyFrames>
+			<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="image">
+				<EasingDoubleKeyFrame KeyTime="0" Value="0.495"/>
+				<EasingDoubleKeyFrame KeyTime="0:0:4" Value="0">
+					<EasingDoubleKeyFrame.EasingFunction>
+						<BackEase EasingMode="EaseIn" Amplitude="2"/>
+					</EasingDoubleKeyFrame.EasingFunction>
+				</EasingDoubleKeyFrame>
+			</DoubleAnimationUsingKeyFrames>
+		</Storyboard>
+		<Storyboard x:Key="loadInstrumentAnim">
+			<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[2].(RotateTransform.Angle)" Storyboard.TargetName="imgInstrumentLoader">
+				<EasingDoubleKeyFrame KeyTime="0" Value="0"/>
+				<EasingDoubleKeyFrame KeyTime="0:0:3" Value="360">
+					<EasingDoubleKeyFrame.EasingFunction>
+						<ExponentialEase EasingMode="EaseInOut" Exponent="5"/>
+					</EasingDoubleKeyFrame.EasingFunction>
+				</EasingDoubleKeyFrame>
+			</DoubleAnimationUsingKeyFrames>
+		</Storyboard>
+		<Storyboard x:Key="loadWallOfSoundAnim">
+			<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[2].(RotateTransform.Angle)" Storyboard.TargetName="imgWallOfSoundLoader">
+				<EasingDoubleKeyFrame KeyTime="0" Value="0"/>
+				<EasingDoubleKeyFrame KeyTime="0:0:3" Value="360">
+					<EasingDoubleKeyFrame.EasingFunction>
+						<ExponentialEase EasingMode="EaseInOut" Exponent="5"/>
+					</EasingDoubleKeyFrame.EasingFunction>
+				</EasingDoubleKeyFrame>
+			</DoubleAnimationUsingKeyFrames>
+		</Storyboard>
+	</Page.Resources>
+	<Page.Triggers>
+		<EventTrigger RoutedEvent="FrameworkElement.Loaded">
+			<BeginStoryboard Storyboard="{StaticResource OnLoaded1}"/>
+		</EventTrigger>
+	</Page.Triggers>
+
+    <Canvas Name="MainCanvas">
+        <Image Canvas.Left="0" Canvas.Top="0" Height="480" Name="startScreenUserImage" Stretch="Fill" Width="640" />
+        <Label Canvas.Left="28" Canvas.Top="36" Content="Hold out left arm to" Height="45" Name="lblHoldOutLeftHand" FontSize="26" Background="White" Visibility="Hidden" />
+        <Label Background="White" Canvas.Left="28" Canvas.Top="72" Content="play an instrument" FontSize="26" Height="45" Name="lblPlayInstrument" FontWeight="Bold" Visibility="Hidden" />
+        <Image Canvas.Left="11" Canvas.Top="209.667" Name="motoLogoTransparent" RenderOptions.BitmapScalingMode="HighQuality" Stretch="Fill" Source="/Moto;component/images/moto-transparent.png" RenderTransformOrigin="0.5,0.5" OpacityMask="{x:Null}" Height="311.956" Width="575.92" >
+        	<Image.RenderTransform>
+        		<TransformGroup>
+        			<ScaleTransform/>
+        			<SkewTransform/>
+        			<RotateTransform/>
+        			<TranslateTransform/>
+        		</TransformGroup>
+        	</Image.RenderTransform>
+        </Image>
+        <Image Canvas.Left="12" Canvas.Top="412" Height="56" Name="imgMicrophone" Stretch="Fill" Width="44" Source="/Moto;component/images/microphone.png" Visibility="Hidden" />
+        <Label Background="White" Canvas.Left="200" Canvas.Top="36" Content="Moto can't see you!" FontSize="26" Height="45" Name="lblMotoNoPlayer" />
+        <TextBlock Canvas.Left="200" Canvas.Top="179" Height="104" Name="txtVoiceCommandAlert" Text="" Width="221" Background="White" FontSize="20" FontWeight="Bold" Padding="10" TextAlignment="Center" Visibility="Hidden" />
+        <Image x:Name="image" Height="53" Canvas.Left="26" Source="/Moto;component/images/microphone-notloaded.png" Stretch="Fill" Canvas.Top="420" Width="45" RenderTransformOrigin="0.5,0.5" Opacity="0">
+        	<Image.RenderTransform>
+        		<TransformGroup>
+        			<ScaleTransform/>
+        			<SkewTransform/>
+        			<RotateTransform/>
+        			<TranslateTransform/>
+        		</TransformGroup>
+        	</Image.RenderTransform>
+        </Image>
+        <Label Background="White" Canvas.Left="360" Canvas.Top="36" Content="Hold out right arm to" FontSize="26" Height="45" Name="lblHoldOutRightHand" Visibility="Hidden" />
+        <Label Background="White" Canvas.Left="375" Canvas.Top="72" Content="play Wall of Sound" FontSize="26" FontWeight="Bold" Height="45" Name="lblPlayWallOfSound" Visibility="Hidden" />
+        <Image x:Name="imgInstrumentLoader" Height="98" Canvas.Left="98" Source="images/loading.png" RenderOptions.BitmapScalingMode="HighQuality" Stretch="Fill" Canvas.Top="99" Width="98" RenderTransformOrigin="0.5,0.5" Visibility="Hidden">
+        	<Image.RenderTransform>
+        		<TransformGroup>
+        			<ScaleTransform/>
+        			<SkewTransform/>
+        			<RotateTransform/>
+        			<TranslateTransform/>
+        		</TransformGroup>
+        	</Image.RenderTransform>
+        </Image>
+        <Image x:Name="imgWallOfSoundLoader" Height="98" Canvas.Left="446" Source="images/loading.png" RenderOptions.BitmapScalingMode="HighQuality" Stretch="Fill" Canvas.Top="99" Width="98" RenderTransformOrigin="0.5,0.5" Visibility="Hidden">
+        	<Image.RenderTransform>
+        		<TransformGroup>
+        			<ScaleTransform/>
+        			<SkewTransform/>
+        			<RotateTransform/>
+        			<TranslateTransform/>
+        		</TransformGroup>
+        	</Image.RenderTransform>
+        </Image>
+    </Canvas>
+</Page>
