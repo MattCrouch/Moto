@@ -149,7 +149,7 @@ namespace Moto
                 //MessageBox.Show(Convert.ToString(difference["X"]));
                 if (handMovements.difference[skeleton.TrackingId][joint].Y < -0.01)
                 {
-                    mpDictionary[(mpCounter % 4)].Open(new Uri(drumName + ".wav", UriKind.Relative));
+                    mpDictionary[(mpCounter % 4)].Open(new Uri("audio/drums/" + drumName + ".wav", UriKind.Relative));
                     mpDictionary[(mpCounter % 4)].Play();
 
                     mpCounter++;

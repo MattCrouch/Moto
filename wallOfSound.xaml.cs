@@ -80,8 +80,8 @@ namespace Moto
 
         private void defaultWallAudio()
         {
-            wallAudio[0] = "audio/buyit.wav";
-            wallAudio[1] = "audio/useit.wav";
+            wallAudio[0] = "audio/wall/technologic/buyit.wav";
+            wallAudio[1] = "audio/wall/technologic/useit.wav";
         }
 
         Dictionary<JointType, Dictionary<int, bool>> createPlayerDictionary()

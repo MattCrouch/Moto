@@ -126,19 +126,19 @@ namespace Moto
         {
             if (neckDist > 0.7)
             {
-                mp.Open(new Uri("guitar1.wav", UriKind.Relative));
+                mp.Open(new Uri("audio/guitar/guitar1.wav", UriKind.Relative));
             }
             else if (neckDist > 0.55)
             {
-                mp.Open(new Uri("guitar2.wav", UriKind.Relative));
+                mp.Open(new Uri("audio/guitar/guitar2.wav", UriKind.Relative));
             }
             else if (neckDist > 0.4)
             {
-                mp.Open(new Uri("guitar3.wav", UriKind.Relative));
+                mp.Open(new Uri("audio/guitar/guitar3.wav", UriKind.Relative));
             }
             else
             {
-                mp.Open(new Uri("guitar4.wav", UriKind.Relative));
+                mp.Open(new Uri("audio/guitar/guitar4.wav", UriKind.Relative));
             }
 
             mp.Play();

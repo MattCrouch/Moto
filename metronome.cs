@@ -25,7 +25,7 @@ namespace Moto
 
         static long timePile = 0;
 
-        static SoundPlayer metronomeTick = new SoundPlayer("metronome-tick.wav");
+        static SoundPlayer metronomeTick = new SoundPlayer("audio/metronome-tick.wav");
 
         public static void setupMetronome() {
             beatTimer = new Stopwatch();
