@@ -86,7 +86,6 @@ namespace Moto
 
         Dictionary<JointType, Dictionary<int, bool>> createPlayerDictionary()
         {
-            Console.WriteLine("Player dictionary created");
             Dictionary<JointType, Dictionary<int, bool>> dictionary = new Dictionary<JointType, Dictionary<int, bool>>();
 
             dictionary.Add(JointType.HandLeft, new Dictionary<int, bool>());
