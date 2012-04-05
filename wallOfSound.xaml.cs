@@ -68,6 +68,11 @@ namespace Moto
                 blankDefinitions.Add(0,new MainWindow.HitBox());
                 blankDefinitions.Add(1,new MainWindow.HitBox());
                 blankDefinitions.Add(2, new MainWindow.HitBox());
+                blankDefinitions.Add(3, new MainWindow.HitBox());
+                blankDefinitions.Add(4, new MainWindow.HitBox());
+                blankDefinitions.Add(5, new MainWindow.HitBox());
+                blankDefinitions.Add(6, new MainWindow.HitBox());
+                blankDefinitions.Add(7, new MainWindow.HitBox());
 
                 hitArea.Add(player.skeleton.TrackingId, blankDefinitions);
 
@@ -82,6 +87,12 @@ namespace Moto
         {
             wallAudio[0] = "audio/wall/technologic/buyit.wav";
             wallAudio[1] = "audio/wall/technologic/useit.wav";
+            wallAudio[2] = "audio/wall/technologic/breakit.wav";
+            wallAudio[3] = "audio/wall/technologic/fixit.wav";
+            wallAudio[4] = "audio/wall/technologic/trashit.wav";
+            wallAudio[5] = "audio/wall/technologic/changeit.wav";
+            wallAudio[6] = "audio/wall/technologic/mail.wav";
+            wallAudio[7] = "audio/wall/technologic/upgradeit.wav";
         }
 
         Dictionary<JointType, Dictionary<int, bool>> createPlayerDictionary()
@@ -104,23 +115,71 @@ namespace Moto
         {
             if (player.skeleton != null)
             {
-                double boxSize = 0.25; //Size of drum edges (in metres)
+                double boxSize = 0.2; //Size of drum edges (in metres)
 
-                //First drum
-                hitArea[player.skeleton.TrackingId][0].X1 = player.skeleton.Joints[JointType.HipCenter].Position.X - 0.2228546;
+                //First box
+                hitArea[player.skeleton.TrackingId][0].X1 = player.skeleton.Joints[JointType.HipCenter].Position.X - 0.4532758;
                 hitArea[player.skeleton.TrackingId][0].X2 = hitArea[player.skeleton.TrackingId][0].X1 + boxSize;
-                hitArea[player.skeleton.TrackingId][0].Y1 = player.skeleton.Joints[JointType.HipCenter].Position.Y - 0.36289116;
+                hitArea[player.skeleton.TrackingId][0].Y1 = player.skeleton.Joints[JointType.HipCenter].Position.Y + 0.36289116;
                 hitArea[player.skeleton.TrackingId][0].Y2 = hitArea[player.skeleton.TrackingId][0].Y1 + boxSize;
-                hitArea[player.skeleton.TrackingId][0].Z1 = player.skeleton.Joints[JointType.HipCenter].Position.Z - 0.1224589;
+                hitArea[player.skeleton.TrackingId][0].Z1 = player.skeleton.Joints[JointType.HipCenter].Position.Z - 0.5014166;
                 hitArea[player.skeleton.TrackingId][0].Z2 = hitArea[player.skeleton.TrackingId][0].Z1 + boxSize;
 
-                //Second drum
-                hitArea[player.skeleton.TrackingId][1].X1 = player.skeleton.Joints[JointType.HipCenter].Position.X + 0.2029613;
+                //Second box
+                hitArea[player.skeleton.TrackingId][1].X1 = player.skeleton.Joints[JointType.HipCenter].Position.X - 0.2032758;
                 hitArea[player.skeleton.TrackingId][1].X2 = hitArea[player.skeleton.TrackingId][1].X1 + boxSize;
-                hitArea[player.skeleton.TrackingId][1].Y1 = player.skeleton.Joints[JointType.HipCenter].Position.Y - 0.36289116;
+                hitArea[player.skeleton.TrackingId][1].Y1 = player.skeleton.Joints[JointType.HipCenter].Position.Y + 0.36289116;
                 hitArea[player.skeleton.TrackingId][1].Y2 = hitArea[player.skeleton.TrackingId][1].Y1 + boxSize;
-                hitArea[player.skeleton.TrackingId][1].Z1 = player.skeleton.Joints[JointType.HipCenter].Position.Z - 0.1224589;
+                hitArea[player.skeleton.TrackingId][1].Z1 = player.skeleton.Joints[JointType.HipCenter].Position.Z - 0.5014166;
                 hitArea[player.skeleton.TrackingId][1].Z2 = hitArea[player.skeleton.TrackingId][1].Z1 + boxSize;
+
+                //Third box
+                hitArea[player.skeleton.TrackingId][2].X1 = player.skeleton.Joints[JointType.HipCenter].Position.X - 0.0532758;
+                hitArea[player.skeleton.TrackingId][2].X2 = hitArea[player.skeleton.TrackingId][2].X1 + boxSize;
+                hitArea[player.skeleton.TrackingId][2].Y1 = player.skeleton.Joints[JointType.HipCenter].Position.Y + 0.36289116;
+                hitArea[player.skeleton.TrackingId][2].Y2 = hitArea[player.skeleton.TrackingId][2].Y1 + boxSize;
+                hitArea[player.skeleton.TrackingId][2].Z1 = player.skeleton.Joints[JointType.HipCenter].Position.Z - 0.4014166;
+                hitArea[player.skeleton.TrackingId][2].Z2 = hitArea[player.skeleton.TrackingId][2].Z1 + boxSize;
+
+                //Fourth box
+                hitArea[player.skeleton.TrackingId][3].X1 = player.skeleton.Joints[JointType.HipCenter].Position.X + 0.3032758;
+                hitArea[player.skeleton.TrackingId][3].X2 = hitArea[player.skeleton.TrackingId][3].X1 + boxSize;
+                hitArea[player.skeleton.TrackingId][3].Y1 = player.skeleton.Joints[JointType.HipCenter].Position.Y + 0.36289116;
+                hitArea[player.skeleton.TrackingId][3].Y2 = hitArea[player.skeleton.TrackingId][3].Y1 + boxSize;
+                hitArea[player.skeleton.TrackingId][3].Z1 = player.skeleton.Joints[JointType.HipCenter].Position.Z - 0.5014166;
+                hitArea[player.skeleton.TrackingId][3].Z2 = hitArea[player.skeleton.TrackingId][3].Z1 + boxSize;
+
+                //Fifth box
+                hitArea[player.skeleton.TrackingId][4].X1 = player.skeleton.Joints[JointType.HipCenter].Position.X - 0.4532758;
+                hitArea[player.skeleton.TrackingId][4].X2 = hitArea[player.skeleton.TrackingId][4].X1 + boxSize;
+                hitArea[player.skeleton.TrackingId][4].Y1 = player.skeleton.Joints[JointType.HipCenter].Position.Y + 0.11289116;
+                hitArea[player.skeleton.TrackingId][4].Y2 = hitArea[player.skeleton.TrackingId][4].Y1 + boxSize;
+                hitArea[player.skeleton.TrackingId][4].Z1 = player.skeleton.Joints[JointType.HipCenter].Position.Z - 0.5014166;
+                hitArea[player.skeleton.TrackingId][4].Z2 = hitArea[player.skeleton.TrackingId][4].Z1 + boxSize;
+
+                //Sixth box
+                hitArea[player.skeleton.TrackingId][5].X1 = player.skeleton.Joints[JointType.HipCenter].Position.X - 0.2032758;
+                hitArea[player.skeleton.TrackingId][5].X2 = hitArea[player.skeleton.TrackingId][5].X1 + boxSize;
+                hitArea[player.skeleton.TrackingId][5].Y1 = player.skeleton.Joints[JointType.HipCenter].Position.Y + 0.11289116;
+                hitArea[player.skeleton.TrackingId][5].Y2 = hitArea[player.skeleton.TrackingId][5].Y1 + boxSize;
+                hitArea[player.skeleton.TrackingId][5].Z1 = player.skeleton.Joints[JointType.HipCenter].Position.Z - 0.5014166;
+                hitArea[player.skeleton.TrackingId][5].Z2 = hitArea[player.skeleton.TrackingId][5].Z1 + boxSize;
+
+                //Seventh box
+                hitArea[player.skeleton.TrackingId][6].X1 = player.skeleton.Joints[JointType.HipCenter].Position.X - 0.0532758;
+                hitArea[player.skeleton.TrackingId][6].X2 = hitArea[player.skeleton.TrackingId][6].X1 + boxSize;
+                hitArea[player.skeleton.TrackingId][6].Y1 = player.skeleton.Joints[JointType.HipCenter].Position.Y + 0.11289116;
+                hitArea[player.skeleton.TrackingId][6].Y2 = hitArea[player.skeleton.TrackingId][6].Y1 + boxSize;
+                hitArea[player.skeleton.TrackingId][6].Z1 = player.skeleton.Joints[JointType.HipCenter].Position.Z - 0.5014166;
+                hitArea[player.skeleton.TrackingId][6].Z2 = hitArea[player.skeleton.TrackingId][6].Z1 + boxSize;
+
+                //Eighth box
+                hitArea[player.skeleton.TrackingId][7].X1 = player.skeleton.Joints[JointType.HipCenter].Position.X + 0.3032758;
+                hitArea[player.skeleton.TrackingId][7].X2 = hitArea[player.skeleton.TrackingId][7].X1 + boxSize;
+                hitArea[player.skeleton.TrackingId][7].Y1 = player.skeleton.Joints[JointType.HipCenter].Position.Y + 0.11289116;
+                hitArea[player.skeleton.TrackingId][7].Y2 = hitArea[player.skeleton.TrackingId][7].Y1 + boxSize;
+                hitArea[player.skeleton.TrackingId][7].Z1 = player.skeleton.Joints[JointType.HipCenter].Position.Z - 0.5014166;
+                hitArea[player.skeleton.TrackingId][7].Z2 = hitArea[player.skeleton.TrackingId][7].Z1 + boxSize;
             }
         }
 
@@ -135,7 +194,7 @@ namespace Moto
                 double posY = skeleton.Joints[joint].Position.Y;
                 double posZ = skeleton.Joints[joint].Position.Z;
 
-                for (int i = 0; i <= 2; i++)
+                for (int i = 0; i <= hitArea[skeleton.TrackingId].Count-1; i++)
                 {
                     if (hitArea[skeleton.TrackingId][i].X1 < posX && hitArea[skeleton.TrackingId][i].X2 > posX && hitArea[skeleton.TrackingId][i].Y1 < posY && hitArea[skeleton.TrackingId][i].Y2 > posY && hitArea[skeleton.TrackingId][i].Z1 < posZ && hitArea[skeleton.TrackingId][i].Z2 > posZ)
                     {
@@ -158,7 +217,7 @@ namespace Moto
         {
             if (handMovements.difference != null)
             {
-                if (handMovements.difference[skeleton.TrackingId][joint].Y < -0.01)
+                if (handMovements.difference[skeleton.TrackingId][joint].Z < -0.01)
                 {
                     mpDictionary[(mpCounter % 4)].Open(new Uri(wallAudio[i], UriKind.Relative));
                     mpDictionary[(mpCounter % 4)].Play();
@@ -375,8 +434,13 @@ namespace Moto
         {
             switch (e.Verb)
             {
-                case SpeechRecognizer.Verbs.DrumsSwitch:
-                    //Do something
+                case SpeechRecognizer.Verbs.Capture:
+                    //Take a picture
+                    startCaptureAnim();
+                    break;
+                case SpeechRecognizer.Verbs.ReturnToStart:
+                    //Back to StartScreen
+                    returnToStart();
                     break;
             }
         }
@@ -476,9 +540,9 @@ namespace Moto
 
         private void btnCaptureImage_Click(object sender, RoutedEventArgs e)
         {
-            startCaptureAnim();
             //MainWindow.sensor.ColorStream.Enable(ColorImageFormat.RgbResolution1280x960Fps12);
             //MainWindow.sensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(sensor_resetResolution);
+            startCaptureAnim();
         }
 
         private void startCaptureAnim()
