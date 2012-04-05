@@ -454,7 +454,16 @@ namespace Moto
 
                 if (MainWindow.activeSkeletons.Count > 0)
                 {
+                    int tempKey = MainWindow.primarySkeletonKey;
                     MainWindow.primarySkeletonKey = MainWindow.selectPrimarySkeleton(MainWindow.activeSkeletons);
+
+                    alignPrimaryGlow(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
+
+                    if (tempKey != MainWindow.primarySkeletonKey)
+                    {
+                        //Primary Skeleton changed
+                        highlightPrimarySkeleton(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
+                    }
                 }
 
                 if (skeletonList.Count < MainWindow.activeSkeletons.Count) {
@@ -489,6 +498,24 @@ namespace Moto
                     handMovements.listenForGestures(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton);
                 }
             }
+        }
+
+        private void alignPrimaryGlow(MainWindow.Player player)
+        {
+            ColorImagePoint leftPoint = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Joints[JointType.HandLeft].Position, ColorImageFormat.RgbResolution640x480Fps30);
+            ColorImagePoint rightPoint = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Joints[JointType.HandRight].Position, ColorImageFormat.RgbResolution640x480Fps30);
+
+            Canvas.SetLeft(imgPrimaryGlowLeft, leftPoint.X - (imgPrimaryGlowLeft.Width / 2));
+            Canvas.SetTop(imgPrimaryGlowLeft, leftPoint.Y - (imgPrimaryGlowLeft.Height / 2));
+
+            Canvas.SetLeft(imgPrimaryGlowRight, rightPoint.X - (imgPrimaryGlowRight.Width / 2));
+            Canvas.SetTop(imgPrimaryGlowRight, rightPoint.Y - (imgPrimaryGlowRight.Height / 2));
+        }
+
+        private void highlightPrimarySkeleton(MainWindow.Player player)
+        {
+            Storyboard sb = this.FindResource("primaryGlow") as Storyboard;
+            sb.Begin();
         }
 
         private void manageInstrumentImage(MainWindow.Player player, instrumentList instrument)
