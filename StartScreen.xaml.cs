@@ -61,12 +61,11 @@ namespace Moto
 
         void handMovements_RightGesture(object sender, handMovements.GestureEventArgs e)
         {
-            Storyboard sb = this.FindResource("loadWallOfSoundAnim") as Storyboard;
+            Storyboard sb = this.FindResource("selectWallOfSound") as Storyboard;
             switch (e.Trigger)
             {
                 case handMovements.UserDecisions.Triggered:
                     selectedMode = modeSelected.WallOfSound;
-                    imgWallOfSoundLoader.Visibility = Visibility.Visible;
                     modeDecision = new DispatcherTimer();
                     modeDecision.Interval = TimeSpan.FromSeconds(3);
                     modeDecision.Start();
@@ -85,7 +84,6 @@ namespace Moto
                         modeDecision.Tick -= new EventHandler(modeDecisionWOS_Tick);
                         modeDecision = null;
                     }
-                    imgWallOfSoundLoader.Visibility = Visibility.Hidden;
                     break;
             }
         }
@@ -107,12 +105,11 @@ namespace Moto
 
         void handMovements_LeftGesture(object sender, handMovements.GestureEventArgs e)
         {
-            Storyboard sb = this.FindResource("loadInstrumentAnim") as Storyboard;
+            Storyboard sb = this.FindResource("selectInstrument") as Storyboard;
             switch (e.Trigger)
             {
                 case handMovements.UserDecisions.Triggered:
                     selectedMode = modeSelected.Instrument;
-                    imgInstrumentLoader.Visibility = Visibility.Visible;
                     modeDecision = new DispatcherTimer();
                     modeDecision.Interval = TimeSpan.FromSeconds(3);
                     modeDecision.Start();
@@ -131,7 +128,6 @@ namespace Moto
                         modeDecision.Tick -= new EventHandler(modeDecisionI_Tick);
                         modeDecision = null;
                     }
-                    imgInstrumentLoader.Visibility = Visibility.Hidden;
                     break;
             }
         }
@@ -218,9 +214,6 @@ namespace Moto
 
                     alignPrimaryGlow(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
 
-                    setLoadingRing(imgWallOfSoundLoader, MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandRight]);
-                    setLoadingRing(imgInstrumentLoader, MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandLeft]);
-
                     if (tempKey != MainWindow.primarySkeletonKey)
                     {
                         //Primary Skeleton changed
@@ -306,19 +299,16 @@ namespace Moto
 
                 lblHoldOutRightHand.Visibility = Visibility.Visible;
                 lblPlayWallOfSound.Visibility = Visibility.Visible;
-
-                setLoadingRing(imgWallOfSoundLoader,MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandRight]);
-                setLoadingRing(imgInstrumentLoader, MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandLeft]);
             }
             else
             {
                 imgStepInToPlay.Visibility = Visibility.Visible;
 
-                imgInstrumentLoader.Visibility = Visibility.Hidden;
+                //imgInstrumentLoader.Visibility = Visibility.Hidden;
                 lblHoldOutLeftHand.Visibility = Visibility.Hidden;
                 lblPlayInstrument.Visibility = Visibility.Hidden;
 
-                imgWallOfSoundLoader.Visibility = Visibility.Hidden;
+                //imgWallOfSoundLoader.Visibility = Visibility.Hidden;
                 lblHoldOutRightHand.Visibility = Visibility.Hidden;
                 lblPlayWallOfSound.Visibility = Visibility.Hidden;
             }
