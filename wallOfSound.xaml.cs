@@ -388,9 +388,9 @@ namespace Moto
             player.instrument = instrument.instrumentList.WallOfSound;
             
             Image image = new Image();
-            image.Source = new BitmapImage(new Uri("images/wosplaceholder.png", UriKind.Relative));
-            image.Height = 100;
-            image.Width = 100;
+            image.Source = new BitmapImage(new Uri("images/wall-sample.png", UriKind.Relative));
+            image.Height = 250;
+            image.Width = 250;
 
             MainCanvas.Children.Add(image);
 
@@ -413,7 +413,7 @@ namespace Moto
         private void setWallPosition(MainWindow.Player player) {
             FrameworkElement image = player.instrumentImage;
 
-            ColorImagePoint point = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Position, ColorImageFormat.RgbResolution640x480Fps30);
+            ColorImagePoint point = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Joints[JointType.Spine].Position, ColorImageFormat.RgbResolution640x480Fps30);
 
             //Grab the image reference and move it to the correct place
             Canvas.SetLeft(image, point.X - (image.Width / 2));

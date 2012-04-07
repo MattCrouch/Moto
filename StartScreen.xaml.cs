@@ -203,6 +203,10 @@ namespace Moto
                         if (!MainWindow.activeSkeletons.ContainsKey(aSkeleton.TrackingId))
                         {
                             MainWindow.playerAdded(aSkeleton);
+                            if (MainWindow.activeSkeletons.Count == 1)
+                            {
+                                playerVisibleChange(true);
+                            }
                         }
                     }
                 }
@@ -213,6 +217,9 @@ namespace Moto
                     MainWindow.primarySkeletonKey = MainWindow.selectPrimarySkeleton(MainWindow.activeSkeletons);
 
                     alignPrimaryGlow(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
+
+                    setLoadingRing(imgWallOfSoundLoader, MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandRight]);
+                    setLoadingRing(imgInstrumentLoader, MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandLeft]);
 
                     if (tempKey != MainWindow.primarySkeletonKey)
                     {
@@ -240,6 +247,11 @@ namespace Moto
                         MainWindow.playerRemoved(activeList[i]);
                     }
 
+                    if (MainWindow.activeSkeletons.Count <= 0)
+                    {
+                        playerVisibleChange(false);
+                    }
+
                     activeList = null;
                 }
 
@@ -250,7 +262,7 @@ namespace Moto
                     handMovements.listenForGestures(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton);
                 }
 
-                screenVisibility();
+                //screenVisibility();
             }
         }
 
@@ -265,11 +277,28 @@ namespace Moto
             }
         }
 
+        private void playerVisibleChange(bool visible)
+        {
+            if (visible)
+            {
+                //There wasn't someone visible, now there is
+                Storyboard sb = this.FindResource("stepUpToPlay") as Storyboard;
+                sb.AutoReverse = true;
+                sb.Begin();
+                sb.Seek(new TimeSpan(0, 0, 0), TimeSeekOrigin.Duration);
+            } else {
+                //There is now nobody visible
+                Storyboard sb = this.FindResource("stepUpToPlay") as Storyboard;
+                sb.AutoReverse = false;
+                sb.Begin();
+            }
+        }
+
         private void screenVisibility()
         {
             if (MainWindow.activeSkeletons.Count > 0)
             {
-                lblMotoNoPlayer.Visibility = Visibility.Hidden;
+                imgStepInToPlay.Visibility = Visibility.Hidden;
 
                 //drumSlider.Visibility = Visibility.Visible;
                 lblHoldOutLeftHand.Visibility = Visibility.Visible;
@@ -283,7 +312,7 @@ namespace Moto
             }
             else
             {
-                lblMotoNoPlayer.Visibility = Visibility.Visible;
+                imgStepInToPlay.Visibility = Visibility.Visible;
 
                 imgInstrumentLoader.Visibility = Visibility.Hidden;
                 lblHoldOutLeftHand.Visibility = Visibility.Hidden;
@@ -297,14 +326,17 @@ namespace Moto
 
         private void alignPrimaryGlow(MainWindow.Player player)
         {
-            ColorImagePoint leftPoint = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Joints[JointType.HandLeft].Position, ColorImageFormat.RgbResolution640x480Fps30);
-            ColorImagePoint rightPoint = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Joints[JointType.HandRight].Position, ColorImageFormat.RgbResolution640x480Fps30);
+            if (MainWindow.sensor.IsRunning)
+            {
+                ColorImagePoint leftPoint = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Joints[JointType.HandLeft].Position, ColorImageFormat.RgbResolution640x480Fps30);
+                ColorImagePoint rightPoint = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Joints[JointType.HandRight].Position, ColorImageFormat.RgbResolution640x480Fps30);
 
-            Canvas.SetLeft(imgPrimaryGlowLeft, leftPoint.X - (imgPrimaryGlowLeft.Width / 2));
-            Canvas.SetTop(imgPrimaryGlowLeft, leftPoint.Y - (imgPrimaryGlowLeft.Height / 2));
+                Canvas.SetLeft(imgPrimaryGlowLeft, leftPoint.X - (imgPrimaryGlowLeft.Width / 2));
+                Canvas.SetTop(imgPrimaryGlowLeft, leftPoint.Y - (imgPrimaryGlowLeft.Height / 2));
 
-            Canvas.SetLeft(imgPrimaryGlowRight, rightPoint.X - (imgPrimaryGlowRight.Width / 2));
-            Canvas.SetTop(imgPrimaryGlowRight, rightPoint.Y - (imgPrimaryGlowRight.Height / 2));
+                Canvas.SetLeft(imgPrimaryGlowRight, rightPoint.X - (imgPrimaryGlowRight.Width / 2));
+                Canvas.SetTop(imgPrimaryGlowRight, rightPoint.Y - (imgPrimaryGlowRight.Height / 2));
+            }
         }
 
         private void highlightPrimarySkeleton(MainWindow.Player player)

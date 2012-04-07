@@ -143,7 +143,7 @@
         </Image>
 
         <Button Canvas.Left="12" Canvas.Top="445" Content="Capture" Height="23" Name="btnCaptureImage" Width="75" Click="btnCaptureImage_Click" />
-        <Label Canvas.Left="166" Canvas.Top="434" Content="Label" Height="34" Name="coordReadout" Width="304" FontWeight="Bold" FontSize="16" Background="White" />
+        <Label Canvas.Left="166" Canvas.Top="434" Content="Label" Height="34" Name="coordReadout" Width="304" FontWeight="Bold" FontSize="16" Background="White" FontFamily="La chata" />
         <Button Canvas.Left="553" Canvas.Top="445" Content="Go Back" Height="23" Name="btnBackFromDrums" Width="75" Click="btnBackFromDrums_Click" />
         <Image x:Name="imgPrimaryGlowLeft" Height="76" Source="images/glowing-point.png" Stretch="Fill" Width="76" Visibility="Hidden" />
         <Image x:Name="imgPrimaryGlowRight" Height="76" Source="images/glowing-point.png" Stretch="Fill" Width="76" Visibility="Hidden" />

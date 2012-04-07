@@ -174,12 +174,6 @@
 	</Page.Resources>
 
     <Canvas Name="MainCanvas">
-        <MediaElement x:Name="drum0sound"
-       Source="drum0.wav"
-       LoadedBehavior="Manual" />
-        <MediaElement x:Name="drum1sound"
-       Source="drum1.wav"
-       LoadedBehavior="Manual" />
         <Image Canvas.Left="0" Canvas.Top="0" Height="480" Name="userImage" Stretch="Fill" Width="640" />
         <Image Canvas.Left="0" Canvas.Top="0" Height="480" Name="image1" Stretch="Fill" Width="640" Source="/Moto;component/images/screenoverlay.png" />
         <Image Canvas.Left="0" Canvas.Top="0" Height="120" Name="userDepth" Stretch="Fill" Width="160" RenderTransformOrigin="0.5,0.5" >
@@ -193,12 +187,8 @@
         	</Image.RenderTransform>
         </Image>
         <Button Canvas.Left="12" Canvas.Top="445" Content="Capture" Height="23" Name="btnCaptureImage" Width="75" Click="btnCaptureImage_Click" />
-        <Rectangle Canvas.Left="-56" Canvas.Top="116" Height="50" Name="drum1" Stroke="White" Width="50" Fill="#640000FF" />
         <Label Canvas.Left="166" Canvas.Top="434" Content="Label" Height="34" Name="coordReadout" Width="304" FontWeight="Bold" FontSize="16" Background="White" />
-        <Rectangle Canvas.Left="-56" Canvas.Top="56" Fill="#6400FF00" Height="50" Name="drum2" Stroke="White" Width="50" />
-        <Rectangle Canvas.Left="-56" Canvas.Top="0" Fill="#64FF0000" Height="50" Name="drum3" Stroke="White" Width="50" />
         <Button Canvas.Left="553" Canvas.Top="445" Content="Go Back" Height="23" Name="btnBackFromDrums" Width="75" Click="btnBackFromDrums_Click" />
-        <Rectangle Canvas.Left="-111" Canvas.Top="0" Fill="Black" Height="50" Name="strum1" Stroke="White" Width="50" />
         <Image x:Name="imgCamera" Height="101.739" Canvas.Left="252.478" Source="/Moto;component/images/camera-game.png" Stretch="Fill" Canvas.Top="157.261" Width="113.043" RenderTransformOrigin="0.5,0.5" Visibility="Hidden">
         	<Image.RenderTransform>
         		<TransformGroup>
