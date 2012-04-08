@@ -502,7 +502,11 @@ namespace Moto
         void instrumentSelectionTimer_Tick(object sender, EventArgs e)
         {
             destroyInstrumentSelectionTimer();
-            clearInstrumentRefs(MainWindow.activeSkeletons[MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.TrackingId]);
+            if (currentInstrumentSelection != instrumentSelectionOptions.Metronome)
+            {
+                clearInstrumentRefs(MainWindow.activeSkeletons[MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.TrackingId]);
+            }
+
             switch (currentInstrumentSelection)
             {
                 case instrumentSelectionOptions.Guitar:
@@ -519,6 +523,7 @@ namespace Moto
                     break;
                 case instrumentSelectionOptions.Metronome:
                     currentInstrumentSelection = instrumentSelectionOptions.Metronome;
+                    //switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.None);
                     metronome.setupMetronome();
                     MainWindow.sensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(listenForMetronome);
                     break;

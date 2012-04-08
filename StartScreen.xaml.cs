@@ -302,7 +302,7 @@ namespace Moto
                     voicePromptVisual(true, "Shut down?");
                     break;
                 case SpeechRecognizer.Verbs.Instrument:
-                    voicePromptVisual(true, "Play instruments?");
+                    voicePromptVisual(true, "Go to Band Mode?");
                     break;
                 case SpeechRecognizer.Verbs.WallOfSound:
                     voicePromptVisual(true, "Wall of Sound?");
