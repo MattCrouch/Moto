@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -43,6 +42,21 @@ namespace Moto
             this.Focus();
         }
 
+        //Image processing variables
+        short[] DepthPixelData = new short[MainWindow.sensor.DepthStream.FramePixelDataLength];
+
+        //Wall of Sound areas
+        Dictionary<int, Dictionary<int, MainWindow.HitBox>> hitArea = new Dictionary<int, Dictionary<int, MainWindow.HitBox>>();
+        Dictionary<int, Dictionary<JointType, Dictionary<int, bool>>> insideArea = new Dictionary<int, Dictionary<JointType, Dictionary<int, bool>>>();
+
+        //Wall audio
+        string[] wallAudio = new string[9];
+
+        //Audio dictionarys
+        Dictionary<int, MediaPlayer> mpDictionary = new Dictionary<int, MediaPlayer>();
+        int mpCounter = 0;
+
+        //Housekeeping
         private void processExistingSkeletons(Dictionary<int, MainWindow.Player> activeSkeletons)
         {
             foreach (var player in activeSkeletons)
@@ -52,21 +66,14 @@ namespace Moto
             }
         }
 
-        //Wall of Sound areas
-        Dictionary<int, Dictionary<int, MainWindow.HitBox>> hitArea = new Dictionary<int, Dictionary<int, MainWindow.HitBox>>();
-        Dictionary<int, Dictionary<JointType, Dictionary<int, bool>>> insideArea = new Dictionary<int, Dictionary<JointType, Dictionary<int, bool>>>();
-
-        //Wall audio
-        string[] wallAudio = new string[9];
-
         private void setupWall(MainWindow.Player player)
         {
             if (!hitArea.ContainsKey(player.skeleton.TrackingId))
             {
                 //Blank dictionary of the drums of one person
-                Dictionary<int,MainWindow.HitBox> blankDefinitions = new Dictionary<int,MainWindow.HitBox>();
-                blankDefinitions.Add(0,new MainWindow.HitBox());
-                blankDefinitions.Add(1,new MainWindow.HitBox());
+                Dictionary<int, MainWindow.HitBox> blankDefinitions = new Dictionary<int, MainWindow.HitBox>();
+                blankDefinitions.Add(0, new MainWindow.HitBox());
+                blankDefinitions.Add(1, new MainWindow.HitBox());
                 blankDefinitions.Add(2, new MainWindow.HitBox());
                 blankDefinitions.Add(3, new MainWindow.HitBox());
                 blankDefinitions.Add(4, new MainWindow.HitBox());
@@ -83,6 +90,12 @@ namespace Moto
             insideArea.Add(player.skeleton.TrackingId, createPlayerDictionary());
         }
 
+        private void setupVoice()
+        {
+            MainWindow.mySpeechRecognizer.SaidSomething += this.RecognizerSaidSomething;
+            MainWindow.mySpeechRecognizer.ListeningChanged += this.ListeningChanged;
+        }
+
         private void defaultWallAudio()
         {
             wallAudio[0] = "audio/wall/technologic/buyit.wav";
@@ -93,22 +106,6 @@ namespace Moto
             wallAudio[5] = "audio/wall/technologic/changeit.wav";
             wallAudio[6] = "audio/wall/technologic/mail.wav";
             wallAudio[7] = "audio/wall/technologic/upgradeit.wav";
-        }
-
-        Dictionary<JointType, Dictionary<int, bool>> createPlayerDictionary()
-        {
-            Dictionary<JointType, Dictionary<int, bool>> dictionary = new Dictionary<JointType, Dictionary<int, bool>>();
-
-            dictionary.Add(JointType.HandLeft, new Dictionary<int, bool>());
-            dictionary.Add(JointType.HandRight, new Dictionary<int, bool>());
-
-            dictionary[JointType.HandLeft].Add(0, false);
-            dictionary[JointType.HandLeft].Add(1, false);
-
-            dictionary[JointType.HandRight].Add(0, false);
-            dictionary[JointType.HandRight].Add(1, false);
-
-            return dictionary;
         }
 
         internal void defineHitAreas(MainWindow.Player player)
@@ -183,53 +180,21 @@ namespace Moto
             }
         }
 
-        internal void checkBoxHit(Skeleton skeleton, JointType joint)
+        Dictionary<JointType, Dictionary<int, bool>> createPlayerDictionary()
         {
-            //checkDrumHit code
-            //MessageBox.Show(Convert.ToString(hitAreaStart[0][1]));
-            if (skeleton != null)
-            {
+            Dictionary<JointType, Dictionary<int, bool>> dictionary = new Dictionary<JointType, Dictionary<int, bool>>();
 
-                double posX = skeleton.Joints[joint].Position.X;
-                double posY = skeleton.Joints[joint].Position.Y;
-                double posZ = skeleton.Joints[joint].Position.Z;
+            dictionary.Add(JointType.HandLeft, new Dictionary<int, bool>());
+            dictionary.Add(JointType.HandRight, new Dictionary<int, bool>());
 
-                for (int i = 0; i <= hitArea[skeleton.TrackingId].Count-1; i++)
-                {
-                    if (hitArea[skeleton.TrackingId][i].X1 < posX && hitArea[skeleton.TrackingId][i].X2 > posX && hitArea[skeleton.TrackingId][i].Y1 < posY && hitArea[skeleton.TrackingId][i].Y2 > posY && hitArea[skeleton.TrackingId][i].Z1 < posZ && hitArea[skeleton.TrackingId][i].Z2 > posZ)
-                    {
-                        if (!insideArea[skeleton.TrackingId][joint][i])
-                        {
-                            playWallSound(i, skeleton, joint);
-                            Console.WriteLine("HIT! " + i);
-                            insideArea[skeleton.TrackingId][joint][i] = true;
-                        }
-                    }
-                    else
-                    {
-                        insideArea[skeleton.TrackingId][joint][i] = false;
-                    }
-                }
-            }
+            dictionary[JointType.HandLeft].Add(0, false);
+            dictionary[JointType.HandLeft].Add(1, false);
+
+            dictionary[JointType.HandRight].Add(0, false);
+            dictionary[JointType.HandRight].Add(1, false);
+
+            return dictionary;
         }
-
-        private void playWallSound(int i, Skeleton skeleton, JointType joint)
-        {
-            if (handMovements.difference != null)
-            {
-                if (handMovements.difference[skeleton.TrackingId][joint].Z < -0.01)
-                {
-                    mpDictionary[(mpCounter % 4)].Open(new Uri(wallAudio[i], UriKind.Relative));
-                    mpDictionary[(mpCounter % 4)].Play();
-
-                    mpCounter++;
-                }
-            }
-        }
-
-        //Audio dictionarys
-        Dictionary<int, MediaPlayer> mpDictionary = new Dictionary<int, MediaPlayer>();
-        int mpCounter = 0;
 
         private void generateMediaPlayers()
         {
@@ -239,14 +204,7 @@ namespace Moto
             mpDictionary.Add(3, new MediaPlayer());
         }
 
-        private void setupVoice()
-        {
-            MainWindow.mySpeechRecognizer.SaidSomething += this.RecognizerSaidSomething;
-            MainWindow.mySpeechRecognizer.ListeningChanged += this.ListeningChanged;
-        }
-
-        short[] DepthPixelData = new short[MainWindow.sensor.DepthStream.FramePixelDataLength];
-
+        //Skeleton data processing (ran every frame)
         void sensor_AllFramesReady(object sender, AllFramesReadyEventArgs e)
         {
             using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
@@ -273,7 +231,7 @@ namespace Moto
 
                 depthFrame.CopyPixelDataTo(DepthPixelData);
 
-                CreatePlayerDepthImage(depthFrame, DepthPixelData);   
+                CreatePlayerDepthImage(depthFrame, DepthPixelData);
             }
 
             using (SkeletonFrame skeletonFrame = e.OpenSkeletonFrame())
@@ -364,22 +322,70 @@ namespace Moto
             }
         }
 
-        private void alignPrimaryGlow(MainWindow.Player player)
+        internal void checkBoxHit(Skeleton skeleton, JointType joint)
         {
-            ColorImagePoint leftPoint = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Joints[JointType.HandLeft].Position, ColorImageFormat.RgbResolution640x480Fps30);
-            ColorImagePoint rightPoint = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Joints[JointType.HandRight].Position, ColorImageFormat.RgbResolution640x480Fps30);
+            //checkDrumHit code
+            //MessageBox.Show(Convert.ToString(hitAreaStart[0][1]));
+            if (skeleton != null)
+            {
 
-            Canvas.SetLeft(imgPrimaryGlowLeft, leftPoint.X - (imgPrimaryGlowLeft.Width / 2));
-            Canvas.SetTop(imgPrimaryGlowLeft, leftPoint.Y - (imgPrimaryGlowLeft.Height / 2));
+                double posX = skeleton.Joints[joint].Position.X;
+                double posY = skeleton.Joints[joint].Position.Y;
+                double posZ = skeleton.Joints[joint].Position.Z;
 
-            Canvas.SetLeft(imgPrimaryGlowRight, rightPoint.X - (imgPrimaryGlowRight.Width / 2));
-            Canvas.SetTop(imgPrimaryGlowRight, rightPoint.Y - (imgPrimaryGlowRight.Height / 2));
+                for (int i = 0; i <= hitArea[skeleton.TrackingId].Count-1; i++)
+                {
+                    if (hitArea[skeleton.TrackingId][i].X1 < posX && hitArea[skeleton.TrackingId][i].X2 > posX && hitArea[skeleton.TrackingId][i].Y1 < posY && hitArea[skeleton.TrackingId][i].Y2 > posY && hitArea[skeleton.TrackingId][i].Z1 < posZ && hitArea[skeleton.TrackingId][i].Z2 > posZ)
+                    {
+                        if (!insideArea[skeleton.TrackingId][joint][i])
+                        {
+                            playWallSound(i, skeleton, joint);
+                            Console.WriteLine("HIT! " + i);
+                            insideArea[skeleton.TrackingId][joint][i] = true;
+                        }
+                    }
+                    else
+                    {
+                        insideArea[skeleton.TrackingId][joint][i] = false;
+                    }
+                }
+            }
         }
 
-        private void highlightPrimarySkeleton(MainWindow.Player player)
+        private void wallUpdate(MainWindow.Player player)
         {
-            Storyboard sb = this.FindResource("primaryGlow") as Storyboard;
-            sb.Begin();
+            //What we need to do every skeleton frame with respect to this player's Wall
+            defineHitAreas(player);
+
+            checkBoxHit(player.skeleton, JointType.HandLeft);
+            checkBoxHit(player.skeleton, JointType.HandRight);
+
+            setWallPosition(player);
+        }
+
+        private void setWallPosition(MainWindow.Player player)
+        {
+            FrameworkElement image = player.instrumentImage;
+
+            ColorImagePoint point = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Joints[JointType.Spine].Position, ColorImageFormat.RgbResolution640x480Fps30);
+
+            //Grab the image reference and move it to the correct place
+            Canvas.SetLeft(image, point.X - (image.Width / 2));
+            Canvas.SetTop(image, point.Y - (image.Height / 2));
+        }
+
+        private void playWallSound(int i, Skeleton skeleton, JointType joint)
+        {
+            if (handMovements.difference != null)
+            {
+                if (handMovements.difference[skeleton.TrackingId][joint].Z < -0.01)
+                {
+                    mpDictionary[(mpCounter % 4)].Open(new Uri(wallAudio[i], UriKind.Relative));
+                    mpDictionary[(mpCounter % 4)].Play();
+
+                    mpCounter++;
+                }
+            }
         }
 
         private void newPlayerWall(MainWindow.Player player)
@@ -399,63 +405,13 @@ namespace Moto
             setupWall(player);
         }
 
-        private void wallUpdate(MainWindow.Player player)
-        {
-            //What we need to do every skeleton frame with respect to this player's Wall
-            defineHitAreas(player);
-
-            checkBoxHit(player.skeleton, JointType.HandLeft);
-            checkBoxHit(player.skeleton, JointType.HandRight);
-
-            setWallPosition(player);
-        }
-
-        private void setWallPosition(MainWindow.Player player) {
-            FrameworkElement image = player.instrumentImage;
-
-            ColorImagePoint point = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Joints[JointType.Spine].Position, ColorImageFormat.RgbResolution640x480Fps30);
-
-            //Grab the image reference and move it to the correct place
-            Canvas.SetLeft(image, point.X - (image.Width / 2));
-            Canvas.SetTop(image, point.Y - (image.Height / 2));
-        }
-
         private void removePlayerWall(MainWindow.Player player)
         {
             //Clean up player wall data
             MainCanvas.Children.Remove(player.instrumentImage);
         }
 
-        private void CreatePlayerDepthImage(DepthImageFrame depthFrame, short[] pixelData)
-        {
-            int playerIndex;
-            int depthBytePerPixel = 4;
-            byte[] enhPixelData = new byte[depthFrame.Width * depthFrame.Height * depthBytePerPixel];
-
-
-            for (int i = 0, j = 0; i < pixelData.Length; i++, j += depthBytePerPixel)
-            {
-                playerIndex = pixelData[i] & DepthImageFrame.PlayerIndexBitmask;
-
-                if (playerIndex == 0)
-                {
-                    enhPixelData[j] = 0xFF;
-                    enhPixelData[j + 1] = 0xFF;
-                    enhPixelData[j + 2] = 0xFF;
-                    enhPixelData[j + 3] = 0x00;
-                }
-                else
-                {
-                    enhPixelData[j] = 0x00;
-                    enhPixelData[j + 1] = 0x00;
-                    enhPixelData[j + 2] = 0x00;
-                    enhPixelData[j + 3] = 0xFF;
-                }
-            }
-
-
-            MainWindow.depthImageBitmap.WritePixels(MainWindow.depthImageBitmapRect, enhPixelData, MainWindow.depthImageStride, 0); 
-        }
+        //Voice navigation
 
         private void RecognizerSaidSomething(object sender, SpeechRecognizer.SaidSomethingEventArgs e)
         {
@@ -482,6 +438,25 @@ namespace Moto
             {
                 MainWindow.mySpeechRecognizer.startListening(MainCanvas);
             }
+        }
+
+        //Primary player identification
+        private void alignPrimaryGlow(MainWindow.Player player)
+        {
+            ColorImagePoint leftPoint = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Joints[JointType.HandLeft].Position, ColorImageFormat.RgbResolution640x480Fps30);
+            ColorImagePoint rightPoint = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Joints[JointType.HandRight].Position, ColorImageFormat.RgbResolution640x480Fps30);
+
+            Canvas.SetLeft(imgPrimaryGlowLeft, leftPoint.X - (imgPrimaryGlowLeft.Width / 2));
+            Canvas.SetTop(imgPrimaryGlowLeft, leftPoint.Y - (imgPrimaryGlowLeft.Height / 2));
+
+            Canvas.SetLeft(imgPrimaryGlowRight, rightPoint.X - (imgPrimaryGlowRight.Width / 2));
+            Canvas.SetTop(imgPrimaryGlowRight, rightPoint.Y - (imgPrimaryGlowRight.Height / 2));
+        }
+
+        private void highlightPrimarySkeleton(MainWindow.Player player)
+        {
+            Storyboard sb = this.FindResource("primaryGlow") as Storyboard;
+            sb.Begin();
         }
 
         #region Image Capture
@@ -595,16 +570,48 @@ namespace Moto
         } 
         #endregion
 
-        private void btnBackFromDrums_Click(object sender, RoutedEventArgs e)
-        {
-            returnToStart();
-        }
-
         private void returnToStart()
         {
             MainWindow.sensor.AllFramesReady -= new EventHandler<AllFramesReadyEventArgs>(sensor_AllFramesReady);
 
             this.NavigationService.GoBack();
+        }
+
+        //Development code
+        private void CreatePlayerDepthImage(DepthImageFrame depthFrame, short[] pixelData)
+        {
+            int playerIndex;
+            int depthBytePerPixel = 4;
+            byte[] enhPixelData = new byte[depthFrame.Width * depthFrame.Height * depthBytePerPixel];
+
+
+            for (int i = 0, j = 0; i < pixelData.Length; i++, j += depthBytePerPixel)
+            {
+                playerIndex = pixelData[i] & DepthImageFrame.PlayerIndexBitmask;
+
+                if (playerIndex == 0)
+                {
+                    enhPixelData[j] = 0xFF;
+                    enhPixelData[j + 1] = 0xFF;
+                    enhPixelData[j + 2] = 0xFF;
+                    enhPixelData[j + 3] = 0x00;
+                }
+                else
+                {
+                    enhPixelData[j] = 0x00;
+                    enhPixelData[j + 1] = 0x00;
+                    enhPixelData[j + 2] = 0x00;
+                    enhPixelData[j + 3] = 0xFF;
+                }
+            }
+
+
+            MainWindow.depthImageBitmap.WritePixels(MainWindow.depthImageBitmapRect, enhPixelData, MainWindow.depthImageStride, 0);
+        }
+
+        private void btnBackFromDrums_Click(object sender, RoutedEventArgs e)
+        {
+            returnToStart();
         }
 
         private void Page_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)

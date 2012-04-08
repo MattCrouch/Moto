@@ -37,6 +37,7 @@ namespace Moto
             this.Focus();
         }
 
+        //Mode selection variables
         DispatcherTimer modeDecision;
         modeSelected selectedMode;
 
@@ -48,6 +49,7 @@ namespace Moto
         }
 
         //Speech variables
+        SpeechRecognizer.SaidSomethingEventArgs voiceConfirmEvent;
         bool showingConfirmDialog = false;
         DispatcherTimer voiceConfirmTime = new DispatcherTimer(); //Assigned later on as 5 seconds
 
@@ -59,105 +61,13 @@ namespace Moto
             handMovements.RightGesture += new EventHandler<handMovements.GestureEventArgs>(handMovements_RightGesture);
         }
 
-        void handMovements_RightGesture(object sender, handMovements.GestureEventArgs e)
-        {
-            Storyboard sb = this.FindResource("selectWallOfSound") as Storyboard;
-            switch (e.Trigger)
-            {
-                case handMovements.UserDecisions.Triggered:
-                    selectedMode = modeSelected.WallOfSound;
-                    modeDecision = new DispatcherTimer();
-                    modeDecision.Interval = TimeSpan.FromSeconds(3);
-                    modeDecision.Start();
-                    modeDecision.Tick += new EventHandler(modeDecisionWOS_Tick);
-                    sb.Begin();
-                    break;
-                case handMovements.UserDecisions.NotTriggered:
-                    if (selectedMode == modeSelected.WallOfSound)
-                    {
-                        selectedMode = modeSelected.None;
-                    }
-                    sb.Stop();
-                    if (modeDecision != null)
-                    {
-                        modeDecision.Stop();
-                        modeDecision.Tick -= new EventHandler(modeDecisionWOS_Tick);
-                        modeDecision = null;
-                    }
-                    break;
-            }
-        }
-
-        void modeDecisionWOS_Tick(object sender, EventArgs e)
-        {
-            if (selectedMode == modeSelected.WallOfSound)
-            {
-                if (modeDecision != null)
-                {
-                    modeDecision.Stop();
-                    modeDecision.Tick -= new EventHandler(modeDecisionWOS_Tick);
-                    modeDecision = null;
-
-                    loadWallOfSound();
-                }
-            }
-        }
-
-        void handMovements_LeftGesture(object sender, handMovements.GestureEventArgs e)
-        {
-            Storyboard sb = this.FindResource("selectInstrument") as Storyboard;
-            switch (e.Trigger)
-            {
-                case handMovements.UserDecisions.Triggered:
-                    selectedMode = modeSelected.Instrument;
-                    modeDecision = new DispatcherTimer();
-                    modeDecision.Interval = TimeSpan.FromSeconds(3);
-                    modeDecision.Start();
-                    modeDecision.Tick += new EventHandler(modeDecisionI_Tick);
-                    sb.Begin();
-                    break;
-                case handMovements.UserDecisions.NotTriggered:
-                    if (selectedMode == modeSelected.Instrument)
-                    {
-                        selectedMode = modeSelected.None;
-                    }
-                    sb.Stop();
-                    if (modeDecision != null)
-                    {
-                        modeDecision.Stop();
-                        modeDecision.Tick -= new EventHandler(modeDecisionI_Tick);
-                        modeDecision = null;
-                    }
-                    break;
-            }
-        }
-
-        void modeDecisionI_Tick(object sender, EventArgs e)
-        {
-            if (selectedMode == modeSelected.Instrument)
-            {
-                if (modeDecision != null)
-                {
-                    modeDecision.Stop();
-                    modeDecision.Tick -= new EventHandler(modeDecisionI_Tick);
-                    modeDecision = null;
-
-                    loadInstrument();
-                }
-            }
-        }
-
-        void handMovements_KinectGuideGesture(object sender, handMovements.GestureEventArgs e)
-        {
-            Console.WriteLine("Kinect guide: " + e.Trigger);
-        }
-
         private void setupVoice()
         {
             MainWindow.mySpeechRecognizer.SaidSomething += this.RecognizerSaidSomething;
             MainWindow.mySpeechRecognizer.ListeningChanged += this.ListeningChanged;
         }
 
+        //Skeleton frame code (run on every frame)
         void sensor_AllFramesReady(object sender, AllFramesReadyEventArgs e)
         {
             using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
@@ -259,88 +169,105 @@ namespace Moto
             }
         }
 
-        private void setLoadingRing(Image ring, Joint joint)
+        //Gesture events
+        void handMovements_LeftGesture(object sender, handMovements.GestureEventArgs e)
         {
-            if (joint != null)
+            Storyboard sb = this.FindResource("selectInstrument") as Storyboard;
+            switch (e.Trigger)
             {
-                ColorImagePoint point = MainWindow.sensor.MapSkeletonPointToColor(joint.Position, ColorImageFormat.RgbResolution640x480Fps30);
-
-                Canvas.SetLeft(ring, point.X - (ring.Width / 2));
-                Canvas.SetTop(ring, point.Y - (ring.Height / 2));
+                case handMovements.UserDecisions.Triggered:
+                    selectedMode = modeSelected.Instrument;
+                    modeDecision = new DispatcherTimer();
+                    modeDecision.Interval = TimeSpan.FromSeconds(3);
+                    modeDecision.Start();
+                    modeDecision.Tick += new EventHandler(modeDecisionI_Tick);
+                    sb.Begin();
+                    break;
+                case handMovements.UserDecisions.NotTriggered:
+                    if (selectedMode == modeSelected.Instrument)
+                    {
+                        selectedMode = modeSelected.None;
+                    }
+                    sb.Stop();
+                    if (modeDecision != null)
+                    {
+                        modeDecision.Stop();
+                        modeDecision.Tick -= new EventHandler(modeDecisionI_Tick);
+                        modeDecision = null;
+                    }
+                    break;
             }
         }
 
-        private void playerVisibleChange(bool visible)
+        void handMovements_RightGesture(object sender, handMovements.GestureEventArgs e)
         {
-            if (visible)
+            Storyboard sb = this.FindResource("selectWallOfSound") as Storyboard;
+            switch (e.Trigger)
             {
-                //There wasn't someone visible, now there is
-                Storyboard sb = this.FindResource("stepUpToPlay") as Storyboard;
-                sb.AutoReverse = true;
-                sb.Begin();
-                sb.Seek(new TimeSpan(0, 0, 0), TimeSeekOrigin.Duration);
-            } else {
-                //There is now nobody visible
-                Storyboard sb = this.FindResource("stepUpToPlay") as Storyboard;
-                sb.AutoReverse = false;
-                sb.Begin();
+                case handMovements.UserDecisions.Triggered:
+                    selectedMode = modeSelected.WallOfSound;
+                    modeDecision = new DispatcherTimer();
+                    modeDecision.Interval = TimeSpan.FromSeconds(3);
+                    modeDecision.Start();
+                    modeDecision.Tick += new EventHandler(modeDecisionWOS_Tick);
+                    sb.Begin();
+                    break;
+                case handMovements.UserDecisions.NotTriggered:
+                    if (selectedMode == modeSelected.WallOfSound)
+                    {
+                        selectedMode = modeSelected.None;
+                    }
+                    sb.Stop();
+                    if (modeDecision != null)
+                    {
+                        modeDecision.Stop();
+                        modeDecision.Tick -= new EventHandler(modeDecisionWOS_Tick);
+                        modeDecision = null;
+                    }
+                    break;
             }
         }
 
-        private void screenVisibility()
+        void handMovements_KinectGuideGesture(object sender, handMovements.GestureEventArgs e)
         {
-            if (MainWindow.activeSkeletons.Count > 0)
+            Console.WriteLine("Kinect guide: " + e.Trigger);
+        }
+
+        void modeDecisionI_Tick(object sender, EventArgs e)
+        {
+            if (selectedMode == modeSelected.Instrument)
             {
-                imgStepInToPlay.Visibility = Visibility.Hidden;
+                if (modeDecision != null)
+                {
+                    modeDecision.Stop();
+                    modeDecision.Tick -= new EventHandler(modeDecisionI_Tick);
+                    modeDecision = null;
 
-                //drumSlider.Visibility = Visibility.Visible;
-                lblHoldOutLeftHand.Visibility = Visibility.Visible;
-                lblPlayInstrument.Visibility = Visibility.Visible;
-
-                lblHoldOutRightHand.Visibility = Visibility.Visible;
-                lblPlayWallOfSound.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                imgStepInToPlay.Visibility = Visibility.Visible;
-
-                //imgInstrumentLoader.Visibility = Visibility.Hidden;
-                lblHoldOutLeftHand.Visibility = Visibility.Hidden;
-                lblPlayInstrument.Visibility = Visibility.Hidden;
-
-                //imgWallOfSoundLoader.Visibility = Visibility.Hidden;
-                lblHoldOutRightHand.Visibility = Visibility.Hidden;
-                lblPlayWallOfSound.Visibility = Visibility.Hidden;
+                    loadInstrument();
+                }
             }
         }
 
-        private void alignPrimaryGlow(MainWindow.Player player)
+        void modeDecisionWOS_Tick(object sender, EventArgs e)
         {
-            if (MainWindow.sensor.IsRunning)
+            if (selectedMode == modeSelected.WallOfSound)
             {
-                ColorImagePoint leftPoint = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Joints[JointType.HandLeft].Position, ColorImageFormat.RgbResolution640x480Fps30);
-                ColorImagePoint rightPoint = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Joints[JointType.HandRight].Position, ColorImageFormat.RgbResolution640x480Fps30);
+                if (modeDecision != null)
+                {
+                    modeDecision.Stop();
+                    modeDecision.Tick -= new EventHandler(modeDecisionWOS_Tick);
+                    modeDecision = null;
 
-                Canvas.SetLeft(imgPrimaryGlowLeft, leftPoint.X - (imgPrimaryGlowLeft.Width / 2));
-                Canvas.SetTop(imgPrimaryGlowLeft, leftPoint.Y - (imgPrimaryGlowLeft.Height / 2));
-
-                Canvas.SetLeft(imgPrimaryGlowRight, rightPoint.X - (imgPrimaryGlowRight.Width / 2));
-                Canvas.SetTop(imgPrimaryGlowRight, rightPoint.Y - (imgPrimaryGlowRight.Height / 2));
+                    loadWallOfSound();
+                }
             }
         }
 
-        private void highlightPrimarySkeleton(MainWindow.Player player)
-        {
-            Storyboard sb = this.FindResource("primaryGlow") as Storyboard;
-            sb.Begin();
-        }
-
-        SpeechRecognizer.SaidSomethingEventArgs voiceConfirmEvent;
-
+        //Voice navigation code
         private void RecognizerSaidSomething(object sender, SpeechRecognizer.SaidSomethingEventArgs e)
         {
             //What to do when we're pretty certain the player said something we know
-            
+
             if (e.Verb == SpeechRecognizer.Verbs.SpeechStart || e.Verb == SpeechRecognizer.Verbs.SpeechStop || e.Verb == SpeechRecognizer.Verbs.None)
             {
                 return;
@@ -368,7 +295,7 @@ namespace Moto
         private void showConfirmation(SpeechRecognizer.SaidSomethingEventArgs e)
         {
             voiceConfirmEvent = e;
-        
+
             switch (voiceConfirmEvent.Verb)
             {
                 case SpeechRecognizer.Verbs.Close:
@@ -450,36 +377,6 @@ namespace Moto
             }
         }
 
-        void loadInstrument()
-        {
-            unlistenVoice();
-            if (voiceConfirmTime.IsEnabled)
-            {
-                voiceConfirmTime.Stop();
-            }
-
-            MainWindow.sensor.AllFramesReady -= new EventHandler<AllFramesReadyEventArgs>(sensor_AllFramesReady);
-            handMovements.KinectGuideGesture -= new EventHandler<handMovements.GestureEventArgs>(handMovements_KinectGuideGesture);
-            handMovements.LeftGesture -= new EventHandler<handMovements.GestureEventArgs>(handMovements_LeftGesture);
-            handMovements.RightGesture -= new EventHandler<handMovements.GestureEventArgs>(handMovements_RightGesture);
-            this.NavigationService.Navigate(new instrument());
-        }
-
-        void loadWallOfSound()
-        {
-            unlistenVoice();
-            if (voiceConfirmTime.IsEnabled)
-            {
-                voiceConfirmTime.Stop();
-            }
-
-            MainWindow.sensor.AllFramesReady -= new EventHandler<AllFramesReadyEventArgs>(sensor_AllFramesReady);
-            handMovements.KinectGuideGesture -= new EventHandler<handMovements.GestureEventArgs>(handMovements_KinectGuideGesture);
-            handMovements.LeftGesture -= new EventHandler<handMovements.GestureEventArgs>(handMovements_LeftGesture);
-            handMovements.RightGesture -= new EventHandler<handMovements.GestureEventArgs>(handMovements_RightGesture);
-            this.NavigationService.Navigate(new wallOfSound());
-        }
-
         void voiceGoDoThis(SpeechRecognizer.SaidSomethingEventArgs voiceCommand)
         {
             switch (voiceCommand.Verb)
@@ -515,6 +412,105 @@ namespace Moto
             MainWindow.mySpeechRecognizer.ListeningChanged -= this.ListeningChanged;
         }
 
+        //Any visible player code
+        private void playerVisibleChange(bool visible)
+        {
+            if (visible)
+            {
+                //There wasn't someone visible, now there is
+                Storyboard sb = this.FindResource("stepUpToPlay") as Storyboard;
+                sb.AutoReverse = true;
+                sb.Begin();
+                sb.Seek(new TimeSpan(0, 0, 0), TimeSeekOrigin.Duration);
+            } else {
+                //There is now nobody visible
+                Storyboard sb = this.FindResource("stepUpToPlay") as Storyboard;
+                sb.AutoReverse = false;
+                sb.Begin();
+            }
+        }
+
+        private void screenVisibility()
+        {
+            if (MainWindow.activeSkeletons.Count > 0)
+            {
+                imgStepInToPlay.Visibility = Visibility.Hidden;
+
+                //drumSlider.Visibility = Visibility.Visible;
+                lblHoldOutLeftHand.Visibility = Visibility.Visible;
+                lblPlayInstrument.Visibility = Visibility.Visible;
+
+                lblHoldOutRightHand.Visibility = Visibility.Visible;
+                lblPlayWallOfSound.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                imgStepInToPlay.Visibility = Visibility.Visible;
+
+                //imgInstrumentLoader.Visibility = Visibility.Hidden;
+                lblHoldOutLeftHand.Visibility = Visibility.Hidden;
+                lblPlayInstrument.Visibility = Visibility.Hidden;
+
+                //imgWallOfSoundLoader.Visibility = Visibility.Hidden;
+                lblHoldOutRightHand.Visibility = Visibility.Hidden;
+                lblPlayWallOfSound.Visibility = Visibility.Hidden;
+            }
+        }
+
+        //Primary player identification
+        private void alignPrimaryGlow(MainWindow.Player player)
+        {
+            if (MainWindow.sensor.IsRunning)
+            {
+                ColorImagePoint leftPoint = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Joints[JointType.HandLeft].Position, ColorImageFormat.RgbResolution640x480Fps30);
+                ColorImagePoint rightPoint = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Joints[JointType.HandRight].Position, ColorImageFormat.RgbResolution640x480Fps30);
+
+                Canvas.SetLeft(imgPrimaryGlowLeft, leftPoint.X - (imgPrimaryGlowLeft.Width / 2));
+                Canvas.SetTop(imgPrimaryGlowLeft, leftPoint.Y - (imgPrimaryGlowLeft.Height / 2));
+
+                Canvas.SetLeft(imgPrimaryGlowRight, rightPoint.X - (imgPrimaryGlowRight.Width / 2));
+                Canvas.SetTop(imgPrimaryGlowRight, rightPoint.Y - (imgPrimaryGlowRight.Height / 2));
+            }
+        }
+
+        private void highlightPrimarySkeleton(MainWindow.Player player)
+        {
+            Storyboard sb = this.FindResource("primaryGlow") as Storyboard;
+            sb.Begin();
+        }
+
+        //Load appropriate pages
+        void loadInstrument()
+        {
+            unlistenVoice();
+            if (voiceConfirmTime.IsEnabled)
+            {
+                voiceConfirmTime.Stop();
+            }
+
+            MainWindow.sensor.AllFramesReady -= new EventHandler<AllFramesReadyEventArgs>(sensor_AllFramesReady);
+            handMovements.KinectGuideGesture -= new EventHandler<handMovements.GestureEventArgs>(handMovements_KinectGuideGesture);
+            handMovements.LeftGesture -= new EventHandler<handMovements.GestureEventArgs>(handMovements_LeftGesture);
+            handMovements.RightGesture -= new EventHandler<handMovements.GestureEventArgs>(handMovements_RightGesture);
+            this.NavigationService.Navigate(new instrument());
+        }
+
+        void loadWallOfSound()
+        {
+            unlistenVoice();
+            if (voiceConfirmTime.IsEnabled)
+            {
+                voiceConfirmTime.Stop();
+            }
+
+            MainWindow.sensor.AllFramesReady -= new EventHandler<AllFramesReadyEventArgs>(sensor_AllFramesReady);
+            handMovements.KinectGuideGesture -= new EventHandler<handMovements.GestureEventArgs>(handMovements_KinectGuideGesture);
+            handMovements.LeftGesture -= new EventHandler<handMovements.GestureEventArgs>(handMovements_LeftGesture);
+            handMovements.RightGesture -= new EventHandler<handMovements.GestureEventArgs>(handMovements_RightGesture);
+            this.NavigationService.Navigate(new wallOfSound());
+        }
+
+        //Development code
         private void Page_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             //Development shortcuts

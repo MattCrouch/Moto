@@ -44,16 +44,8 @@ namespace Moto
             this.Focus();
         }
 
+        //Player's current focus
         playerFocus currentFocus;
-
-        public enum instrumentList
-        {
-            None = 0,
-            Drums,
-            GuitarLeft,
-            GuitarRight,
-            WallOfSound,
-        }
 
         enum playerFocus
         {
@@ -63,6 +55,44 @@ namespace Moto
             Picture
         }
 
+        //What instruments are available (USED IN WALL OF SOUND TOO)
+        public enum instrumentList
+        {
+            None = 0,
+            Drums,
+            GuitarLeft,
+            GuitarRight,
+            WallOfSound,
+        }
+
+        //Kinect guide variables
+        DispatcherTimer kinectGuideTimer;
+
+        bool handUp = false;
+
+        DispatcherTimer instrumentSelectionTimer;
+        instrumentSelectionOptions currentInstrumentSelection = instrumentSelectionOptions.None;
+
+        enum instrumentSelectionOptions
+        {
+            None = 0,
+            Guitar,
+            GuitarLeft,
+            Drums,
+            Metronome,
+        }
+
+        //Metronome variables
+        private bool beatSet = false;
+
+        private DispatcherTimer beatSetTimeout;
+
+        //Image capture variables
+        private Storyboard flashStoryboard;
+        private Rectangle cameraFlash;
+        private DispatcherTimer pictureCountdown;
+
+        //Housekeeping
         void processExistingSkeletons(Dictionary<int, MainWindow.Player> activeSkeletons)
         {
             foreach (var player in activeSkeletons)
@@ -72,9 +102,264 @@ namespace Moto
             }
         }
 
-        DispatcherTimer kinectGuideTimer;
+        private void setupVoice()
+        {
+            MainWindow.mySpeechRecognizer.SaidSomething += this.RecognizerSaidSomething;
+            MainWindow.mySpeechRecognizer.ListeningChanged += this.ListeningChanged;
+        }
 
+        //Skeleton processing code (ran every frame)
+        void sensor_AllFramesReady(object sender, AllFramesReadyEventArgs e)
+        {
+            using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
+            {
+                //COLOUR IMAGE CODE
+                if (colorFrame == null)
+                {
+                    return;
+                }
 
+                byte[] pixelData = new byte[colorFrame.PixelDataLength];
+                colorFrame.CopyPixelDataTo(pixelData);
+
+                MainWindow.colorImageBitmap.WritePixels(MainWindow.colorImageBitmapRect, pixelData, MainWindow.colorImageStride, 0);
+
+                //userImage.Source = colorFrame.ToBitmapSource();
+            }
+
+            using (DepthImageFrame depthFrame = e.OpenDepthImageFrame())
+            {
+                //DEPTH IMAGE CODE
+                if (depthFrame == null)
+                {
+                    return;
+                }
+
+                //userDepth.Source = depthFrame.ToBitmapSource();
+            }
+
+            using (SkeletonFrame skeletonFrame = e.OpenSkeletonFrame())
+            {
+                //SKELETON CODE
+                if (skeletonFrame == null)
+                {
+                    return;
+                }
+
+                skeletonFrame.CopySkeletonDataTo(MainWindow.allSkeletons);
+
+                Skeleton aSkeleton;
+                List<int> skeletonList = new List<int>();
+
+                for (int i = 0; i < MainWindow.allSkeletons.Length; i++)
+                {
+                    aSkeleton = MainWindow.allSkeletons[i];
+
+                    if (aSkeleton.TrackingState == SkeletonTrackingState.Tracked)
+                    {
+
+                        skeletonList.Add(aSkeleton.TrackingId);
+
+                        //A new skeleton?
+                        if (!MainWindow.activeSkeletons.ContainsKey(aSkeleton.TrackingId))
+                        {
+                            if (MainWindow.playerAdded(aSkeleton))
+                            {
+                                switchInstrument(MainWindow.activeSkeletons[aSkeleton.TrackingId], instrumentList.GuitarLeft);
+                            }
+                        }
+
+                        //The player we're referencing at this point in the loop
+                        MainWindow.Player player = MainWindow.activeSkeletons[aSkeleton.TrackingId];
+
+                        handMovements.trackJointProgression(player.skeleton, player.skeleton.Joints[JointType.HandLeft]);
+                        handMovements.trackJointProgression(player.skeleton, player.skeleton.Joints[JointType.HandRight]);
+                        instrumentUpdate(player);
+                    }
+                }
+
+                if (MainWindow.activeSkeletons.Count > 0)
+                {
+                    int tempKey = MainWindow.primarySkeletonKey;
+                    MainWindow.primarySkeletonKey = MainWindow.selectPrimarySkeleton(MainWindow.activeSkeletons);
+
+                    alignPrimaryGlow(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
+
+                    if (tempKey != MainWindow.primarySkeletonKey)
+                    {
+                        //Primary Skeleton changed
+                        highlightPrimarySkeleton(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
+                    }
+                }
+
+                if (skeletonList.Count < MainWindow.activeSkeletons.Count)
+                {
+                    List<int> activeList = new List<int>(MainWindow.activeSkeletons.Keys);
+                    //We've lost at least one skeleton
+                    //find which one(s) it/they are
+                    for (int i = 0; i < skeletonList.Count; i++)
+                    {
+                        if (activeList.Contains(skeletonList[i]))
+                        {
+                            activeList.Remove(skeletonList[i]);
+                        }
+                    }
+
+                    //Remove them
+                    for (int i = 0; i < activeList.Count; i++)
+                    {
+                        MainCanvas.Children.Remove(MainWindow.activeSkeletons[activeList[i]].instrumentImage);
+                        clearInstrumentRefs(MainWindow.activeSkeletons[activeList[i]]);
+                        MainWindow.playerRemoved(activeList[i]);
+                        hitArea.Remove(activeList[i]);
+                        insideArea.Remove(activeList[i]);
+
+                    }
+
+                    activeList = null;
+                }
+
+                skeletonList = null;
+
+                if (MainWindow.activeSkeletons.Count > 0)
+                {
+                    handMovements.listenForGestures(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton);
+                }
+            }
+        }
+
+        private void instrumentUpdate(MainWindow.Player player)
+        {
+            switch (player.instrument)
+            {
+                case instrumentList.Drums:
+                    //DRUMS
+                    defineHitAreas(player);
+                    //showReadout((skeleton.Joints[JointType.HipLeft].Position.X - skeleton.Joints[JointType.HipRight].Position.X).ToString());
+                    if (currentFocus == playerFocus.None)
+                    {
+                        checkDrumHit(player.skeleton, JointType.HandLeft);
+                        checkDrumHit(player.skeleton, JointType.HandRight);
+                    }
+                    break;
+                case instrumentList.GuitarRight:
+                    //GUITAR
+                    defineStrumArea(player);
+                    if (currentFocus == playerFocus.None)
+                    {
+                        checkStrum(player, JointType.HandRight);
+                    }
+                    break;
+                case instrumentList.GuitarLeft:
+                    //GUITAR LEFTY
+                    defineStrumArea(player);
+                    if (currentFocus == playerFocus.None)
+                    {
+                        checkStrum(player, JointType.HandLeft);
+                    }
+                    break;
+            }
+        }
+
+        //Voice navigation
+        private void RecognizerSaidSomething(object sender, SpeechRecognizer.SaidSomethingEventArgs e)
+        {
+            switch (e.Verb)
+            {
+                case SpeechRecognizer.Verbs.DrumsSwitch:
+                    switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.Drums);
+                    break;
+                case SpeechRecognizer.Verbs.GuitarSwitch:
+                    switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.GuitarRight);
+                    break;
+                case SpeechRecognizer.Verbs.StartMetronome:
+                    metronome.setupMetronome();
+                    currentInstrumentSelection = instrumentSelectionOptions.Metronome;
+                    MainWindow.sensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(listenForMetronome);
+                    break;
+                case SpeechRecognizer.Verbs.StopMetronome:
+                    metronome.destroyMetronome();
+                    currentInstrumentSelection = instrumentSelectionOptions.None;
+                    MainWindow.sensor.AllFramesReady -= listenForMetronome;
+                    break;
+                case SpeechRecognizer.Verbs.BackToInstruments:
+                    currentInstrumentSelection = instrumentSelectionOptions.None;
+                    break;
+                case SpeechRecognizer.Verbs.Capture:
+                    startCaptureAnim();
+                    break;
+                case SpeechRecognizer.Verbs.ReturnToStart:
+                    returnToStart();
+                    break;
+                case SpeechRecognizer.Verbs.Close:
+                    Application.Current.Shutdown();
+                    break;
+            }
+        }
+
+        private void ListeningChanged(object sender, SpeechRecognizer.ListeningChangedEventArgs e)
+        {
+            if (e.Paused)
+            {
+                MainWindow.mySpeechRecognizer.stopListening(MainCanvas);
+            }
+            else
+            {
+                MainWindow.mySpeechRecognizer.startListening(MainCanvas);
+            }
+        }
+
+        //Instrument management code
+        private void manageInstrumentImage(MainWindow.Player player, instrumentList instrument)
+        {
+            //Remove the old image
+            MainCanvas.Children.Remove(MainWindow.activeSkeletons[player.skeleton.TrackingId].instrumentImage);
+
+            Image image = new Image();
+            //image.Name = "image" + aSkeleton.TrackingId.ToString();
+
+            switch (instrument)
+            {
+                case instrumentList.Drums:
+                    image.Source = new BitmapImage(new Uri("images/drumplaceholder.png", UriKind.Relative));
+                    image.Width = 100;
+                    image.Height = 100;
+                    break;
+                case instrumentList.GuitarLeft:
+                case instrumentList.GuitarRight:
+                    image.Source = new BitmapImage(new Uri("images/guitarplaceholder.png", UriKind.Relative));
+                    image.Width = 50;
+                    image.Height = 50;
+                    break;
+            }
+
+            MainCanvas.Children.Add(image);
+
+            player.instrumentImage = image;
+        }
+
+        private void switchInstrument(MainWindow.Player player, instrumentList instrument)
+        {
+            //Hide all the instrument-specific overlays & set the new instrument
+
+            manageInstrumentImage(MainWindow.activeSkeletons[player.skeleton.TrackingId], instrument);
+
+            switch (instrument)
+            {
+                case instrumentList.Drums:
+                    setupDrums(MainWindow.activeSkeletons[player.skeleton.TrackingId]);
+                    break;
+                case instrumentList.GuitarLeft:
+                case instrumentList.GuitarRight:
+                    setupGuitar(MainWindow.activeSkeletons[player.skeleton.TrackingId]);
+                    break;
+            }
+
+            MainWindow.activeSkeletons[player.skeleton.TrackingId].instrument = instrument;
+
+        }
+
+        //Kinect guide code
         void handMovements_KinectGuideInstrument(object sender, handMovements.GestureEventArgs e)
         {
             if (currentFocus != playerFocus.KinectGuide || currentFocus != playerFocus.None)
@@ -128,18 +413,16 @@ namespace Moto
             sb.Begin();
         }
 
-        bool handUp = false;
-
-        DispatcherTimer instrumentSelectionTimer;
-        instrumentSelectionOptions currentInstrumentSelection = instrumentSelectionOptions.None;
-
-        enum instrumentSelectionOptions
+        private void setupInstrumentSelectionTimer()
         {
-            None = 0,
-            Guitar,
-            GuitarLeft,
-            Drums,
-            Metronome,
+            if (instrumentSelectionTimer != null)
+            {
+                destroyInstrumentSelectionTimer();
+            }
+            instrumentSelectionTimer = new DispatcherTimer();
+            instrumentSelectionTimer.Interval = TimeSpan.FromSeconds(3);
+            instrumentSelectionTimer.Tick += new EventHandler(instrumentSelectionTimer_Tick);
+            instrumentSelectionTimer.Start();
         }
 
         private void selectAnInstrument(object sender, EventArgs e)
@@ -216,85 +499,6 @@ namespace Moto
             }
         }
 
-        private bool beatSet = false;
-
-        private DispatcherTimer beatSetTimeout;
-
-        private void listenForMetronome(object sender, EventArgs e)
-        {
-            if (currentInstrumentSelection == instrumentSelectionOptions.Metronome && MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton != null)
-            {
-                if (Math.Abs(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandLeft].Position.X - MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandRight].Position.X) < 0.1 && !beatSet)
-                {
-                    Console.WriteLine("#############Set the beat##########\n\n");
-
-                    beatSet = true;
-                    metronome.metronomeBeat();
-
-                    resetBeatSetTimeout(metronome.theMetronome.Interval);
-                }
-                else if (Math.Abs(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandLeft].Position.X - MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandRight].Position.X) > 0.4)
-                {
-                    beatSet = false;
-                }
-            }
-            else
-            {
-                MainWindow.sensor.AllFramesReady -= listenForMetronome;
-            }
-        }
-
-        private void resetBeatSetTimeout(TimeSpan interval, bool restart = true)
-        {
-            if (beatSetTimeout == null)
-            {
-                beatSetTimeout = new DispatcherTimer();
-            }
-
-            beatSetTimeout.Interval = TimeSpan.FromTicks(interval.Ticks * 3);
-
-            if (!beatSetTimeout.IsEnabled)
-            {
-                beatSetTimeout.Tick +=new EventHandler(beatSetTimeout_Tick);
-            }
-
-            if (restart)
-            {
-                beatSetTimeout.Start();
-            }
-        }
-
-        void beatSetTimeout_Tick(object sender, EventArgs e)
-        {
-            //Stop listening for the metronome
-            currentInstrumentSelection = instrumentSelectionOptions.None;
-            beatSetTimeout.Tick -= beatSetTimeout_Tick;
-            beatSetTimeout = null;
-        }
-
-
-        private void setupInstrumentSelectionTimer()
-        {
-            if (instrumentSelectionTimer != null)
-            {
-                destroyInstrumentSelectionTimer();
-            }
-            instrumentSelectionTimer = new DispatcherTimer();
-            instrumentSelectionTimer.Interval = TimeSpan.FromSeconds(3);
-            instrumentSelectionTimer.Tick += new EventHandler(instrumentSelectionTimer_Tick);
-            instrumentSelectionTimer.Start();
-        }
-
-        private void destroyInstrumentSelectionTimer()
-        {
-            if (instrumentSelectionTimer != null)
-            {
-                instrumentSelectionTimer.Stop();
-                instrumentSelectionTimer.Tick -= instrumentSelectionTimer_Tick;
-                instrumentSelectionTimer = null;
-            }
-        }
-
         void instrumentSelectionTimer_Tick(object sender, EventArgs e)
         {
             destroyInstrumentSelectionTimer();
@@ -330,7 +534,8 @@ namespace Moto
             double centreX = Canvas.GetLeft(top) + (top.ActualWidth / 2);
             double centreY = Canvas.GetTop(top) + (top.ActualHeight / 2);
 
-            if (centreX > Canvas.GetLeft(bottom) && centreX < (Canvas.GetLeft(bottom) + bottom.ActualWidth)) {
+            if (centreX > Canvas.GetLeft(bottom) && centreX < (Canvas.GetLeft(bottom) + bottom.ActualWidth))
+            {
                 if (centreY > Canvas.GetTop(bottom) && centreY < (Canvas.GetTop(bottom) + bottom.ActualHeight))
                 {
                     return true;
@@ -354,152 +559,70 @@ namespace Moto
             sb.Seek(this, new TimeSpan(0, 0, 0), TimeSeekOrigin.Duration);
         }
 
-        private void setupVoice()
+        private void destroyInstrumentSelectionTimer()
         {
-            MainWindow.mySpeechRecognizer.SaidSomething += this.RecognizerSaidSomething;
-            MainWindow.mySpeechRecognizer.ListeningChanged += this.ListeningChanged;
-        }
-
-        private void destroyVoice()
-        {
-            MainWindow.mySpeechRecognizer.toggleListening(false);
-            MainWindow.mySpeechRecognizer.SaidSomething -= this.RecognizerSaidSomething;
-            MainWindow.mySpeechRecognizer.ListeningChanged -= this.ListeningChanged;
-        }
-
-        private void clearInstrumentRefs(MainWindow.Player player)
-        {
-            switch (player.instrument)
+            if (instrumentSelectionTimer != null)
             {
-                case instrumentList.Drums:
-                    hitArea.Remove(player.skeleton.TrackingId);
-                    insideArea.Remove(player.skeleton.TrackingId);
-                    break;
-                case instrumentList.GuitarLeft:
-                case instrumentList.GuitarRight:
-                    strumArea.Remove(player.skeleton.TrackingId);
-                    insideStrumArea.Remove(player.skeleton.TrackingId);
-                    break;
+                instrumentSelectionTimer.Stop();
+                instrumentSelectionTimer.Tick -= instrumentSelectionTimer_Tick;
+                instrumentSelectionTimer = null;
             }
         }
 
-        void sensor_AllFramesReady(object sender, AllFramesReadyEventArgs e)
+        //Metronome code
+        private void listenForMetronome(object sender, EventArgs e)
         {
-            using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
+            if (currentInstrumentSelection == instrumentSelectionOptions.Metronome && MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton != null)
             {
-                //COLOUR IMAGE CODE
-                if (colorFrame == null)
+                if (Math.Abs(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandLeft].Position.X - MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandRight].Position.X) < 0.1 && !beatSet)
                 {
-                    return;
+                    Console.WriteLine("#############Set the beat##########\n\n");
+
+                    beatSet = true;
+                    metronome.metronomeBeat();
+
+                    resetBeatSetTimeout(metronome.theMetronome.Interval);
                 }
-
-                byte[] pixelData = new byte[colorFrame.PixelDataLength];
-                colorFrame.CopyPixelDataTo(pixelData);
-
-                MainWindow.colorImageBitmap.WritePixels(MainWindow.colorImageBitmapRect, pixelData, MainWindow.colorImageStride, 0);
-
-                //userImage.Source = colorFrame.ToBitmapSource();
+                else if (Math.Abs(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandLeft].Position.X - MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandRight].Position.X) > 0.4)
+                {
+                    beatSet = false;
+                }
             }
-
-            using (DepthImageFrame depthFrame = e.OpenDepthImageFrame())
+            else
             {
-                //DEPTH IMAGE CODE
-                if (depthFrame == null)
-                {
-                    return;
-                }
-
-                //userDepth.Source = depthFrame.ToBitmapSource();
-            }
-
-            using (SkeletonFrame skeletonFrame = e.OpenSkeletonFrame())
-            {
-                //SKELETON CODE
-                if (skeletonFrame == null)
-                {
-                    return;
-                }
-
-                skeletonFrame.CopySkeletonDataTo(MainWindow.allSkeletons);
-
-                Skeleton aSkeleton;
-                List<int> skeletonList = new List<int>();
-
-                for (int i = 0; i < MainWindow.allSkeletons.Length; i++)
-                {
-                    aSkeleton = MainWindow.allSkeletons[i];
-
-                    if (aSkeleton.TrackingState == SkeletonTrackingState.Tracked)
-                    {
-                        
-                        skeletonList.Add(aSkeleton.TrackingId);
-
-                        //A new skeleton?
-                        if (!MainWindow.activeSkeletons.ContainsKey(aSkeleton.TrackingId))
-                        {
-                            if (MainWindow.playerAdded(aSkeleton))
-                            {
-                                switchInstrument(MainWindow.activeSkeletons[aSkeleton.TrackingId], instrumentList.GuitarLeft);
-                            }
-                        }
-
-                        //The player we're referencing at this point in the loop
-                        MainWindow.Player player = MainWindow.activeSkeletons[aSkeleton.TrackingId];
-
-                        handMovements.trackJointProgression(player.skeleton, player.skeleton.Joints[JointType.HandLeft]);
-                        handMovements.trackJointProgression(player.skeleton, player.skeleton.Joints[JointType.HandRight]);
-                        instrumentUpdate(player);
-                    }
-                }
-
-                if (MainWindow.activeSkeletons.Count > 0)
-                {
-                    int tempKey = MainWindow.primarySkeletonKey;
-                    MainWindow.primarySkeletonKey = MainWindow.selectPrimarySkeleton(MainWindow.activeSkeletons);
-
-                    alignPrimaryGlow(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
-
-                    if (tempKey != MainWindow.primarySkeletonKey)
-                    {
-                        //Primary Skeleton changed
-                        highlightPrimarySkeleton(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
-                    }
-                }
-
-                if (skeletonList.Count < MainWindow.activeSkeletons.Count) {
-                    List<int> activeList = new List<int>(MainWindow.activeSkeletons.Keys);
-                    //We've lost at least one skeleton
-                    //find which one(s) it/they are
-                    for (int i = 0; i < skeletonList.Count; i++)
-                    {
-                        if (activeList.Contains(skeletonList[i])) {
-                            activeList.Remove(skeletonList[i]);
-                        }
-                    }
-
-                    //Remove them
-                    for (int i = 0; i < activeList.Count; i++)
-                    {
-                        MainCanvas.Children.Remove(MainWindow.activeSkeletons[activeList[i]].instrumentImage);
-                        clearInstrumentRefs(MainWindow.activeSkeletons[activeList[i]]);
-                        MainWindow.playerRemoved(activeList[i]);
-                        hitArea.Remove(activeList[i]);
-                        insideArea.Remove(activeList[i]);
-
-                    }
-
-                    activeList = null;
-                }
-
-                skeletonList = null;
-
-                if (MainWindow.activeSkeletons.Count > 0)
-                {
-                    handMovements.listenForGestures(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton);
-                }
+                MainWindow.sensor.AllFramesReady -= listenForMetronome;
             }
         }
 
+        private void resetBeatSetTimeout(TimeSpan interval, bool restart = true)
+        {
+            if (beatSetTimeout == null)
+            {
+                beatSetTimeout = new DispatcherTimer();
+            }
+
+            beatSetTimeout.Interval = TimeSpan.FromTicks(interval.Ticks * 3);
+
+            if (!beatSetTimeout.IsEnabled)
+            {
+                beatSetTimeout.Tick += new EventHandler(beatSetTimeout_Tick);
+            }
+
+            if (restart)
+            {
+                beatSetTimeout.Start();
+            }
+        }
+
+        void beatSetTimeout_Tick(object sender, EventArgs e)
+        {
+            //Stop listening for the metronome
+            currentInstrumentSelection = instrumentSelectionOptions.None;
+            beatSetTimeout.Tick -= beatSetTimeout_Tick;
+            beatSetTimeout = null;
+        }
+
+        //Primary player identification
         private void alignPrimaryGlow(MainWindow.Player player)
         {
             ColorImagePoint leftPoint = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Joints[JointType.HandLeft].Position, ColorImageFormat.RgbResolution640x480Fps30);
@@ -518,141 +641,7 @@ namespace Moto
             sb.Begin();
         }
 
-        private void manageInstrumentImage(MainWindow.Player player, instrumentList instrument)
-        {
-            //Remove the old image
-            MainCanvas.Children.Remove(MainWindow.activeSkeletons[player.skeleton.TrackingId].instrumentImage);
-
-            Image image = new Image();
-            //image.Name = "image" + aSkeleton.TrackingId.ToString();
-
-            switch (instrument)
-            {
-                case instrumentList.Drums:
-                    image.Source = new BitmapImage(new Uri("images/drumplaceholder.png", UriKind.Relative));
-                    image.Width = 100;
-                    image.Height = 100;
-                    break;
-                case instrumentList.GuitarLeft:
-                case instrumentList.GuitarRight:
-                    image.Source = new BitmapImage(new Uri("images/guitarplaceholder.png", UriKind.Relative));
-                    image.Width = 50;
-                    image.Height = 50;
-                    break;
-            }
-            
-            MainCanvas.Children.Add(image);
-
-            player.instrumentImage = image;
-        }
-
-        private void RecognizerSaidSomething(object sender, SpeechRecognizer.SaidSomethingEventArgs e)
-        {
-            switch (e.Verb)
-            {
-                case SpeechRecognizer.Verbs.DrumsSwitch:
-                    switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.Drums);
-                    break;
-                case SpeechRecognizer.Verbs.GuitarSwitch:
-                    switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.GuitarRight);
-                    break;
-                case SpeechRecognizer.Verbs.StartMetronome:
-                    metronome.setupMetronome();
-                    currentInstrumentSelection = instrumentSelectionOptions.Metronome;
-                    MainWindow.sensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(listenForMetronome);
-                    break;
-                case SpeechRecognizer.Verbs.StopMetronome:
-                    metronome.destroyMetronome();
-                    currentInstrumentSelection = instrumentSelectionOptions.None;
-                    MainWindow.sensor.AllFramesReady -= listenForMetronome;
-                    break;
-                case SpeechRecognizer.Verbs.BackToInstruments:
-                    currentInstrumentSelection = instrumentSelectionOptions.None;
-                    break;
-                case SpeechRecognizer.Verbs.Capture:
-                    startCaptureAnim();
-                    break;
-                case SpeechRecognizer.Verbs.ReturnToStart:
-                    returnToStart();
-                    break;
-                case SpeechRecognizer.Verbs.Close:
-                    Application.Current.Shutdown();
-                    break;
-            }
-        }
-
-        private void ListeningChanged(object sender, SpeechRecognizer.ListeningChangedEventArgs e)
-        {
-            if (e.Paused)
-            {
-                MainWindow.mySpeechRecognizer.stopListening(MainCanvas);
-            }
-            else
-            {
-                MainWindow.mySpeechRecognizer.startListening(MainCanvas);
-            }
-        }
-
-        private void switchInstrument(MainWindow.Player player, instrumentList instrument)
-        {
-            //Hide all the instrument-specific overlays & set the new instrument
-
-            manageInstrumentImage(MainWindow.activeSkeletons[player.skeleton.TrackingId], instrument);
-
-            switch (instrument)
-            {
-                case instrumentList.Drums:
-                    setupDrums(MainWindow.activeSkeletons[player.skeleton.TrackingId]);
-                    break;
-                case instrumentList.GuitarLeft:
-                case instrumentList.GuitarRight:
-                    setupGuitar(MainWindow.activeSkeletons[player.skeleton.TrackingId]);
-                    break;
-            }
-
-            MainWindow.activeSkeletons[player.skeleton.TrackingId].instrument = instrument;
-
-        }
-
-        //Dictionary<Joint, Dictionary<string, double>> difference = new Dictionary<Joint, Dictionary<string, double>>();
-
-        private void instrumentUpdate(MainWindow.Player player)
-        {
-            switch (player.instrument)
-            {
-                case instrumentList.Drums:
-                    //DRUMS
-                    defineHitAreas(player);
-                    //showReadout((skeleton.Joints[JointType.HipLeft].Position.X - skeleton.Joints[JointType.HipRight].Position.X).ToString());
-                    if (currentFocus == playerFocus.None)
-                    {
-                        checkDrumHit(player.skeleton, JointType.HandLeft);
-                        checkDrumHit(player.skeleton, JointType.HandRight);
-                    }
-                    break;
-                case instrumentList.GuitarRight:
-                    //GUITAR
-                    defineStrumArea(player);
-                    if (currentFocus == playerFocus.None)
-                    {
-                        checkStrum(player, JointType.HandRight);
-                    }
-                    break;
-                case instrumentList.GuitarLeft:
-                    //GUITAR LEFTY
-                    defineStrumArea(player);
-                    if (currentFocus == playerFocus.None)
-                    {
-                        checkStrum(player, JointType.HandLeft);
-                    }
-                    break;
-            }
-        }
-
-        private Storyboard flashStoryboard;
-        private Rectangle cameraFlash;
-        private DispatcherTimer pictureCountdown;
-
+        #region Image Capture
         void uploadPicture(string imageAddress)
         {
             System.Net.WebClient Client = new System.Net.WebClient();
@@ -764,7 +753,41 @@ namespace Moto
             uploadPicture(captureImage(e.OpenColorImageFrame().ToBitmapSource()));
             MainWindow.sensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
         }*/
+        #endregion
 
+        //Tidy up
+        private void destroyVoice()
+        {
+            MainWindow.mySpeechRecognizer.toggleListening(false);
+            MainWindow.mySpeechRecognizer.SaidSomething -= this.RecognizerSaidSomething;
+            MainWindow.mySpeechRecognizer.ListeningChanged -= this.ListeningChanged;
+        }
+
+        private void clearInstrumentRefs(MainWindow.Player player)
+        {
+            switch (player.instrument)
+            {
+                case instrumentList.Drums:
+                    hitArea.Remove(player.skeleton.TrackingId);
+                    insideArea.Remove(player.skeleton.TrackingId);
+                    break;
+                case instrumentList.GuitarLeft:
+                case instrumentList.GuitarRight:
+                    strumArea.Remove(player.skeleton.TrackingId);
+                    insideStrumArea.Remove(player.skeleton.TrackingId);
+                    break;
+            }
+        }
+
+        private void returnToStart()
+        {
+            MainWindow.sensor.AllFramesReady -= new EventHandler<AllFramesReadyEventArgs>(sensor_AllFramesReady);
+            destroyVoice();
+            metronome.destroyMetronome();
+            this.NavigationService.GoBack();
+        }
+
+        //Reused methods
         private double getCoords(string axis, Joint joint)
         {
             double position = 0;
@@ -783,23 +806,6 @@ namespace Moto
 
 
             return position;
-        }
-
-        private void btnBackFromDrums_Click(object sender, RoutedEventArgs e)
-        {
-            returnToStart();
-        }
-
-        private void returnToStart() {
-            MainWindow.sensor.AllFramesReady -= new EventHandler<AllFramesReadyEventArgs>(sensor_AllFramesReady);
-            destroyVoice();
-            metronome.destroyMetronome();
-            this.NavigationService.GoBack();
-        }
-
-        public void showReadout(string text)
-        {
-            coordReadout.Content = text;
         }
 
         public static double distQuotient(double unitMin, double unitMax, double playerDist, double scaleMin, double scaleMax)
@@ -825,6 +831,17 @@ namespace Moto
             }
 
             return quotient;
+        }
+
+        //Development code
+        private void btnBackFromDrums_Click(object sender, RoutedEventArgs e)
+        {
+            returnToStart();
+        }
+
+        public void showReadout(string text)
+        {
+            coordReadout.Content = text;
         }
 
         private void Page_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
