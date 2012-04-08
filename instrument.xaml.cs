@@ -238,8 +238,8 @@ namespace Moto
                     //showReadout((skeleton.Joints[JointType.HipLeft].Position.X - skeleton.Joints[JointType.HipRight].Position.X).ToString());
                     if (currentFocus == playerFocus.None)
                     {
-                        checkDrumHit(player.skeleton, JointType.HandLeft);
-                        checkDrumHit(player.skeleton, JointType.HandRight);
+                        checkDrumHit(player, JointType.HandLeft);
+                        checkDrumHit(player, JointType.HandRight);
                     }
                     break;
                 case instrumentList.GuitarRight:

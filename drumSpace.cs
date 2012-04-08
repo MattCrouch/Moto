@@ -98,31 +98,31 @@ namespace Moto
 
 
 
-        internal void checkDrumHit(Skeleton skeleton, JointType joint)
+        internal void checkDrumHit(MainWindow.Player player, JointType joint)
         {
             //checkDrumHit code
             //MessageBox.Show(Convert.ToString(hitAreaStart[0][1]));
-            if (skeleton != null)
+            if (player.skeleton != null && player.skeleton.Joints[joint].TrackingState == JointTrackingState.Tracked)
             {
 
-                double posX = skeleton.Joints[joint].Position.X;
-                double posY = skeleton.Joints[joint].Position.Y;
-                double posZ = skeleton.Joints[joint].Position.Z;
+                double posX = player.skeleton.Joints[joint].Position.X;
+                double posY = player.skeleton.Joints[joint].Position.Y;
+                double posZ = player.skeleton.Joints[joint].Position.Z;
 
                 for (int i = 0; i <= 2; i++)
                 {
-                    if (hitArea[skeleton.TrackingId][i].X1 < posX && hitArea[skeleton.TrackingId][i].X2 > posX && hitArea[skeleton.TrackingId][i].Y1 < posY && hitArea[skeleton.TrackingId][i].Y2 > posY && hitArea[skeleton.TrackingId][i].Z1 < posZ && hitArea[skeleton.TrackingId][i].Z2 > posZ)
+                    if (hitArea[player.skeleton.TrackingId][i].X1 < posX && hitArea[player.skeleton.TrackingId][i].X2 > posX && hitArea[player.skeleton.TrackingId][i].Y1 < posY && hitArea[player.skeleton.TrackingId][i].Y2 > posY && hitArea[player.skeleton.TrackingId][i].Z1 < posZ && hitArea[player.skeleton.TrackingId][i].Z2 > posZ)
                     {
-                        if (!insideArea[skeleton.TrackingId][joint][i])
+                        if (!insideArea[player.skeleton.TrackingId][joint][i])
                         {
-                            hitDrum("drum" + i, skeleton, joint);
+                            hitDrum("drum" + i, player.skeleton, joint);
                             Debug.Print("HIT! " + i);
-                            insideArea[skeleton.TrackingId][joint][i] = true;
+                            insideArea[player.skeleton.TrackingId][joint][i] = true;
                         }
                     }
                     else
                     {
-                        insideArea[skeleton.TrackingId][joint][i] = false;
+                        insideArea[player.skeleton.TrackingId][joint][i] = false;
                     }
                 }
             }

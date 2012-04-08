@@ -91,13 +91,14 @@ namespace Moto
 
         public void checkStrum(MainWindow.Player player, JointType joint)
         {
-            //Did the player strum just then?
+            if (player != null && player.skeleton.Joints[joint].TrackingState == JointTrackingState.Tracked)
+            {
+                //Did the player strum just then?
+                double posX = player.skeleton.Joints[joint].Position.X;
+                double posY = player.skeleton.Joints[joint].Position.Y;
+                double posZ = player.skeleton.Joints[joint].Position.Z;
 
-            double posX = player.skeleton.Joints[joint].Position.X;
-            double posY = player.skeleton.Joints[joint].Position.Y;
-            double posZ = player.skeleton.Joints[joint].Position.Z;
-
-            if (strumArea[player.skeleton.TrackingId].X1 < posX && strumArea[player.skeleton.TrackingId].X2 > posX && strumArea[player.skeleton.TrackingId].Y1 < posY && strumArea[player.skeleton.TrackingId].Y2 > posY && strumArea[player.skeleton.TrackingId].Z1 < posZ && strumArea[player.skeleton.TrackingId].Z2 > posZ)
+                if (strumArea[player.skeleton.TrackingId].X1 < posX && strumArea[player.skeleton.TrackingId].X2 > posX && strumArea[player.skeleton.TrackingId].Y1 < posY && strumArea[player.skeleton.TrackingId].Y2 > posY && strumArea[player.skeleton.TrackingId].Z1 < posZ && strumArea[player.skeleton.TrackingId].Z2 > posZ)
                 {
                     if (!insideStrumArea[player.skeleton.TrackingId])
                     {
@@ -118,6 +119,7 @@ namespace Moto
                 {
                     insideStrumArea[player.skeleton.TrackingId] = false;
                 }
+            }
         }
 
         MediaPlayer mp = new MediaPlayer();
