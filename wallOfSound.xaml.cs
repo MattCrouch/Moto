@@ -28,6 +28,10 @@ namespace Moto
             //Listening for when our frames are ready
             MainWindow.sensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(sensor_AllFramesReady);
 
+
+            //Listen for Kinect Guide gesture
+            handMovements.KinectGuideGesture += new EventHandler<handMovements.GestureEventArgs>(handMovements_KinectGuideGesture);
+
             //Create dictionary definitions for all the Media Players available
             generateMediaPlayers();
 
@@ -55,6 +59,19 @@ namespace Moto
         //Audio dictionarys
         Dictionary<int, MediaPlayer> mpDictionary = new Dictionary<int, MediaPlayer>();
         int mpCounter = 0;
+
+        //Kinect Guide variables
+        DispatcherTimer kinectGuideTimer;
+
+        //Player's current focus
+        playerFocus currentFocus = playerFocus.None;
+
+        enum playerFocus
+        {
+            None = 0,
+            KinectGuide,
+            Picture
+        }
 
         //Housekeeping
         private void processExistingSkeletons(Dictionary<int, MainWindow.Player> activeSkeletons)
@@ -282,6 +299,8 @@ namespace Moto
 
                     alignPrimaryGlow(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
 
+                    handMovements.listenForGestures(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton);
+
                     if (tempKey != MainWindow.primarySkeletonKey)
                     {
                         //Primary Skeleton changed
@@ -459,6 +478,51 @@ namespace Moto
             sb.Begin();
         }
 
+        //Kinect Guide code
+        void handMovements_KinectGuideGesture(object sender, handMovements.GestureEventArgs e)
+        {
+            Storyboard sb = this.FindResource("kinectGuideStart") as Storyboard;
+            Console.WriteLine("Kinect Guide: " + e.Trigger);
+            switch (e.Trigger)
+            {
+                case handMovements.UserDecisions.Triggered:
+                    sb.Begin();
+                    kinectGuideTimer = new DispatcherTimer();
+                    kinectGuideTimer.Interval = TimeSpan.FromSeconds(3);
+                    kinectGuideTimer.Tick += new EventHandler(kinectGuideTimer_Tick);
+                    kinectGuideTimer.Start();
+                    break;
+                case handMovements.UserDecisions.NotTriggered:
+                    sb.Stop();
+                    if (kinectGuideTimer != null)
+                    {
+                        kinectGuideTimer.Stop();
+                        kinectGuideTimer.Tick -= kinectGuideTimer_Tick;
+                        kinectGuideTimer = null;
+                    }
+                    break;
+            }
+        }
+
+        void kinectGuideTimer_Tick(object sender, EventArgs e)
+        {
+            currentFocus = playerFocus.KinectGuide;
+
+            //Listen for swipe gesture
+            handMovements.LeftSwipeRight += new EventHandler<handMovements.GestureEventArgs>(handMovements_LeftSwipeRight);
+        }
+
+        void handMovements_LeftSwipeRight(object sender, handMovements.GestureEventArgs e)
+        {
+            MessageBox.Show("Left swipe right");
+
+            currentFocus = playerFocus.None;
+
+            //Stop listening and reset the flag for next time
+            handMovements.LeftSwipeRight -= handMovements_LeftSwipeRight;
+            handMovements.LeftSwipeRightStatus = false;
+        }
+
         #region Image Capture
         private Storyboard flashStoryboard;
         private Rectangle cameraFlash;
@@ -549,6 +613,7 @@ namespace Moto
 
         private void startCaptureAnim()
         {
+            currentFocus = playerFocus.Picture;
             imgGetReady.Visibility = Visibility.Visible;
             imgCamera.Visibility = Visibility.Visible;
             pictureCountdown = new DispatcherTimer();
@@ -562,6 +627,7 @@ namespace Moto
 
         void pictureCountdown_Tick(object sender, EventArgs e)
         {
+            currentFocus = playerFocus.None;
             pictureCountdown.Stop();
             pictureCountdown.Tick -= new EventHandler(pictureCountdown_Tick);
             uploadPicture(captureImage((BitmapSource)userImage.Source));

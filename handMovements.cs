@@ -28,10 +28,12 @@ namespace Moto
         public static event EventHandler<GestureEventArgs> KinectGuideGesture;
         public static event EventHandler<GestureEventArgs> LeftGesture;
         public static event EventHandler<GestureEventArgs> RightGesture;
+        public static event EventHandler<GestureEventArgs> LeftSwipeRight;
 
         public static bool KinectGuideGestureStatus;
         public static bool LeftGestureStatus;
         public static bool RightGestureStatus;
+        public static bool LeftSwipeRightStatus;
 
         public struct difference3
         {
@@ -170,6 +172,19 @@ namespace Moto
                 if (failed)
                 {
                     toggleGestureStatus(ref RightGestureStatus, RightGesture, false);
+                }
+            }
+
+            if (LeftSwipeRight != null)
+            {
+                if (skeleton.Joints[JointType.HandLeft].Position.X > skeleton.Joints[JointType.ElbowLeft].Position.X)
+                {
+                    //The hand has moved from left to right, was it fast enough for a swipe?
+                    Console.WriteLine(difference[skeleton.TrackingId][JointType.HandLeft].X);
+                    if (difference[skeleton.TrackingId][JointType.HandLeft].X > 0.2)
+                    {
+                        toggleGestureStatus(ref LeftSwipeRightStatus, LeftSwipeRight, true);
+                    }
                 }
             }
         }
