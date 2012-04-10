@@ -26,7 +26,7 @@ namespace Moto
             Storyboard sb = this.FindResource("loadingMic") as Storyboard;
             sb.Begin();
 
-            MainWindow.animateSlide(imgStepInToPlay);
+            //MainWindow.animateSlide(imgStepInToPlay);
             MainWindow.animateSlide(imgMotoLogo);
 
             setupVoiceVisuals();

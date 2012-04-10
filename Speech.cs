@@ -480,7 +480,10 @@ namespace Moto.Speech
         {
             disableSpeechTimeout();
 
-            MainWindow.animateSlide(microphoneImg, true, 10, 0.5);
+            if (microphoneImg != null)
+            {
+                MainWindow.animateSlide(microphoneImg, true, 10, 0.5);
+            }
 
             //canvas.Children.Remove(microphoneImg);
         }

@@ -272,8 +272,6 @@ namespace Moto
         }
 
         public static void animateSlide(FrameworkElement item, bool reverse = false, double movement = 10, double duration = 1) {
-            Console.WriteLine("SLIDEY SLIDEY");
-
             DoubleAnimation daOpacity = new DoubleAnimation();
             DoubleAnimation daMovement = new DoubleAnimation();
 
