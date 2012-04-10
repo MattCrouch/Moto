@@ -167,28 +167,6 @@
 				<DiscreteObjectKeyFrame KeyTime="0:0:1" Value="{x:Static Visibility.Hidden}"/>
 			</ObjectAnimationUsingKeyFrames>
 		</Storyboard>
-		<Storyboard x:Key="motoLogoIn">
-			<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.Y)" Storyboard.TargetName="imgMotoLogo">
-				<EasingDoubleKeyFrame KeyTime="0" Value="0"/>
-				<EasingDoubleKeyFrame KeyTime="0:0:1" Value="-20">
-					<EasingDoubleKeyFrame.EasingFunction>
-						<CircleEase EasingMode="EaseOut"/>
-					</EasingDoubleKeyFrame.EasingFunction>
-				</EasingDoubleKeyFrame>
-			</DoubleAnimationUsingKeyFrames>
-			<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="imgMotoLogo">
-				<EasingDoubleKeyFrame KeyTime="0" Value="0"/>
-				<EasingDoubleKeyFrame KeyTime="0:0:1" Value="1">
-					<EasingDoubleKeyFrame.EasingFunction>
-						<CircleEase EasingMode="EaseOut"/>
-					</EasingDoubleKeyFrame.EasingFunction>
-				</EasingDoubleKeyFrame>
-			</DoubleAnimationUsingKeyFrames>
-			<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="imgMotoLogo">
-				<DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}"/>
-				<DiscreteObjectKeyFrame KeyTime="0:0:1" Value="{x:Static Visibility.Visible}"/>
-			</ObjectAnimationUsingKeyFrames>
-		</Storyboard>
 		<Storyboard x:Key="selectInstrument">
 			<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="imgRightHand">
 				<DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Hidden}"/>
@@ -236,10 +214,8 @@
 	</Page.Resources>
 	<Page.Triggers>
 		<EventTrigger RoutedEvent="FrameworkElement.Loaded">
-			<BeginStoryboard Storyboard="{StaticResource motoLogoIn}"/>
 			<BeginStoryboard Storyboard="{StaticResource selectInstrument}"/>
-			<BeginStoryboard Storyboard="{StaticResource selectWallOfSound}"/>
-			
+			<BeginStoryboard Storyboard="{StaticResource selectWallOfSound}"/>	
 		</EventTrigger>
 	</Page.Triggers>
 
@@ -314,7 +290,7 @@
         		</TransformGroup>
         	</Image.RenderTransform>
         </Image>
-        <Image x:Name="imgMotoLogo" Height="88.184" Canvas.Left="186.5" RenderOptions.BitmapScalingMode="HighQuality" Source="images/moto-transparent.png" Stretch="Fill" Canvas.Top="401.816" Width="267" RenderTransformOrigin="0.5,0.5">
+        <Image x:Name="imgMotoLogo" Height="88.184" Canvas.Left="186.5" RenderOptions.BitmapScalingMode="HighQuality" Source="images/moto-transparent.png" Stretch="Fill" Canvas.Top="381" Width="267" RenderTransformOrigin="0.5,0.5">
         	<Image.RenderTransform>
         		<TransformGroup>
         			<ScaleTransform/>

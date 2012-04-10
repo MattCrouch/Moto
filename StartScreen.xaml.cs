@@ -3,6 +3,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
+using System.Windows.Media.Imaging;
 using Microsoft.Kinect;
 using Coding4Fun.Kinect.Wpf;
 using Moto.Speech;
@@ -24,6 +25,11 @@ namespace Moto
             //(It's here so it only runs the once)
             Storyboard sb = this.FindResource("loadingMic") as Storyboard;
             sb.Begin();
+
+            MainWindow.animateSlide(imgStepInToPlay);
+            MainWindow.animateSlide(imgMotoLogo);
+
+            setupVoiceVisuals();
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -51,7 +57,10 @@ namespace Moto
         //Speech variables
         SpeechRecognizer.SaidSomethingEventArgs voiceConfirmEvent;
         bool showingConfirmDialog = false;
-        DispatcherTimer voiceConfirmTime = new DispatcherTimer(); //Assigned later on as 5 seconds
+        DispatcherTimer voiceConfirmTime;
+
+        Dictionary<SpeechRecognizer.Verbs, BitmapImage> voiceVisuals = new Dictionary<SpeechRecognizer.Verbs, BitmapImage>();
+        Image confirmationVisual = new Image();
 
         private void setupStartScreen()
         {
@@ -65,6 +74,18 @@ namespace Moto
         {
             MainWindow.mySpeechRecognizer.SaidSomething += this.RecognizerSaidSomething;
             MainWindow.mySpeechRecognizer.ListeningChanged += this.ListeningChanged;
+        }
+
+        private void setupVoiceVisuals()
+        {
+            voiceVisuals.Add(SpeechRecognizer.Verbs.Close, new BitmapImage(new Uri("/Moto;component/images/voice/close.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.Instrument, new BitmapImage(new Uri("/Moto;component/images/voice/instrument.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.WallOfSound, new BitmapImage(new Uri("/Moto;component/images/voice/wallofsound.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.KinectUp, new BitmapImage(new Uri("/Moto;component/images/voice/angleup.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.KinectUpSmall, new BitmapImage(new Uri("/Moto;component/images/voice/angleslightlyup.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.KinectDown, new BitmapImage(new Uri("/Moto;component/images/voice/angledown.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.KinectDownSmall, new BitmapImage(new Uri("/Moto;component/images/voice/angleslightlydown.png", UriKind.Relative)));
+
         }
 
         //Skeleton frame code (run on every frame)
@@ -299,25 +320,13 @@ namespace Moto
             switch (voiceConfirmEvent.Verb)
             {
                 case SpeechRecognizer.Verbs.Close:
-                    voicePromptVisual(true, "Shut down?");
-                    break;
                 case SpeechRecognizer.Verbs.Instrument:
-                    voicePromptVisual(true, "Go to Band Mode?");
-                    break;
                 case SpeechRecognizer.Verbs.WallOfSound:
-                    voicePromptVisual(true, "Wall of Sound?");
-                    break;
                 case SpeechRecognizer.Verbs.KinectUp:
-                    voicePromptVisual(true, "Move Up?");
-                    break;
                 case SpeechRecognizer.Verbs.KinectUpSmall:
-                    voicePromptVisual(true, "Move Slightly Up?");
-                    break;
                 case SpeechRecognizer.Verbs.KinectDown:
-                    voicePromptVisual(true, "Move Down?");
-                    break;
                 case SpeechRecognizer.Verbs.KinectDownSmall:
-                    voicePromptVisual(true, "Move Slightly Down?");
+                    voicePromptVisual(true);
                     break;
             }
 
@@ -345,23 +354,31 @@ namespace Moto
 
         private void removeConfirmationTime()
         {
-            voiceConfirmTime.Stop();
-            voiceConfirmTime.Tick -= new EventHandler(voiceConfirmTime_Tick);
+            if (voiceConfirmTime != null)
+            {
+                voiceConfirmTime.Stop();
+                voiceConfirmTime.Tick -= new EventHandler(voiceConfirmTime_Tick);
+                voiceConfirmTime = null;
+            }
         }
 
-        private void voicePromptVisual(bool showing, string message = "")
+        private void voicePromptVisual(bool showing)
         {
             if (showing)
             {
                 showingConfirmDialog = true;
-                txtVoiceCommandAlert.Visibility = Visibility.Visible;
-                txtVoiceCommandAlert.Text = message;
+                confirmationVisual = new Image();
+                MainCanvas.Children.Add(confirmationVisual);
+                MainWindow.animateSlide(confirmationVisual);
+                confirmationVisual.Source = voiceVisuals[voiceConfirmEvent.Verb];
+                confirmationVisual.Height = 50;
+                Canvas.SetTop(confirmationVisual, (MainCanvas.ActualHeight - confirmationVisual.Height - 15));
+                Canvas.SetLeft(confirmationVisual, 75);
             }
             else
             {
                 showingConfirmDialog = false;
-                txtVoiceCommandAlert.Visibility = Visibility.Hidden;
-                txtVoiceCommandAlert.Text = "";
+                MainWindow.animateSlide(confirmationVisual, true);
             }
         }
 
@@ -370,10 +387,12 @@ namespace Moto
             if (e.Paused)
             {
                 MainWindow.mySpeechRecognizer.stopListening(MainCanvas);
+                MainWindow.animateSlide(imgMotoLogo, false);
             }
             else
             {
                 MainWindow.mySpeechRecognizer.startListening(MainCanvas);
+                MainWindow.animateSlide(imgMotoLogo, true);
             }
         }
 
@@ -482,32 +501,36 @@ namespace Moto
         //Load appropriate pages
         void loadInstrument()
         {
-            unlistenVoice();
-            if (voiceConfirmTime.IsEnabled)
+            if (voiceConfirmTime != null)
             {
-                voiceConfirmTime.Stop();
+                removeConfirmationTime();
             }
 
-            MainWindow.sensor.AllFramesReady -= new EventHandler<AllFramesReadyEventArgs>(sensor_AllFramesReady);
-            handMovements.KinectGuideGesture -= new EventHandler<handMovements.GestureEventArgs>(handMovements_KinectGuideGesture);
-            handMovements.LeftGesture -= new EventHandler<handMovements.GestureEventArgs>(handMovements_LeftGesture);
-            handMovements.RightGesture -= new EventHandler<handMovements.GestureEventArgs>(handMovements_RightGesture);
+            removeListeners();
+
             this.NavigationService.Navigate(new instrument());
         }
 
         void loadWallOfSound()
         {
-            unlistenVoice();
-            if (voiceConfirmTime.IsEnabled)
+            if (voiceConfirmTime != null)
             {
-                voiceConfirmTime.Stop();
+                removeConfirmationTime();
             }
+
+            removeListeners();
+
+            this.NavigationService.Navigate(new wallOfSound());
+        }
+
+        private void removeListeners()
+        {
+            unlistenVoice();
 
             MainWindow.sensor.AllFramesReady -= new EventHandler<AllFramesReadyEventArgs>(sensor_AllFramesReady);
             handMovements.KinectGuideGesture -= new EventHandler<handMovements.GestureEventArgs>(handMovements_KinectGuideGesture);
             handMovements.LeftGesture -= new EventHandler<handMovements.GestureEventArgs>(handMovements_LeftGesture);
             handMovements.RightGesture -= new EventHandler<handMovements.GestureEventArgs>(handMovements_RightGesture);
-            this.NavigationService.Navigate(new wallOfSound());
         }
 
         //Development code

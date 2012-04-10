@@ -447,10 +447,12 @@ namespace Moto.Speech
             microphoneImg.Source = BitImg;
             microphoneImg.Height = 50;
 
-            Canvas.SetBottom(microphoneImg, 15);
+            canvas.Children.Add(microphoneImg);
+
+            Canvas.SetTop(microphoneImg, (canvas.ActualHeight - microphoneImg.Height - 15));
             Canvas.SetLeft(microphoneImg, 15);
 
-            canvas.Children.Add(microphoneImg);
+            MainWindow.animateSlide(microphoneImg,false,10,0.5);
 
         }
 
@@ -477,7 +479,10 @@ namespace Moto.Speech
         public void stopListening(Canvas canvas)
         {
             disableSpeechTimeout();
-            canvas.Children.Remove(microphoneImg);
+
+            MainWindow.animateSlide(microphoneImg, true, 10, 0.5);
+
+            //canvas.Children.Remove(microphoneImg);
         }
 
         public void toggleSpeech()

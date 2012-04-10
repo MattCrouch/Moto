@@ -5,6 +5,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media;
 using System.Collections.Generic;
 using System.Windows.Controls;
+using System.Windows.Media.Animation;
 using Microsoft.Kinect;
 using Moto.Speech;
 
@@ -268,6 +269,43 @@ namespace Moto
             {
                 return false;
             }
+        }
+
+        public static void animateSlide(FrameworkElement item, bool reverse = false, double movement = 10, double duration = 1) {
+            Console.WriteLine("SLIDEY SLIDEY");
+
+            DoubleAnimation daOpacity = new DoubleAnimation();
+            DoubleAnimation daMovement = new DoubleAnimation();
+
+            if (!reverse)
+            {
+                daOpacity.From = 0;
+                daOpacity.To = 1;
+                daMovement.From = movement;
+                daMovement.To = 0;
+            }
+            else
+            {
+                daOpacity.From = 1;
+                daOpacity.To = 0;
+                daMovement.From = 0;
+                daMovement.To = movement;
+            }
+
+            daOpacity.Duration = TimeSpan.FromSeconds(duration);
+
+            daMovement.Duration = TimeSpan.FromSeconds(duration);
+
+            TranslateTransform tt = new TranslateTransform();
+            item.RenderTransform = tt;
+
+            CircleEase ease = new CircleEase();
+            ease.EasingMode = EasingMode.EaseOut;
+            daOpacity.EasingFunction = ease;
+            daMovement.EasingFunction = ease;
+            
+            item.BeginAnimation(FrameworkElement.OpacityProperty, daOpacity);
+            tt.BeginAnimation(TranslateTransform.YProperty, daMovement);
         }
     }
 }
