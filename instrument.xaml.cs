@@ -722,13 +722,6 @@ namespace Moto
             return imageAddress;
 
         }
-        
-        private void btnCaptureImage_Click(object sender, RoutedEventArgs e)
-        {
-            startCaptureAnim();
-            //MainWindow.sensor.ColorStream.Enable(ColorImageFormat.RgbResolution1280x960Fps12);
-            //MainWindow.sensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(sensor_resetResolution);
-        }
 
         private void startCaptureAnim()
         {
@@ -839,16 +832,6 @@ namespace Moto
         }
 
         //Development code
-        private void btnBackFromDrums_Click(object sender, RoutedEventArgs e)
-        {
-            returnToStart();
-        }
-
-        public void showReadout(string text)
-        {
-            coordReadout.Content = text;
-        }
-
         private void Page_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             //Development shortcuts

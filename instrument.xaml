@@ -186,9 +186,6 @@
         		</TransformGroup>
         	</Image.RenderTransform>
         </Image>
-        <Button Canvas.Left="12" Canvas.Top="445" Content="Capture" Height="23" Name="btnCaptureImage" Width="75" Click="btnCaptureImage_Click" />
-        <Label Canvas.Left="166" Canvas.Top="434" Content="Label" Height="34" Name="coordReadout" Width="304" FontWeight="Bold" FontSize="16" Background="White" />
-        <Button Canvas.Left="553" Canvas.Top="445" Content="Go Back" Height="23" Name="btnBackFromDrums" Width="75" Click="btnBackFromDrums_Click" />
         <Image x:Name="imgCamera" Height="101.739" Canvas.Left="252.478" Source="/Moto;component/images/camera-game.png" Stretch="Fill" Canvas.Top="157.261" Width="113.043" RenderTransformOrigin="0.5,0.5" Visibility="Hidden">
         	<Image.RenderTransform>
         		<TransformGroup>

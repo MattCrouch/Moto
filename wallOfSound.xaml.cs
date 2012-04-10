@@ -604,13 +604,6 @@ namespace Moto
 
         }
 
-        private void btnCaptureImage_Click(object sender, RoutedEventArgs e)
-        {
-            //MainWindow.sensor.ColorStream.Enable(ColorImageFormat.RgbResolution1280x960Fps12);
-            //MainWindow.sensor.ColorFrameReady += new EventHandler<ColorImageFrameReadyEventArgs>(sensor_resetResolution);
-            startCaptureAnim();
-        }
-
         private void startCaptureAnim()
         {
             currentFocus = playerFocus.Picture;
@@ -673,11 +666,6 @@ namespace Moto
 
 
             MainWindow.depthImageBitmap.WritePixels(MainWindow.depthImageBitmapRect, enhPixelData, MainWindow.depthImageStride, 0);
-        }
-
-        private void btnBackFromDrums_Click(object sender, RoutedEventArgs e)
-        {
-            returnToStart();
         }
 
         private void Page_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)

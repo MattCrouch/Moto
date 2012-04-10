@@ -71,8 +71,8 @@
 		</Storyboard>
 		<Storyboard x:Key="stepUpToPlay">
 			<DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.Y)" Storyboard.TargetName="imgStepInToPlay">
-				<EasingDoubleKeyFrame KeyTime="0" Value="0"/>
-				<EasingDoubleKeyFrame KeyTime="0:0:1" Value="-20">
+				<EasingDoubleKeyFrame KeyTime="0" Value="20"/>
+				<EasingDoubleKeyFrame KeyTime="0:0:1" Value="0">
 					<EasingDoubleKeyFrame.EasingFunction>
 						<CircleEase EasingMode="EaseOut"/>
 					</EasingDoubleKeyFrame.EasingFunction>
@@ -240,7 +240,7 @@
         <Label Background="White" Canvas.Left="375" Canvas.Top="72" Content="play Wall of Sound" FontSize="26" FontWeight="Bold" Height="45" Name="lblPlayWallOfSound" Visibility="Hidden" />
         <Image x:Name="imgPrimaryGlowLeft" Height="76" Source="images/glowing-point.png" Stretch="Fill" Width="76" Visibility="Hidden" />
         <Image x:Name="imgPrimaryGlowRight" Height="76" Source="images/glowing-point.png" Stretch="Fill" Width="76" Visibility="Hidden" />
-        <Image x:Name="imgStepInToPlay" Height="206.412" Canvas.Left="153" Source="images/stepintoplay.png" Stretch="Fill" Canvas.Top="82.794" Width="334" RenderTransformOrigin="0.5,0.5">
+        <Image x:Name="imgStepInToPlay" Height="206.412" Canvas.Left="153" Source="images/stepintoplay.png" Stretch="Fill" Canvas.Top="83" Width="334" RenderTransformOrigin="0.5,0.5">
         	<Image.RenderTransform>
         		<TransformGroup>
         			<ScaleTransform/>
@@ -250,7 +250,7 @@
         		</TransformGroup>
         	</Image.RenderTransform>
         </Image>
-        <Image x:Name="imgLeftHand" Height="190" Canvas.Left="40" Source="images/person-left-arm-90.png" RenderOptions.BitmapScalingMode="HighQuality" Stretch="Fill" Canvas.Top="157" Width="150" RenderTransformOrigin="0.5,0.5">
+        <Image x:Name="imgLeftHand" Height="190" Canvas.Left="40" Source="images/person-left-arm-90.png" RenderOptions.BitmapScalingMode="HighQuality" Stretch="Fill" Canvas.Top="157" Width="150" RenderTransformOrigin="0.5,0.5" Visibility="Hidden">
         	<Image.RenderTransform>
         		<TransformGroup>
         			<ScaleTransform/>
@@ -260,7 +260,7 @@
         		</TransformGroup>
         	</Image.RenderTransform>
         </Image>
-        <Image x:Name="imgRightHand" Height="190" Canvas.Left="450" Source="images/person-right-arm-90.png" RenderOptions.BitmapScalingMode="HighQuality" Stretch="Fill" Canvas.Top="157" Width="150" RenderTransformOrigin="0.5,0.5">
+        <Image x:Name="imgRightHand" Height="190" Canvas.Left="450" Source="images/person-right-arm-90.png" RenderOptions.BitmapScalingMode="HighQuality" Stretch="Fill" Canvas.Top="157" Width="150" RenderTransformOrigin="0.5,0.5" Visibility="Hidden">
         	<Image.RenderTransform>
         		<TransformGroup>
         			<ScaleTransform/>
@@ -270,7 +270,7 @@
         		</TransformGroup>
         	</Image.RenderTransform>
         </Image>
-        <Image Height="135" Canvas.Left="395" Source="images/wall-of-sound.png" Stretch="Fill" Canvas.Top="28" Width="270" RenderOptions.BitmapScalingMode="HighQuality" Name="imgWallOfSound" RenderTransformOrigin="0.5,0.5">
+        <Image Height="135" Canvas.Left="395" Source="images/wall-of-sound.png" Stretch="Fill" Canvas.Top="28" Width="270" RenderOptions.BitmapScalingMode="HighQuality" Name="imgWallOfSound" RenderTransformOrigin="0.5,0.5" Visibility="Hidden">
         	<Image.RenderTransform>
         		<TransformGroup>
         			<ScaleTransform/>
@@ -280,7 +280,7 @@
         		</TransformGroup>
         	</Image.RenderTransform>
         </Image>
-        <Image Height="135" Source="images/instruments.png" Stretch="Fill" Canvas.Top="28" Width="270" RenderOptions.BitmapScalingMode="HighQuality" Name="imgBandMode" Canvas.Left="-25" RenderTransformOrigin="0.5,0.5">
+        <Image Height="135" Source="images/instruments.png" Stretch="Fill" Canvas.Top="28" Width="270" RenderOptions.BitmapScalingMode="HighQuality" Name="imgBandMode" Canvas.Left="-25" RenderTransformOrigin="0.5,0.5" Visibility="Hidden">
         	<Image.RenderTransform>
         		<TransformGroup>
         			<ScaleTransform/>

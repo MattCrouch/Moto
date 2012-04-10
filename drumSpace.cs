@@ -65,7 +65,6 @@ namespace Moto
             if (player.skeleton != null)
             {
                 double distQuotient = instrument.distQuotient(1, 3, player.skeleton.Position.Z, -0.05, 0.05);
-                showReadout(distQuotient.ToString());
                 double drumSize = 0.3 - distQuotient; //Size of drum edges (in metres)
 
                 //First drum
