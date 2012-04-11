@@ -47,6 +47,15 @@ namespace Moto
             public double Z { get; set; }
         }
 
+        public enum scrollDirection
+        {
+            None = 0,
+            SmallUp,
+            LargeUp,
+            SmallDown,
+            LargeDown
+        }
+
         public static void trackJointProgression(Skeleton skeleton, Joint joint)
         {
             //Pick up the position of provided joint
@@ -290,6 +299,45 @@ namespace Moto
             }
 
             return false;
+        }
+
+        public static scrollDirection sliderMenuValue(MainWindow.Player player, double angleValue)
+        {
+            bool upwards = false;
+            if (player.skeleton.Joints[JointType.ShoulderLeft].Position.Y < player.skeleton.Joints[JointType.HandLeft].Position.Y)
+            {
+                upwards = true;
+            }
+
+            if (angleValue > 75)
+            {
+                //No movement
+                return scrollDirection.None;
+            }
+            else if (angleValue > 50)
+            {
+                //Small increment
+                if (upwards)
+                {
+                    return scrollDirection.SmallUp;
+                }
+                else
+                {
+                    return scrollDirection.SmallDown;
+                }
+            }
+            else
+            {
+                //Large increment
+                if (upwards)
+                {
+                    return scrollDirection.LargeUp;
+                }
+                else
+                {
+                    return scrollDirection.LargeDown;
+                }
+            }
         }
 
         public static void toggleGestureStatus(ref bool flag, EventHandler<GestureEventArgs> theEvent, bool on)

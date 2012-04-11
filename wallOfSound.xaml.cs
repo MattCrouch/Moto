@@ -37,6 +37,8 @@ namespace Moto
 
             setupVoice();
 
+            setupKinectGuide();
+
             userImage.Source = MainWindow.colorImageBitmap;
             userDepth.Source = MainWindow.depthImageBitmap;
 
@@ -63,6 +65,18 @@ namespace Moto
         //Kinect Guide variables
         DispatcherTimer kinectGuideTimer;
         DispatcherTimer menuMovementTimer;
+        handMovements.scrollDirection menuScrollDirection;
+        menuOptions[] kinectGuideMenu = new menuOptions[Enum.GetValues(typeof(menuOptions)).Length];
+        int menuPosition;
+
+        enum menuOptions
+        {
+            //All menu items
+            GoBack,
+            CustomWall,
+            RecordNewWall,
+            Technologic
+        }
 
         //Player's current focus
         playerFocus currentFocus = playerFocus.None;
@@ -112,6 +126,19 @@ namespace Moto
         {
             MainWindow.mySpeechRecognizer.SaidSomething += this.RecognizerSaidSomething;
             MainWindow.mySpeechRecognizer.ListeningChanged += this.ListeningChanged;
+        }
+
+
+        private void setupKinectGuide()
+        {
+            //Loop through the 'menuOptions' enum and assign an array position for each
+
+            int i = 0;
+            foreach (menuOptions option in Enum.GetValues(typeof(menuOptions)))
+            {
+                kinectGuideMenu[i] = option;
+                i++;
+            }
         }
 
         private void defaultWallAudio()
@@ -517,61 +544,93 @@ namespace Moto
         {
             currentFocus = playerFocus.KinectGuide;
 
+            rectKinectGuide.Visibility = System.Windows.Visibility.Visible;
+
+            menuPosition = 0;
+
             //Listen for swipe gesture
             handMovements.LeftSwipeRight += new EventHandler<handMovements.GestureEventArgs>(handMovements_LeftSwipeRight);
+
+            menuMovementTimer = new DispatcherTimer();
+            menuMovementTimer.Interval = TimeSpan.FromMilliseconds(500);
+            menuMovementTimer.Tick += new EventHandler(menuMovementTimer_Tick);
+            menuMovementTimer.Start();
+        }
+
+        void menuMovementTimer_Tick(object sender, EventArgs e)
+        {
+            if (menuScrollDirection == handMovements.scrollDirection.SmallDown || menuScrollDirection == handMovements.scrollDirection.LargeDown)
+            {
+                if (menuPosition > 0)
+                {
+                    menuPosition--;
+                    Canvas.SetTop(rectKinectGuide, Canvas.GetTop(rectKinectGuide) + 50);
+                }
+            }
+            else if (menuScrollDirection == handMovements.scrollDirection.SmallUp || menuScrollDirection == handMovements.scrollDirection.LargeUp)
+            {
+                if (menuPosition < kinectGuideMenu.Length - 1)
+                {
+                    menuPosition++;
+                    Canvas.SetTop(rectKinectGuide, Canvas.GetTop(rectKinectGuide) - 50);
+                }
+            }
+            Console.WriteLine(kinectGuideMenu[menuPosition]);
         }
 
         private void kinectGuideManipulation(MainWindow.Player player)
         {
             double angleValue = handMovements.getAngle(player.skeleton.Joints[JointType.ShoulderLeft], player.skeleton.Joints[JointType.HandLeft]);
 
-            bool upwards = false;
-            if (player.skeleton.Joints[JointType.ShoulderLeft].Position.Y < player.skeleton.Joints[JointType.HandLeft].Position.Y)
-            {
-                upwards = true;
-            }
+            handMovements.scrollDirection oldDirection = menuScrollDirection;
 
-            if (angleValue > 75) {
-                //No movement
-                Console.WriteLine("No Movement");
-            }
-            else if (angleValue > 50)
+            menuScrollDirection = handMovements.sliderMenuValue(player, angleValue);
+
+            if (oldDirection != menuScrollDirection)
             {
-                //Small increment
-                if (upwards)
-                {
-                    Console.WriteLine("Small increment up");
-                }
-                else
-                {
-                    Console.WriteLine("Small increment down");
-                }
+                //Console.WriteLine("CHANGE IN DIRECTION: " + menuScrollDirection);
+                adjustMenuSpeed(menuScrollDirection);
+            }
+        }
+
+        private void adjustMenuSpeed(handMovements.scrollDirection scrollDirection)
+        {
+            if (scrollDirection == handMovements.scrollDirection.SmallUp || scrollDirection == handMovements.scrollDirection.SmallDown)
+            {
+                menuMovementTimer.Interval = TimeSpan.FromMilliseconds(500);
+                menuMovementTimer.Start();
+            }
+            else if (scrollDirection == handMovements.scrollDirection.LargeUp || scrollDirection == handMovements.scrollDirection.LargeDown)
+            {
+                menuMovementTimer.Interval = TimeSpan.FromMilliseconds(150);
+                menuMovementTimer.Start();
             }
             else
             {
-                //Large increment
-                if (upwards)
-                {
-                    Console.WriteLine("Large increment up");
-                }
-                else
-                {
-                    Console.WriteLine("Large increment down");
-                }
+                menuMovementTimer.Stop();
             }
-
-            //Console.WriteLine(angleValue);
         }
 
         void handMovements_LeftSwipeRight(object sender, handMovements.GestureEventArgs e)
         {
-            MessageBox.Show("Left swipe right");
+            Console.WriteLine("Left swipe right");
+            rectKinectGuide.Visibility = System.Windows.Visibility.Hidden;
+
+            MessageBox.Show(kinectGuideMenu[menuPosition].ToString());
 
             currentFocus = playerFocus.None;
 
             //Stop listening and reset the flag for next time
             handMovements.LeftSwipeRight -= handMovements_LeftSwipeRight;
             handMovements.LeftSwipeRightStatus = false;
+
+            //Remove menu nav tick
+            if (menuMovementTimer != null)
+            {
+                menuMovementTimer.Stop();
+                menuMovementTimer.Tick -= menuMovementTimer_Tick;
+                menuMovementTimer = null;
+            }
         }
 
         #region Image Capture
@@ -683,6 +742,9 @@ namespace Moto
         private void returnToStart()
         {
             MainWindow.sensor.AllFramesReady -= new EventHandler<AllFramesReadyEventArgs>(sensor_AllFramesReady);
+
+            MainWindow.mySpeechRecognizer.SaidSomething -= this.RecognizerSaidSomething;
+            MainWindow.mySpeechRecognizer.ListeningChanged -= this.ListeningChanged;
 
             this.NavigationService.GoBack();
         }

@@ -159,5 +159,6 @@
         <Image x:Name="imgPrimaryGlowLeft" Height="76" Source="images/glowing-point.png" Stretch="Fill" Width="76" Visibility="Hidden" />
         <Image x:Name="imgPrimaryGlowRight" Height="76" Source="images/glowing-point.png" Stretch="Fill" Width="76" Visibility="Hidden" />
         <Image x:Name="imgKinectGuide" Height="100" Source="/Moto;component/images/kinect-guide.png" Stretch="Fill" Canvas.Top="380" Width="100" Visibility="Hidden" />
+        <Rectangle Canvas.Left="0" Canvas.Top="420" Height="60" Name="rectKinectGuide" Stroke="Black" Width="60" Fill="Red" Visibility="Hidden" />
     </Canvas>
 </Page>
