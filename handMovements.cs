@@ -181,7 +181,7 @@ namespace Moto
                 {
                     //The hand has moved from left to right, was it fast enough for a swipe?
                     Console.WriteLine(difference[skeleton.TrackingId][JointType.HandLeft].X);
-                    if (difference[skeleton.TrackingId][JointType.HandLeft].X > 0.2)
+                    if (difference[skeleton.TrackingId][JointType.HandLeft].X > 0.2 && skeleton.Joints[JointType.HandLeft].TrackingState == JointTrackingState.Tracked)
                     {
                         toggleGestureStatus(ref LeftSwipeRightStatus, LeftSwipeRight, true);
                     }
@@ -189,11 +189,13 @@ namespace Moto
             }
         }
 
-        static void KinectGuideTimer_Tick(object sender, EventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
+        /// <summary>
+        /// Measures distance between two joints in a given axis
+        /// </summary>
+        /// <param name="joint1">A joint to measure from</param>
+        /// <param name="joint2">A joint to measure to</param>
+        /// <param name="axis">"X", "Y" or "Z"</param>
+        /// <returns>distance in metres between joints</returns>
         public static double jointDistance(Joint joint1, Joint joint2, string axis)
         {
             switch (axis)
@@ -208,6 +210,14 @@ namespace Moto
             return 100;
         }
 
+        /// <summary>
+        /// Calculates whether the supplied joints are level in a given axis
+        /// </summary>
+        /// <param name="joint1">A point of which to measure from</param>
+        /// <param name="joint2">A point of which to measure from</param>
+        /// <param name="axis">"X", "Y" or "Z"</param>
+        /// <param name="drift">Difference in metres between two points that could be considered 'level'</param>
+        /// <returns>true if the supplied joints are level, else false</returns>
         public static bool jointsLevel(Joint joint1, Joint joint2, string axis, double drift)
         {
             //returns true if joints in supplied axis are level (+ or - the 'drift', or 'leeway')
@@ -235,12 +245,19 @@ namespace Moto
             return false;
         }
 
+        /// <summary>
+        /// <para>This is as the RGB camera sees - 2D</para>
+        /// <para>The baseline is the y-axis - two points are vertically level with an angle of 0 and horizontally level with an angle of 90</para>
+        /// </summary>
+        /// <param name="joint1">A joint from which to get the angle</param>
+        /// <param name="joint2">A joint to measure an angle with</param>
+        /// <returns>double - size of the angle in degrees</returns>
         public static double getAngle(Joint joint1, Joint joint2)
         {
             //Returns an angle created by two points from the first point
             /*
              * NOTE: This is as the RGB camera sees - 2D
-             * NOTE: Our baseline is the x-axis - two points are vertically level with an angle of 0,
+             * NOTE: Our baseline is the y-axis - two points are vertically level with an angle of 0,
              *       and horizontally level with an angle of 90
             */
 

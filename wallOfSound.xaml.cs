@@ -62,6 +62,7 @@ namespace Moto
 
         //Kinect Guide variables
         DispatcherTimer kinectGuideTimer;
+        DispatcherTimer menuMovementTimer;
 
         //Player's current focus
         playerFocus currentFocus = playerFocus.None;
@@ -301,6 +302,11 @@ namespace Moto
 
                     handMovements.listenForGestures(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton);
 
+                    if (currentFocus == playerFocus.KinectGuide)
+                    {
+                        kinectGuideManipulation(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
+                    }
+
                     if (tempKey != MainWindow.primarySkeletonKey)
                     {
                         //Primary Skeleton changed
@@ -486,11 +492,14 @@ namespace Moto
             switch (e.Trigger)
             {
                 case handMovements.UserDecisions.Triggered:
-                    sb.Begin();
-                    kinectGuideTimer = new DispatcherTimer();
-                    kinectGuideTimer.Interval = TimeSpan.FromSeconds(3);
-                    kinectGuideTimer.Tick += new EventHandler(kinectGuideTimer_Tick);
-                    kinectGuideTimer.Start();
+                    if (currentFocus != playerFocus.KinectGuide)
+                    {
+                        sb.Begin();
+                        kinectGuideTimer = new DispatcherTimer();
+                        kinectGuideTimer.Interval = TimeSpan.FromSeconds(3);
+                        kinectGuideTimer.Tick += new EventHandler(kinectGuideTimer_Tick);
+                        kinectGuideTimer.Start();
+                    }
                     break;
                 case handMovements.UserDecisions.NotTriggered:
                     sb.Stop();
@@ -510,6 +519,48 @@ namespace Moto
 
             //Listen for swipe gesture
             handMovements.LeftSwipeRight += new EventHandler<handMovements.GestureEventArgs>(handMovements_LeftSwipeRight);
+        }
+
+        private void kinectGuideManipulation(MainWindow.Player player)
+        {
+            double angleValue = handMovements.getAngle(player.skeleton.Joints[JointType.ShoulderLeft], player.skeleton.Joints[JointType.HandLeft]);
+
+            bool upwards = false;
+            if (player.skeleton.Joints[JointType.ShoulderLeft].Position.Y < player.skeleton.Joints[JointType.HandLeft].Position.Y)
+            {
+                upwards = true;
+            }
+
+            if (angleValue > 75) {
+                //No movement
+                Console.WriteLine("No Movement");
+            }
+            else if (angleValue > 50)
+            {
+                //Small increment
+                if (upwards)
+                {
+                    Console.WriteLine("Small increment up");
+                }
+                else
+                {
+                    Console.WriteLine("Small increment down");
+                }
+            }
+            else
+            {
+                //Large increment
+                if (upwards)
+                {
+                    Console.WriteLine("Large increment up");
+                }
+                else
+                {
+                    Console.WriteLine("Large increment down");
+                }
+            }
+
+            //Console.WriteLine(angleValue);
         }
 
         void handMovements_LeftSwipeRight(object sender, handMovements.GestureEventArgs e)
