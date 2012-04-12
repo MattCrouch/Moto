@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Media.Imaging;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Collections.Generic;
@@ -33,9 +34,10 @@ namespace Moto
             return c;
         }
 
-        internal double checkNeckDist(MainWindow.Player player, Joint hand)
+        internal double checkNeckDist(MainWindow.Player player, JointType fretHand)
         {
             Joint hip = player.skeleton.Joints[JointType.HipCenter];
+            Joint hand = player.skeleton.Joints[fretHand];
 
             double xLength = doPythag((hip.Position.Z - hand.Position.Z), (hip.Position.X - hand.Position.X));
 
@@ -68,13 +70,52 @@ namespace Moto
 
         private void SetStrumPosition(MainWindow.Player player)
         {
+            JointType fretHand = JointType.HandLeft;
+
+            if (player.instrument == instrumentList.GuitarLeft)
+            {
+                fretHand = JointType.HandRight;
+            }
+
+            player.instrumentImage.Source = guitarImage(player);
+
             FrameworkElement image = player.instrumentImage;
 
             ColorImagePoint point = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Position, ColorImageFormat.RgbResolution640x480Fps30);
 
+            double angle = handMovements.getAngle(player.skeleton.Joints[JointType.HipCenter], player.skeleton.Joints[fretHand]);
+
+            if (player.skeleton.Joints[fretHand].Position.Y > player.skeleton.Joints[JointType.HipCenter].Position.Y)
+            {
+                //Upper quadrant
+                if (player.skeleton.Joints[fretHand].Position.X > player.skeleton.Joints[JointType.HipCenter].Position.X)
+                {
+                    
+                }
+                else
+                {
+                    angle = -angle;
+                }
+            }
+            else
+            {
+                //Lower quadrant
+                if (player.skeleton.Joints[fretHand].Position.X > player.skeleton.Joints[JointType.HipCenter].Position.X)
+                {
+                    angle = 180 - angle;
+                }
+                else
+                {
+                    angle += 180;
+                }
+            }
+
             //Grab the image reference and move it to the correct place
-            Canvas.SetLeft(image, point.X - (image.Width / 2));
-            Canvas.SetTop(image, point.Y - (image.Height / 2));
+            Canvas.SetLeft(image, point.X - (90));
+            Canvas.SetTop(image, point.Y - (390));
+
+            image.RenderTransform = new RotateTransform(angle, 90, 390);
+
             /*(FrameworkElement square)
              * double posStartX = (strumAreaStart[0] * 320) + 320;
             double posStartY = 480 - ((strumAreaStart[1] * 240) + 240);
@@ -105,12 +146,12 @@ namespace Moto
                         if (player.instrument == instrumentList.GuitarRight)
                         {
                             //Normal guitar stance
-                            strumGuitar(checkNeckDist(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandLeft]));
+                            strumGuitar(checkNeckDist(player, JointType.HandLeft));
                         }
                         else if (player.instrument == instrumentList.GuitarLeft)
                         {
                             //Lefty stance
-                            strumGuitar(checkNeckDist(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandRight]));
+                            strumGuitar(checkNeckDist(player, JointType.HandRight));
                         }
                         insideStrumArea[player.skeleton.TrackingId] = true;
                     }
@@ -145,6 +186,35 @@ namespace Moto
 
             mp.Play();
         }
-        }
 
+        private BitmapImage guitarImage(MainWindow.Player player)
+        {
+            JointType fretHand = JointType.HandLeft;
+
+            if (player.instrument == instrumentList.GuitarLeft)
+            {
+                fretHand = JointType.HandRight;
+            }
+
+            double neckDist = checkNeckDist(player, fretHand);
+
+            if (neckDist > 0.7)
+            {
+                return new BitmapImage(new Uri("images/guitar-green.png", UriKind.Relative));
+            }
+            else if (neckDist > 0.55)
+            {
+                return new BitmapImage(new Uri("images/guitar-red.png", UriKind.Relative));
+            }
+            else if (neckDist > 0.4)
+            {
+                return new BitmapImage(new Uri("images/guitar-yellow.png", UriKind.Relative));
+            }
+            else
+            {
+                return new BitmapImage(new Uri("images/guitar-blue.png", UriKind.Relative));
+            }
+        }
     }
+
+}

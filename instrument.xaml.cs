@@ -327,9 +327,10 @@ namespace Moto
                     break;
                 case instrumentList.GuitarLeft:
                 case instrumentList.GuitarRight:
-                    image.Source = new BitmapImage(new Uri("images/guitarplaceholder.png", UriKind.Relative));
-                    image.Width = 50;
-                    image.Height = 50;
+                    image.Source = new BitmapImage(new Uri("images/guitar.png", UriKind.Relative));
+                    image.Width = 180;
+                    image.Height = 510;
+
                     break;
             }
 
