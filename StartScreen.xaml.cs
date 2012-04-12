@@ -245,6 +245,10 @@ namespace Moto
                         modeDecision.Tick -= new EventHandler(modeDecisionWOS_Tick);
                         modeDecision = null;
                     }
+                    imgBandMode.Visibility = Visibility.Visible;
+                    imgLeftHand.Visibility = Visibility.Visible;
+                    imgWallOfSound.Visibility = Visibility.Visible;
+                    imgRightHand.Visibility = Visibility.Visible;
                     break;
             }
         }
