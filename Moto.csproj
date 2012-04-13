@@ -185,6 +185,9 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="images\drums.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="images\guitar-blue.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>

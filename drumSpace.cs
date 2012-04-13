@@ -64,38 +64,23 @@ namespace Moto
         {
             if (player.skeleton != null)
             {
-                double distQuotient = instrument.distQuotient(1, 3, player.skeleton.Position.Z, -0.05, 0.05);
-                double drumSize = 0.3 - distQuotient; //Size of drum edges (in metres)
-
-                //First drum
-                hitArea[player.skeleton.TrackingId][0].X1 = player.skeleton.Joints[JointType.HipCenter].Position.X - 0.2228546;
-                hitArea[player.skeleton.TrackingId][0].X2 = hitArea[player.skeleton.TrackingId][0].X1 + drumSize;
-                hitArea[player.skeleton.TrackingId][0].Y1 = player.skeleton.Joints[JointType.HipCenter].Position.Y - 0.36289116;
-                hitArea[player.skeleton.TrackingId][0].Y2 = hitArea[player.skeleton.TrackingId][0].Y1 + drumSize;
-                hitArea[player.skeleton.TrackingId][0].Z1 = player.skeleton.Joints[JointType.HipCenter].Position.Z - 0.1224589;
-                hitArea[player.skeleton.TrackingId][0].Z2 = hitArea[player.skeleton.TrackingId][0].Z1 + drumSize;
-
-                //Second drum
-                hitArea[player.skeleton.TrackingId][1].X1 = player.skeleton.Joints[JointType.HipCenter].Position.X + 0.2029613;
-                hitArea[player.skeleton.TrackingId][1].X2 = hitArea[player.skeleton.TrackingId][1].X1 + drumSize;
-                hitArea[player.skeleton.TrackingId][1].Y1 = player.skeleton.Joints[JointType.HipCenter].Position.Y - 0.36289116;
-                hitArea[player.skeleton.TrackingId][1].Y2 = hitArea[player.skeleton.TrackingId][1].Y1 + drumSize;
-                hitArea[player.skeleton.TrackingId][1].Z1 = player.skeleton.Joints[JointType.HipCenter].Position.Z - 0.1224589;
-                hitArea[player.skeleton.TrackingId][1].Z2 = hitArea[player.skeleton.TrackingId][1].Z1 + drumSize;
-
-                //Third drum
-                hitArea[player.skeleton.TrackingId][2].X1 = player.skeleton.Joints[JointType.HipCenter].Position.X + 0.3183096;
-                hitArea[player.skeleton.TrackingId][2].X2 = hitArea[player.skeleton.TrackingId][2].X1 + drumSize;
-                hitArea[player.skeleton.TrackingId][2].Y1 = player.skeleton.Joints[JointType.HipCenter].Position.Y + 0.22338450;
-                hitArea[player.skeleton.TrackingId][2].Y2 = hitArea[player.skeleton.TrackingId][2].Y1 + drumSize;
-                hitArea[player.skeleton.TrackingId][2].Z1 = player.skeleton.Joints[JointType.HipCenter].Position.Z - 0.1224589;
-                hitArea[player.skeleton.TrackingId][2].Z2 = hitArea[player.skeleton.TrackingId][2].Z1 + drumSize;
+                defineDrum(player, 0, -0.3035938, 0.0450525, -0.3892172);
+                defineDrum(player, 1, 0.1035938, 0.0450525, -0.3892172);
+                defineDrum(player, 2, 0.17892, 0.2215563, -0.4976295);
 
                 SetDrumPosition(player);
             }
         }
 
-
+        private void defineDrum(MainWindow.Player player, int drum, double X, double Y, double Z, double drumSize = 0.2)
+        {
+            hitArea[player.skeleton.TrackingId][drum].X1 = player.skeleton.Joints[JointType.HipCenter].Position.X + X;
+            hitArea[player.skeleton.TrackingId][drum].X2 = hitArea[player.skeleton.TrackingId][drum].X1 + drumSize;
+            hitArea[player.skeleton.TrackingId][drum].Y1 = player.skeleton.Joints[JointType.HipCenter].Position.Y + Y;
+            hitArea[player.skeleton.TrackingId][drum].Y2 = hitArea[player.skeleton.TrackingId][drum].Y1 + drumSize;
+            hitArea[player.skeleton.TrackingId][drum].Z1 = player.skeleton.Joints[JointType.HipCenter].Position.Z + Z;
+            hitArea[player.skeleton.TrackingId][drum].Z2 = hitArea[player.skeleton.TrackingId][drum].Z1 + drumSize;
+        }
 
         internal void checkDrumHit(MainWindow.Player player, JointType joint)
         {

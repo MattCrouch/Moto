@@ -321,9 +321,9 @@ namespace Moto
             switch (instrument)
             {
                 case instrumentList.Drums:
-                    image.Source = new BitmapImage(new Uri("images/drumplaceholder.png", UriKind.Relative));
-                    image.Width = 100;
-                    image.Height = 100;
+                    image.Source = new BitmapImage(new Uri("images/drums.png", UriKind.Relative));
+                    image.Width = 360;
+                    image.Height = image.Width * 0.80;
                     break;
                 case instrumentList.GuitarLeft:
                 case instrumentList.GuitarRight:
