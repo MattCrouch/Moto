@@ -110,11 +110,15 @@ namespace Moto
                 }
             }
 
-            //Grab the image reference and move it to the correct place
-            Canvas.SetLeft(image, point.X - (90));
-            Canvas.SetTop(image, point.Y - (390));
+            //Define center point to pivot around
+            double centerX = image.Width * 0.5;
+            double centerY = image.Height * 0.75;
 
-            image.RenderTransform = new RotateTransform(angle, 90, 390);
+            //Grab the image reference and move it to the correct place
+            Canvas.SetLeft(image, point.X - centerX);
+            Canvas.SetTop(image, point.Y - centerY);
+
+            image.RenderTransform = new RotateTransform(angle, centerX, centerY);
 
             /*(FrameworkElement square)
              * double posStartX = (strumAreaStart[0] * 320) + 320;
