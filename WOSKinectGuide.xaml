@@ -1,0 +1,21 @@
+﻿<UserControl
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	mc:Ignorable="d"
+	x:Class="Moto.WOSKinectGuide"
+	x:Name="UserControl"
+	d:DesignWidth="146" d:DesignHeight="109.217">
+
+	<Grid x:Name="LayoutRoot">
+		<Rectangle Fill="#FFF4F4F5" Height="50" Stroke="Black" Margin="-1,-2,-53,0" VerticalAlignment="Top"/>
+		<Rectangle Fill="#FFF4F4F5" Height="50" Stroke="Black" Margin="-1,0,-53,-2.783" VerticalAlignment="Bottom"/>
+		<Rectangle Fill="#FFF4F4F5" Height="50" Stroke="Black" Margin="-1,0,-53,-66.783" VerticalAlignment="Bottom"/>
+		<Rectangle Fill="#FFF4F4F5" Height="50" Stroke="Black" Margin="-1,0,-53,-130.783" VerticalAlignment="Bottom"/>
+		<Rectangle Fill="#FFF4F4F5" Height="50" Stroke="Black" Margin="-1,0,-53,-194.783" VerticalAlignment="Bottom"/>
+		<Rectangle Fill="#FFF4F4F5" Height="50" Stroke="Black" Margin="-1,0,-53,-258.783" VerticalAlignment="Bottom"/>
+		<Rectangle Fill="#FFF4F4F5" Height="50" Stroke="Black" Margin="-1,0,-53,-322.783" VerticalAlignment="Bottom"/>
+		<Rectangle Fill="#FFF4F4F5" Height="50" Stroke="Black" Margin="-1,0,-53,-386.783" VerticalAlignment="Bottom"/>
+	</Grid>
+</UserControl>

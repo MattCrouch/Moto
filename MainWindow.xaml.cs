@@ -45,12 +45,27 @@ namespace Moto
             {
                 skeleton = null;
                 instrument = Moto.instrument.instrumentList.None;
+                mode = PlayerMode.None;
                 instrumentImage = null;
             }
 
             public Skeleton skeleton { get; set; }
             public instrument.instrumentList instrument { get; set; }
+            public PlayerMode mode { get; set; }
             public Image instrumentImage {get; set; }
+        }
+
+        public enum PlayerMode
+        {
+            None = 0,
+            //Guitar
+            Acoustic,
+            Electric,
+            //Wall of Sound
+            Technologic,
+            Drum,
+            Custom,
+            Create,
         }
 
         //Hit area structure
@@ -96,6 +111,7 @@ namespace Moto
                 {
                     case KinectStatus.Connected:
                         sensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
+                        //sensor.ColorStream.Enable(ColorImageFormat.RgbResolution1280x960Fps12);
                         sensor.DepthStream.Enable();
                         sensor.SkeletonStream.Enable();
 
@@ -271,7 +287,7 @@ namespace Moto
             }
         }
 
-        public static void animateSlide(FrameworkElement item, bool reverse = false, double movement = 10, double duration = 1) {
+        public static void animateSlide(FrameworkElement item, bool vertical = true, bool reverse = false, double movement = 10, double duration = 1) {
             DoubleAnimation daOpacity = new DoubleAnimation();
             DoubleAnimation daMovement = new DoubleAnimation();
 
@@ -303,7 +319,14 @@ namespace Moto
             daMovement.EasingFunction = ease;
             
             item.BeginAnimation(FrameworkElement.OpacityProperty, daOpacity);
-            tt.BeginAnimation(TranslateTransform.YProperty, daMovement);
+            if (vertical)
+            {
+                tt.BeginAnimation(TranslateTransform.YProperty, daMovement);
+            }
+            else
+            {
+                tt.BeginAnimation(TranslateTransform.XProperty, daMovement);
+            }
         }
     }
 }

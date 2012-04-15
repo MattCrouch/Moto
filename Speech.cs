@@ -452,7 +452,7 @@ namespace Moto.Speech
             Canvas.SetTop(microphoneImg, (canvas.ActualHeight - microphoneImg.Height - 15));
             Canvas.SetLeft(microphoneImg, 15);
 
-            MainWindow.animateSlide(microphoneImg,false,10,0.5);
+            MainWindow.animateSlide(microphoneImg,true,false,10,0.5);
 
         }
 
@@ -482,7 +482,7 @@ namespace Moto.Speech
 
             if (microphoneImg != null)
             {
-                MainWindow.animateSlide(microphoneImg, true, 10, 0.5);
+                MainWindow.animateSlide(microphoneImg, true, true, 10, 0.5);
             }
 
             //canvas.Children.Remove(microphoneImg);

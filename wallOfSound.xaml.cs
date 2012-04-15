@@ -75,7 +75,8 @@ namespace Moto
             GoBack,
             CustomWall,
             RecordNewWall,
-            Technologic
+            Technologic,
+            Drum,
         }
 
         //Player's current focus
@@ -115,7 +116,15 @@ namespace Moto
 
                 hitArea.Add(player.skeleton.TrackingId, blankDefinitions);
 
-                defaultWallAudio();
+                switch (player.mode)
+                {
+                    case MainWindow.PlayerMode.Technologic:
+                        technologicAudio();
+                        break;
+                    case MainWindow.PlayerMode.Drum:
+                        drumsetAudio();
+                        break;
+                }
             }
 
             //Make sure the hands aren't in the drums areas in the first place
@@ -141,7 +150,7 @@ namespace Moto
             }
         }
 
-        private void defaultWallAudio()
+        private void technologicAudio()
         {
             wallAudio[0] = "audio/wall/technologic/buyit.wav";
             wallAudio[1] = "audio/wall/technologic/useit.wav";
@@ -151,6 +160,13 @@ namespace Moto
             wallAudio[5] = "audio/wall/technologic/changeit.wav";
             wallAudio[6] = "audio/wall/technologic/mail.wav";
             wallAudio[7] = "audio/wall/technologic/upgradeit.wav";
+        }
+
+        private void drumsetAudio()
+        {
+            wallAudio[0] = "audio/drums/drum0.wav";
+            wallAudio[1] = "audio/drums/drum1.wav";
+            wallAudio[2] = "audio/drums/drum2.wav";
         }
 
         internal void defineHitAreas(MainWindow.Player player)
@@ -432,10 +448,13 @@ namespace Moto
             {
                 if (handMovements.difference[skeleton.TrackingId][joint].Z < -0.01)
                 {
-                    mpDictionary[(mpCounter % 4)].Open(new Uri(wallAudio[i], UriKind.Relative));
-                    mpDictionary[(mpCounter % 4)].Play();
+                    if (wallAudio[i] != null)
+                    {
+                        mpDictionary[(mpCounter % 4)].Open(new Uri(wallAudio[i], UriKind.Relative));
+                        mpDictionary[(mpCounter % 4)].Play();
 
-                    mpCounter++;
+                        mpCounter++;
+                    }
                 }
             }
         }
@@ -444,6 +463,7 @@ namespace Moto
         {
             //Set up a new player with their Wall
             player.instrument = instrument.instrumentList.WallOfSound;
+            player.mode = MainWindow.PlayerMode.Drum;
             
             Image image = new Image();
             image.Source = new BitmapImage(new Uri("images/wall-sample.png", UriKind.Relative));
@@ -544,7 +564,11 @@ namespace Moto
         {
             currentFocus = playerFocus.KinectGuide;
 
-            rectKinectGuide.Visibility = System.Windows.Visibility.Visible;
+            MainWindow.animateSlide(testCanvas, false, false, -150, 0.5);
+            MainWindow.animateSlide(rectangle1, false, false, -150, 0.5);
+            
+            testCanvas.Visibility = System.Windows.Visibility.Visible;
+            rectangle1.Visibility = System.Windows.Visibility.Visible;
 
             menuPosition = 0;
 
@@ -559,23 +583,31 @@ namespace Moto
 
         void menuMovementTimer_Tick(object sender, EventArgs e)
         {
-            if (menuScrollDirection == handMovements.scrollDirection.SmallDown || menuScrollDirection == handMovements.scrollDirection.LargeDown)
-            {
-                if (menuPosition > 0)
-                {
-                    menuPosition--;
-                    Canvas.SetTop(rectKinectGuide, Canvas.GetTop(rectKinectGuide) + 50);
-                }
-            }
-            else if (menuScrollDirection == handMovements.scrollDirection.SmallUp || menuScrollDirection == handMovements.scrollDirection.LargeUp)
-            {
-                if (menuPosition < kinectGuideMenu.Length - 1)
-                {
-                    menuPosition++;
-                    Canvas.SetTop(rectKinectGuide, Canvas.GetTop(rectKinectGuide) - 50);
-                }
-            }
+            menuTick();
+
             Console.WriteLine(kinectGuideMenu[menuPosition]);
+        }
+
+        private void menuTick()
+        {
+            Skeleton player = MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton;
+            if (handMovements.isLimbStraight(player.Joints[JointType.ShoulderLeft], player.Joints[JointType.ElbowLeft], player.Joints[JointType.HandLeft], 10))
+            {
+                if (menuScrollDirection == handMovements.scrollDirection.SmallDown || menuScrollDirection == handMovements.scrollDirection.LargeDown)
+                {
+                    if (menuPosition > 0)
+                    {
+                        animateMenu(false);
+                    }
+                }
+                else if (menuScrollDirection == handMovements.scrollDirection.SmallUp || menuScrollDirection == handMovements.scrollDirection.LargeUp)
+                {
+                    if (menuPosition < kinectGuideMenu.Length - 1)
+                    {
+                        animateMenu(true);
+                    }
+                }
+            }
         }
 
         private void kinectGuideManipulation(MainWindow.Player player)
@@ -599,11 +631,13 @@ namespace Moto
             {
                 menuMovementTimer.Interval = TimeSpan.FromMilliseconds(500);
                 menuMovementTimer.Start();
+                menuTick();
             }
             else if (scrollDirection == handMovements.scrollDirection.LargeUp || scrollDirection == handMovements.scrollDirection.LargeDown)
             {
                 menuMovementTimer.Interval = TimeSpan.FromMilliseconds(150);
                 menuMovementTimer.Start();
+                menuTick();
             }
             else
             {
@@ -614,9 +648,9 @@ namespace Moto
         void handMovements_LeftSwipeRight(object sender, handMovements.GestureEventArgs e)
         {
             Console.WriteLine("Left swipe right");
-            rectKinectGuide.Visibility = System.Windows.Visibility.Hidden;
 
-            MessageBox.Show(kinectGuideMenu[menuPosition].ToString());
+            MainWindow.animateSlide(testCanvas, false, true, -150, 0.5);
+            MainWindow.animateSlide(rectangle1, false, true, -150, 0.5);
 
             currentFocus = playerFocus.None;
 
@@ -630,6 +664,16 @@ namespace Moto
                 menuMovementTimer.Stop();
                 menuMovementTimer.Tick -= menuMovementTimer_Tick;
                 menuMovementTimer = null;
+            }
+
+            switch (kinectGuideMenu[menuPosition])
+            {
+                case menuOptions.Technologic:
+                    technologicAudio();
+                    break;
+                case menuOptions.Drum:
+                    drumsetAudio();
+                    break;
             }
         }
 
@@ -803,6 +847,39 @@ namespace Moto
                     Application.Current.Shutdown();
                     break;
             }
+        }
+
+        private void animateMenu(bool up = true, int count = 1)
+        {
+           Canvas.SetTop(testCanvas, 60 * menuPosition);
+            
+            DoubleAnimation animation = new DoubleAnimation();
+
+            animation.Duration = TimeSpan.FromMilliseconds(200);
+            animation.From = 0;
+
+            if (up)
+            {
+                menuPosition++;
+                //Selection going up, move menu down
+                animation.By = animation.From + (60 * count);
+            }
+            else
+            {
+                menuPosition--;
+                //Selection going down, move menu up
+                animation.By = animation.From + (-60 * count);
+            }
+
+            TranslateTransform tt = new TranslateTransform();
+            testCanvas.RenderTransform = tt;
+
+            CircleEase ease = new CircleEase();
+            ease.EasingMode = EasingMode.EaseOut;
+            animation.EasingFunction = ease;
+
+            tt.BeginAnimation(TranslateTransform.YProperty, animation);
+            Console.WriteLine(menuPosition);
         }
     }
 }

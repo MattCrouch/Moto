@@ -118,7 +118,7 @@ namespace Moto
                 {
                     return;
                 }
-
+                
                 byte[] pixelData = new byte[colorFrame.PixelDataLength];
                 colorFrame.CopyPixelDataTo(pixelData);
 
@@ -348,10 +348,12 @@ namespace Moto
             {
                 case instrumentList.Drums:
                     setupDrums(MainWindow.activeSkeletons[player.skeleton.TrackingId]);
+                    MainWindow.activeSkeletons[player.skeleton.TrackingId].mode = MainWindow.PlayerMode.None;
                     break;
                 case instrumentList.GuitarLeft:
                 case instrumentList.GuitarRight:
                     setupGuitar(MainWindow.activeSkeletons[player.skeleton.TrackingId]);
+                    MainWindow.activeSkeletons[player.skeleton.TrackingId].mode = MainWindow.PlayerMode.Acoustic;
                     break;
             }
 
@@ -725,6 +727,7 @@ namespace Moto
 
         private void startCaptureAnim()
         {
+            toggleRGB();
             imgGetReady.Visibility = Visibility.Visible;
             imgCamera.Visibility = Visibility.Visible;
             pictureCountdown = new DispatcherTimer();
@@ -743,6 +746,7 @@ namespace Moto
             uploadPicture(captureImage((BitmapSource)userImage.Source));
             imgGetReady.Visibility = Visibility.Hidden;
             imgCamera.Visibility = Visibility.Hidden;
+            toggleRGB();
         }
 
         /*void sensor_resetResolution(object sender, ColorImageFrameReadyEventArgs e)
@@ -856,6 +860,10 @@ namespace Moto
                     //Take a picture
                     startCaptureAnim();
                     break;
+                case System.Windows.Input.Key.F:
+                    //Toggle RGB input style
+                    toggleRGB();
+                    break;
                 case System.Windows.Input.Key.B:
                     //Back to the start screen
                     returnToStart();
@@ -865,6 +873,26 @@ namespace Moto
                     Application.Current.Shutdown();
                     break;
             }
+        }
+
+        private void toggleRGB()
+        {
+            userImage.Source = null;
+
+            if (MainWindow.sensor.ColorStream.Format == ColorImageFormat.RgbResolution640x480Fps30)
+            {
+                MainWindow.sensor.ColorStream.Enable(ColorImageFormat.RgbResolution1280x960Fps12);
+            }
+            else
+            {
+                MainWindow.sensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
+            }
+
+            MainWindow.colorImageBitmap = new WriteableBitmap(MainWindow.sensor.ColorStream.FrameWidth, MainWindow.sensor.ColorStream.FrameHeight, 96, 96, PixelFormats.Bgr32, null);
+            MainWindow.colorImageBitmapRect = new Int32Rect(0, 0, MainWindow.sensor.ColorStream.FrameWidth, MainWindow.sensor.ColorStream.FrameHeight);
+            MainWindow.colorImageStride = MainWindow.sensor.ColorStream.FrameWidth * MainWindow.sensor.ColorStream.FrameBytesPerPixel;
+            
+            userImage.Source = MainWindow.colorImageBitmap;            
         }
     }
 }
