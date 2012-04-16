@@ -1,5 +1,13 @@
 CHANGELOG
 =========
+0.5.1.0 - 16/4/12
+-----------------
+- Start screen visuals have been updated
+- 'Instruments' is now called 'Band Mode'
+- Added basic graphic overlays to the guitar and drumset in Band Mode
+- Added a basic horizontal scrolling menu to the Wall of Sound
+- Higher definition images are now captured when Moto takes a picture
+- Improved the accuracy of both modes when players are at the extreme edges of the play area
 
 0.5.0.11 - 5/4/12
 -----------------

@@ -192,7 +192,10 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <BlendEmbeddedFont Include="Fonts\La-chata-normal.ttf">
+    <Resource Include="images\text-background.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Fonts\La-chata-normal.ttf">
       <IsSystemFont>True</IsSystemFont>
       <All>True</All>
       <AutoFill>True</AutoFill>
@@ -202,7 +205,11 @@
       <Lowercase>True</Lowercase>
       <Numbers>True</Numbers>
       <Punctuation>True</Punctuation>
-    </BlendEmbeddedFont>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="images\preparing.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="images\drums.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>

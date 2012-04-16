@@ -491,7 +491,7 @@ namespace Moto
             {
                 case SpeechRecognizer.Verbs.Capture:
                     //Take a picture
-                    startCaptureAnim();
+                    takeAPicture();
                     break;
                 case SpeechRecognizer.Verbs.ReturnToStart:
                     //Back to StartScreen
@@ -649,8 +649,8 @@ namespace Moto
         {
             Console.WriteLine("Left swipe right");
 
-            MainWindow.animateSlide(testCanvas, false, true, -150, 0.5);
-            MainWindow.animateSlide(rectangle1, false, true, -150, 0.5);
+            MainWindow.animateSlide(testCanvas, true, false, -150, 0.5);
+            MainWindow.animateSlide(rectangle1, true, false, -150, 0.5);
 
             currentFocus = playerFocus.None;
 
@@ -681,6 +681,22 @@ namespace Moto
         private Storyboard flashStoryboard;
         private Rectangle cameraFlash;
         private DispatcherTimer pictureCountdown;
+        private DispatcherTimer imgProcessDelay;
+        private TextBlock uploadFeedback;
+        private Image cameraUpload;
+
+        void takeAPicture()
+        {
+            currentFocus = playerFocus.Picture;
+            toggleRGB(ColorImageFormat.RgbResolution1280x960Fps12);
+
+            Storyboard sb = this.FindResource("photoPrep") as Storyboard;
+            sb.AutoReverse = false;
+            sb.Begin();
+
+            Storyboard sb2 = this.FindResource("photoLoading") as Storyboard;
+            sb2.Begin();
+        }
 
         void uploadPicture(string imageAddress)
         {
@@ -713,12 +729,35 @@ namespace Moto
 
         void Client_UploadFileCompleted(object sender, System.Net.UploadFileCompletedEventArgs e)
         {
+            string uploadString;
+
+            if (e.Error != null)
+            {
+                uploadString = "cannot upload to moto";
+            }
+            else
+            {
+                uploadString = System.Text.Encoding.UTF8.GetString(e.Result, 0, e.Result.Length);
+            }
+
             //WHAT HAPPENS WHEN THE UPLOAD HAS FINISHED
-            //System.Windows.Controls.Label label = new Label();
+            uploadFeedback = new TextBlock();
+            uploadFeedback.FontFamily = new FontFamily(new Uri("pack://application:,,,/Fonts/La-chata-normal.ttf"), "La Chata");
+            uploadFeedback.FontSize = 40;
+            uploadFeedback.Foreground = new SolidColorBrush(Color.FromRgb(230, 229, 255));
+            uploadFeedback.Text = uploadString;
 
-            //label.Content = "FINISHED UPLOADING!!!!";
+            cameraUpload = new Image();
+            cameraUpload.Source = new BitmapImage(new Uri("/Moto;component/images/camera-game.png", UriKind.Relative));
+            cameraUpload.Width = 70;
 
-            //MainCanvas.Children.Add(label);
+            MainCanvas.Children.Add(uploadFeedback);
+            MainCanvas.Children.Add(cameraUpload);
+
+            Canvas.SetLeft(uploadFeedback, 70);
+
+            MainWindow.animateSlide(uploadFeedback);
+            MainWindow.animateSlide(cameraUpload);
         }
 
         void Client_UploadProgressChanged(object sender, System.Net.UploadProgressChangedEventArgs e)
@@ -760,6 +799,14 @@ namespace Moto
 
         private void startCaptureAnim()
         {
+            Storyboard sb2 = this.FindResource("photoPrep") as Storyboard;
+            sb2.AutoReverse = true;
+            sb2.Begin(this, true);
+            sb2.Seek(this, new TimeSpan(0, 0, 0), TimeSeekOrigin.Duration);
+
+            Storyboard sb3 = this.FindResource("photoLoading") as Storyboard;
+            sb2.Stop();
+
             currentFocus = playerFocus.Picture;
             imgGetReady.Visibility = Visibility.Visible;
             imgCamera.Visibility = Visibility.Visible;
@@ -780,7 +827,54 @@ namespace Moto
             uploadPicture(captureImage((BitmapSource)userImage.Source));
             imgGetReady.Visibility = Visibility.Hidden;
             imgCamera.Visibility = Visibility.Hidden;
-        } 
+            toggleRGB(ColorImageFormat.RgbResolution640x480Fps30, 5000);
+        }
+
+        private void toggleRGB(ColorImageFormat format, int delay = 3000)
+        {
+            if (MainWindow.sensor.ColorStream.Format != format)
+            {
+                MainWindow.sensor.ColorStream.Enable(format);
+
+                MainWindow.colorImageBitmap = new WriteableBitmap(MainWindow.sensor.ColorStream.FrameWidth, MainWindow.sensor.ColorStream.FrameHeight, 96, 96, PixelFormats.Bgr32, null);
+                MainWindow.colorImageBitmapRect = new Int32Rect(0, 0, MainWindow.sensor.ColorStream.FrameWidth, MainWindow.sensor.ColorStream.FrameHeight);
+                MainWindow.colorImageStride = MainWindow.sensor.ColorStream.FrameWidth * MainWindow.sensor.ColorStream.FrameBytesPerPixel;
+
+                imgProcessDelay = new DispatcherTimer();
+                imgProcessDelay.Interval = TimeSpan.FromMilliseconds(delay);
+                imgProcessDelay.Tick += new EventHandler(imgProcessDelay_Tick);
+                imgProcessDelay.Start();
+            }
+        }
+
+        void imgProcessDelay_Tick(object sender, EventArgs e)
+        {
+            if (imgProcessDelay != null)
+            {
+                imgProcessDelay.Tick -= imgProcessDelay_Tick;
+                imgProcessDelay.Stop();
+                imgProcessDelay = null;
+            }
+
+            userImage.Source = MainWindow.colorImageBitmap;
+
+            if (currentFocus == playerFocus.Picture)
+            {
+                startCaptureAnim();
+            }
+
+            if (uploadFeedback != null)
+            {
+                MainCanvas.Children.Remove(uploadFeedback);
+                uploadFeedback = null;
+            }
+
+            if (cameraUpload != null)
+            {
+                MainCanvas.Children.Remove(cameraUpload);
+                cameraUpload = null;
+            }
+        }
         #endregion
 
         private void returnToStart()
@@ -836,7 +930,7 @@ namespace Moto
                     break;
                 case System.Windows.Input.Key.C:
                     //Take a picture
-                    startCaptureAnim();
+                    takeAPicture();
                     break;
                 case System.Windows.Input.Key.B:
                     //Back to the start screen

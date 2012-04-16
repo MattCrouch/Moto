@@ -452,7 +452,7 @@ namespace Moto.Speech
             Canvas.SetTop(microphoneImg, (canvas.ActualHeight - microphoneImg.Height - 15));
             Canvas.SetLeft(microphoneImg, 15);
 
-            MainWindow.animateSlide(microphoneImg,true,false,10,0.5);
+            MainWindow.animateSlide(microphoneImg,false,true,10,0.5);
 
         }
 

@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -7,7 +7,6 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using System.Collections.Generic;
 using Coding4Fun.Kinect.Wpf;
 using Microsoft.Kinect;
 using Moto.Speech;
@@ -91,6 +90,9 @@ namespace Moto
         private Storyboard flashStoryboard;
         private Rectangle cameraFlash;
         private DispatcherTimer pictureCountdown;
+        private DispatcherTimer imgProcessDelay;
+        private TextBlock uploadFeedback;
+        private Image cameraUpload;
 
         //Housekeeping
         void processExistingSkeletons(Dictionary<int, MainWindow.Player> activeSkeletons)
@@ -114,7 +116,7 @@ namespace Moto
             using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
             {
                 //COLOUR IMAGE CODE
-                if (colorFrame == null)
+                if (colorFrame == null || colorFrame.Format != MainWindow.sensor.ColorStream.Format)
                 {
                     return;
                 }
@@ -286,7 +288,7 @@ namespace Moto
                     currentInstrumentSelection = instrumentSelectionOptions.None;
                     break;
                 case SpeechRecognizer.Verbs.Capture:
-                    startCaptureAnim();
+                    takeAPicture();
                     break;
                 case SpeechRecognizer.Verbs.ReturnToStart:
                     returnToStart();
@@ -649,6 +651,20 @@ namespace Moto
         }
 
         #region Image Capture
+        
+        void takeAPicture()
+        {
+            currentFocus = playerFocus.Picture;
+            toggleRGB(ColorImageFormat.RgbResolution1280x960Fps12);
+
+            Storyboard sb = this.FindResource("photoPrep") as Storyboard;
+            sb.AutoReverse = false;
+            sb.Begin();
+
+            Storyboard sb2 = this.FindResource("photoLoading") as Storyboard;
+            sb2.Begin();
+        }
+
         void uploadPicture(string imageAddress)
         {
             System.Net.WebClient Client = new System.Net.WebClient();
@@ -661,10 +677,6 @@ namespace Moto
 
             Client.UploadProgressChanged += new System.Net.UploadProgressChangedEventHandler(Client_UploadProgressChanged);
             Client.UploadFileCompleted += new System.Net.UploadFileCompletedEventHandler(Client_UploadFileCompleted);
-
-
-            //string s = System.Text.Encoding.UTF8.GetString(result, 0, result.Length);
-            //MessageBox.Show(s);
         }
 
         void cameraFlash_Loaded(object sender, RoutedEventArgs e)
@@ -680,12 +692,35 @@ namespace Moto
 
         void Client_UploadFileCompleted(object sender, System.Net.UploadFileCompletedEventArgs e)
         {
+            string uploadString;
+
+            if (e.Error != null)
+            {
+                uploadString = "cannot upload to moto";
+            }
+            else
+            {
+                uploadString = System.Text.Encoding.UTF8.GetString(e.Result, 0, e.Result.Length);
+            }
+
             //WHAT HAPPENS WHEN THE UPLOAD HAS FINISHED
-            //System.Windows.Controls.Label label = new Label();
+            uploadFeedback = new TextBlock();
+            uploadFeedback.FontFamily = new FontFamily(new Uri("pack://application:,,,/Fonts/La-chata-normal.ttf"), "La Chata");
+            uploadFeedback.FontSize = 40;
+            uploadFeedback.Foreground = new SolidColorBrush(Color.FromRgb(230, 229, 255));
+            uploadFeedback.Text = uploadString;
+      
+            cameraUpload = new Image();
+            cameraUpload.Source = new BitmapImage(new Uri("/Moto;component/images/camera-game.png", UriKind.Relative));
+            cameraUpload.Width = 70;
 
-            //label.Content = "FINISHED UPLOADING!!!!";
+            MainCanvas.Children.Add(uploadFeedback);
+            MainCanvas.Children.Add(cameraUpload);
 
-            //MainCanvas.Children.Add(label);
+            Canvas.SetLeft(uploadFeedback, 70);
+
+            MainWindow.animateSlide(uploadFeedback);
+            MainWindow.animateSlide(cameraUpload);
         }
 
         void Client_UploadProgressChanged(object sender, System.Net.UploadProgressChangedEventArgs e)
@@ -727,7 +762,16 @@ namespace Moto
 
         private void startCaptureAnim()
         {
-            toggleRGB();
+            //MainWindow.animateSlide(preparingImg, true, true, 5, 0.5);
+
+            Storyboard sb2 = this.FindResource("photoPrep") as Storyboard;
+            sb2.AutoReverse = true;
+            sb2.Begin(this, true);
+            sb2.Seek(this, new TimeSpan(0, 0, 0), TimeSeekOrigin.Duration);
+
+            Storyboard sb3 = this.FindResource("photoLoading") as Storyboard;
+            sb2.Stop();
+
             imgGetReady.Visibility = Visibility.Visible;
             imgCamera.Visibility = Visibility.Visible;
             pictureCountdown = new DispatcherTimer();
@@ -741,20 +785,15 @@ namespace Moto
 
         void pictureCountdown_Tick(object sender, EventArgs e)
         {
+            currentFocus = playerFocus.None;
             pictureCountdown.Stop();
             pictureCountdown.Tick -= new EventHandler(pictureCountdown_Tick);
             uploadPicture(captureImage((BitmapSource)userImage.Source));
             imgGetReady.Visibility = Visibility.Hidden;
             imgCamera.Visibility = Visibility.Hidden;
-            toggleRGB();
+            toggleRGB(ColorImageFormat.RgbResolution640x480Fps30, 5000);
         }
 
-        /*void sensor_resetResolution(object sender, ColorImageFrameReadyEventArgs e)
-        {
-            MainWindow.sensor.ColorFrameReady -= new EventHandler<ColorImageFrameReadyEventArgs>(sensor_resetResolution);
-            uploadPicture(captureImage(e.OpenColorImageFrame().ToBitmapSource()));
-            MainWindow.sensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
-        }*/
         #endregion
 
         //Tidy up
@@ -858,11 +897,18 @@ namespace Moto
                     break;
                 case System.Windows.Input.Key.C:
                     //Take a picture
-                    startCaptureAnim();
+                    takeAPicture();
                     break;
                 case System.Windows.Input.Key.F:
                     //Toggle RGB input style
-                    toggleRGB();
+                    if (MainWindow.sensor.ColorStream.Format == ColorImageFormat.RgbResolution640x480Fps30)
+                    {
+                        toggleRGB(ColorImageFormat.RgbResolution1280x960Fps12);
+                    }
+                    else
+                    {
+                        toggleRGB(ColorImageFormat.RgbResolution640x480Fps30);
+                    }
                     break;
                 case System.Windows.Input.Key.B:
                     //Back to the start screen
@@ -875,24 +921,50 @@ namespace Moto
             }
         }
 
-        private void toggleRGB()
+        private void toggleRGB(ColorImageFormat format, int delay = 3000)
         {
-            userImage.Source = null;
-
-            if (MainWindow.sensor.ColorStream.Format == ColorImageFormat.RgbResolution640x480Fps30)
+            if (MainWindow.sensor.ColorStream.Format != format)
             {
-                MainWindow.sensor.ColorStream.Enable(ColorImageFormat.RgbResolution1280x960Fps12);
+                MainWindow.sensor.ColorStream.Enable(format);
+
+                MainWindow.colorImageBitmap = new WriteableBitmap(MainWindow.sensor.ColorStream.FrameWidth, MainWindow.sensor.ColorStream.FrameHeight, 96, 96, PixelFormats.Bgr32, null);
+                MainWindow.colorImageBitmapRect = new Int32Rect(0, 0, MainWindow.sensor.ColorStream.FrameWidth, MainWindow.sensor.ColorStream.FrameHeight);
+                MainWindow.colorImageStride = MainWindow.sensor.ColorStream.FrameWidth * MainWindow.sensor.ColorStream.FrameBytesPerPixel;
+
+                imgProcessDelay = new DispatcherTimer();
+                imgProcessDelay.Interval = TimeSpan.FromMilliseconds(delay);
+                imgProcessDelay.Tick += new EventHandler(imgProcessDelay_Tick);
+                imgProcessDelay.Start();
             }
-            else
+        }
+
+        void imgProcessDelay_Tick(object sender, EventArgs e)
+        {
+            if (imgProcessDelay != null)
             {
-                MainWindow.sensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
+                imgProcessDelay.Tick -= imgProcessDelay_Tick;
+                imgProcessDelay.Stop();
+                imgProcessDelay = null;
             }
 
-            MainWindow.colorImageBitmap = new WriteableBitmap(MainWindow.sensor.ColorStream.FrameWidth, MainWindow.sensor.ColorStream.FrameHeight, 96, 96, PixelFormats.Bgr32, null);
-            MainWindow.colorImageBitmapRect = new Int32Rect(0, 0, MainWindow.sensor.ColorStream.FrameWidth, MainWindow.sensor.ColorStream.FrameHeight);
-            MainWindow.colorImageStride = MainWindow.sensor.ColorStream.FrameWidth * MainWindow.sensor.ColorStream.FrameBytesPerPixel;
-            
-            userImage.Source = MainWindow.colorImageBitmap;            
+            userImage.Source = MainWindow.colorImageBitmap;
+
+            if (currentFocus == playerFocus.Picture)
+            {
+                startCaptureAnim();
+            }
+
+            if (uploadFeedback != null)
+            {
+                MainCanvas.Children.Remove(uploadFeedback);
+                uploadFeedback = null;
+            }
+
+            if (cameraUpload != null)
+            {
+                MainCanvas.Children.Remove(cameraUpload);
+                cameraUpload = null;
+            }
         }
     }
 }

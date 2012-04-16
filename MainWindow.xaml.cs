@@ -287,7 +287,8 @@ namespace Moto
             }
         }
 
-        public static void animateSlide(FrameworkElement item, bool vertical = true, bool reverse = false, double movement = 10, double duration = 1) {
+        public static void animateSlide(FrameworkElement item, bool reverse = false, bool vertical = true, double movement = 10, double duration = 1)
+        {
             DoubleAnimation daOpacity = new DoubleAnimation();
             DoubleAnimation daMovement = new DoubleAnimation();
 
