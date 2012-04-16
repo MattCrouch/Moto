@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+0.5.1.1 - 16/4/12
+-----------------
+- Upped the minimum build requirement to 0.5.1.1
+- Fixed a bug which would crash Moto if a photo was taken while offline
+
 0.5.1.0 - 16/4/12
 -----------------
 - Start screen visuals have been updated
