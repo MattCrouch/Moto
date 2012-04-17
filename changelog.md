@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+0.5.1.2 - 17/4/12
+-----------------
+- Instruments are now translucent
+- Wall of Sound vertical scrolling has updated visuals
+
 0.5.1.1 - 16/4/12
 -----------------
 - Upped the minimum build requirement to 0.5.1.1

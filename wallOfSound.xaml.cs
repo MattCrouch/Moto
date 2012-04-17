@@ -565,10 +565,10 @@ namespace Moto
             currentFocus = playerFocus.KinectGuide;
 
             MainWindow.animateSlide(testCanvas, false, false, -150, 0.5);
-            MainWindow.animateSlide(rectangle1, false, false, -150, 0.5);
+            MainWindow.animateSlide(imgMenuSelected, false, false, -150, 0.5);
             
             testCanvas.Visibility = System.Windows.Visibility.Visible;
-            rectangle1.Visibility = System.Windows.Visibility.Visible;
+            imgMenuSelected.Visibility = System.Windows.Visibility.Visible;
 
             menuPosition = 0;
 
@@ -650,7 +650,8 @@ namespace Moto
             Console.WriteLine("Left swipe right");
 
             MainWindow.animateSlide(testCanvas, true, false, -150, 0.5);
-            MainWindow.animateSlide(rectangle1, true, false, -150, 0.5);
+            MainWindow.animateSlide(imgMenuSelected, true, false, -150, 0.5);
+            //MainWindow.animateSlide(imgKinectGuideDimmer, true, false, -150, 0.5);
 
             currentFocus = playerFocus.None;
 
