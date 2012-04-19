@@ -35,16 +35,32 @@ namespace Moto
         public static bool RightGestureStatus;
         public static bool LeftSwipeRightStatus;
 
+        public static bool leftSwipeRightStarted;
+        public static gesturePoint leftSwipeRightIn;
+        public static gesturePoint leftSwipeRightOut;
+
+        public static long currentTimestamp;
+
+        /// <summary>
+        /// Used with the difference engines.
+        /// Provides a template to record the points.
+        /// </summary>
         public struct difference3
         {
-            //Structure of the difference between two points
-            //Used for tracking joint progression
-
             public double X { get; set; }
 
             public double Y { get; set; }
 
             public double Z { get; set; }
+        }
+
+        /// <summary>
+        /// Records a point for a point within a gesture
+        /// </summary>
+        public class gesturePoint
+        {
+            public difference3 Position { get; set; }
+            public long Timestamp { get; set; }
         }
 
         public enum scrollDirection
@@ -186,7 +202,54 @@ namespace Moto
 
             if (LeftSwipeRight != null)
             {
-                if (skeleton.Joints[JointType.HandLeft].Position.X > skeleton.Joints[JointType.ElbowLeft].Position.X)
+                if (difference[skeleton.TrackingId][JointType.HandLeft].X > 0.05)
+                {
+                    if (leftSwipeRightIn == null)
+                    {
+                        leftSwipeRightIn = new gesturePoint();
+
+                        //Create a new start point
+                        difference3 newPosition = new difference3();
+                        newPosition.X = skeleton.Joints[JointType.HandLeft].Position.X;
+                        newPosition.Y = skeleton.Joints[JointType.HandLeft].Position.Y;
+                        newPosition.Z = skeleton.Joints[JointType.HandLeft].Position.Z;
+
+                        leftSwipeRightIn.Position = newPosition;
+                        leftSwipeRightIn.Timestamp = currentTimestamp;
+                    }
+                }
+                else
+                {
+                    if (leftSwipeRightIn != null)
+                    {
+                        //Create a new end point, then compare
+                        //Creating the end point
+                        leftSwipeRightOut = new gesturePoint();
+
+                        difference3 newPosition = new difference3();
+                        newPosition.X = skeleton.Joints[JointType.HandLeft].Position.X;
+                        newPosition.Y = skeleton.Joints[JointType.HandLeft].Position.Y;
+                        newPosition.Z = skeleton.Joints[JointType.HandLeft].Position.Z;
+
+                        leftSwipeRightOut.Position = newPosition;
+                        leftSwipeRightOut.Timestamp = currentTimestamp;
+
+                        //Comparison
+                        if ((leftSwipeRightOut.Position.X - leftSwipeRightIn.Position.X) >= 0.2 && (leftSwipeRightOut.Timestamp - leftSwipeRightIn.Timestamp) < 4000)
+                        {
+                            //Fire the event
+                            toggleGestureStatus(ref LeftSwipeRightStatus, LeftSwipeRight, true);
+                        }
+
+                        //Reset both values
+                        leftSwipeRightIn = null;
+                        leftSwipeRightOut = null;
+                    }
+                }
+
+
+
+                /*if (skeleton.Joints[JointType.HandLeft].Position.X > skeleton.Joints[JointType.ElbowLeft].Position.X)
                 {
                     //The hand has moved from left to right, was it fast enough for a swipe?
                     Console.WriteLine(difference[skeleton.TrackingId][JointType.HandLeft].X);
@@ -194,7 +257,7 @@ namespace Moto
                     {
                         toggleGestureStatus(ref LeftSwipeRightStatus, LeftSwipeRight, true);
                     }
-                }
+                }*/
             }
         }
 

@@ -95,7 +95,7 @@ namespace Moto
 
         //Skeleton variables
         public static Skeleton[] allSkeletons = new Skeleton[6]; //Holds all skeleton data (always returns six skeletons regardless)
-
+        
         public void setupKinect()
         {
             if (KinectSensor.KinectSensors.Count <= 0)

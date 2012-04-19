@@ -1,5 +1,13 @@
 CHANGELOG
 =========
+0.5.1.3 - 19/4/12
+-----------------
+- Fixed a crashing bug with high definition image capture within the Wall of Sound
+- Improved responsiveness of the vertical scrolling menu
+- Added placeholder labels to the vertical scrolling menu
+- Swipe-to-select no longer needs to be as agressive
+- You now cannot change the selected item accidently while you are swiping
+
 0.5.1.2 - 17/4/12
 -----------------
 - Instruments are now translucent

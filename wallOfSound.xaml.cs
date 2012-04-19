@@ -271,7 +271,7 @@ namespace Moto
             using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
             {
                 //COLOUR IMAGE CODE
-                if (colorFrame == null)
+                if (colorFrame == null || colorFrame.Format != MainWindow.sensor.ColorStream.Format)
                 {
                     return;
                 }
@@ -302,6 +302,8 @@ namespace Moto
                 {
                     return;
                 }
+
+                handMovements.currentTimestamp = skeletonFrame.Timestamp;
 
                 skeletonFrame.CopySkeletonDataTo(MainWindow.allSkeletons);
                 Skeleton aSkeleton;
@@ -564,10 +566,10 @@ namespace Moto
         {
             currentFocus = playerFocus.KinectGuide;
 
-            MainWindow.animateSlide(testCanvas, false, false, -150, 0.5);
+            MainWindow.animateSlide(kinectGuideCanvas, false, false, -150, 0.5);
             MainWindow.animateSlide(imgMenuSelected, false, false, -150, 0.5);
             
-            testCanvas.Visibility = System.Windows.Visibility.Visible;
+            kinectGuideCanvas.Visibility = System.Windows.Visibility.Visible;
             imgMenuSelected.Visibility = System.Windows.Visibility.Visible;
 
             menuPosition = 0;
@@ -612,20 +614,25 @@ namespace Moto
 
         private void kinectGuideManipulation(MainWindow.Player player)
         {
-            double angleValue = handMovements.getAngle(player.skeleton.Joints[JointType.ShoulderLeft], player.skeleton.Joints[JointType.HandLeft]);
-
-            handMovements.scrollDirection oldDirection = menuScrollDirection;
-
-            menuScrollDirection = handMovements.sliderMenuValue(player, angleValue);
-
-            if (oldDirection != menuScrollDirection)
+            if (handMovements.leftSwipeRightIn == null)
             {
-                //Console.WriteLine("CHANGE IN DIRECTION: " + menuScrollDirection);
-                adjustMenuSpeed(menuScrollDirection);
+                //Manipulate the guide if we're not currently swiping to select
+                double angleValue = handMovements.getAngle(player.skeleton.Joints[JointType.ShoulderLeft], player.skeleton.Joints[JointType.HandLeft]);
 
-                if((oldDirection == handMovements.scrollDirection.None && menuScrollDirection == handMovements.scrollDirection.SmallUp) || (oldDirection == handMovements.scrollDirection.SmallUp && menuScrollDirection == handMovements.scrollDirection.LargeUp) || (oldDirection == handMovements.scrollDirection.None && menuScrollDirection == handMovements.scrollDirection.SmallDown) || (oldDirection == handMovements.scrollDirection.SmallDown && menuScrollDirection == handMovements.scrollDirection.LargeDown)) {
-                    //If we're increasing in any direction, tick when the speed changes
-                    menuTick();
+                handMovements.scrollDirection oldDirection = menuScrollDirection;
+
+                menuScrollDirection = handMovements.sliderMenuValue(player, angleValue);
+
+                if (oldDirection != menuScrollDirection)
+                {
+                    //Console.WriteLine("CHANGE IN DIRECTION: " + menuScrollDirection);
+                    adjustMenuSpeed(menuScrollDirection);
+
+                    if ((oldDirection == handMovements.scrollDirection.None && menuScrollDirection == handMovements.scrollDirection.SmallUp) || (oldDirection == handMovements.scrollDirection.SmallUp && menuScrollDirection == handMovements.scrollDirection.LargeUp) || (oldDirection == handMovements.scrollDirection.None && menuScrollDirection == handMovements.scrollDirection.SmallDown) || (oldDirection == handMovements.scrollDirection.SmallDown && menuScrollDirection == handMovements.scrollDirection.LargeDown))
+                    {
+                        //If we're increasing in any direction, tick when the speed changes
+                        menuTick();
+                    }
                 }
             }
         }
@@ -652,7 +659,9 @@ namespace Moto
         {
             Console.WriteLine("Left swipe right");
 
-            MainWindow.animateSlide(testCanvas, true, false, -150, 0.5);
+            Canvas.SetTop(kinectGuideCanvas, 60 * menuPosition);
+
+            MainWindow.animateSlide(kinectGuideCanvas, true, false, -150, 0.5);
             MainWindow.animateSlide(imgMenuSelected, true, false, -150, 0.5);
             //MainWindow.animateSlide(imgKinectGuideDimmer, true, false, -150, 0.5);
 
@@ -949,7 +958,7 @@ namespace Moto
 
         private void animateMenu(bool up = true, int count = 1)
         {
-           Canvas.SetTop(testCanvas, 60 * menuPosition);
+           Canvas.SetTop(kinectGuideCanvas, 60 * menuPosition);
             
             DoubleAnimation animation = new DoubleAnimation();
 
@@ -970,7 +979,7 @@ namespace Moto
             }
 
             TranslateTransform tt = new TranslateTransform();
-            testCanvas.RenderTransform = tt;
+            kinectGuideCanvas.RenderTransform = tt;
 
             CircleEase ease = new CircleEase();
             ease.EasingMode = EasingMode.EaseOut;
