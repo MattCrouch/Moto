@@ -622,6 +622,11 @@ namespace Moto
             {
                 //Console.WriteLine("CHANGE IN DIRECTION: " + menuScrollDirection);
                 adjustMenuSpeed(menuScrollDirection);
+
+                if((oldDirection == handMovements.scrollDirection.None && menuScrollDirection == handMovements.scrollDirection.SmallUp) || (oldDirection == handMovements.scrollDirection.SmallUp && menuScrollDirection == handMovements.scrollDirection.LargeUp) || (oldDirection == handMovements.scrollDirection.None && menuScrollDirection == handMovements.scrollDirection.SmallDown) || (oldDirection == handMovements.scrollDirection.SmallDown && menuScrollDirection == handMovements.scrollDirection.LargeDown)) {
+                    //If we're increasing in any direction, tick when the speed changes
+                    menuTick();
+                }
             }
         }
 
@@ -629,15 +634,13 @@ namespace Moto
         {
             if (scrollDirection == handMovements.scrollDirection.SmallUp || scrollDirection == handMovements.scrollDirection.SmallDown)
             {
-                menuMovementTimer.Interval = TimeSpan.FromMilliseconds(500);
+                menuMovementTimer.Interval = TimeSpan.FromMilliseconds(1000);
                 menuMovementTimer.Start();
-                menuTick();
             }
             else if (scrollDirection == handMovements.scrollDirection.LargeUp || scrollDirection == handMovements.scrollDirection.LargeDown)
             {
-                menuMovementTimer.Interval = TimeSpan.FromMilliseconds(150);
+                menuMovementTimer.Interval = TimeSpan.FromMilliseconds(250);
                 menuMovementTimer.Start();
-                menuTick();
             }
             else
             {
