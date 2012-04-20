@@ -81,6 +81,8 @@ namespace Moto
 
             FrameworkElement image = player.instrumentImage;
 
+            image.Height = scaledWidth(player, player.instrument);
+
             ColorImagePoint point = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Position, ColorImageFormat.RgbResolution640x480Fps30);
 
             double angle = handMovements.getAngle(player.skeleton.Joints[JointType.HipCenter], player.skeleton.Joints[fretHand]);
@@ -111,8 +113,8 @@ namespace Moto
             }
 
             //Define center point to pivot around
-            double centerX = image.Width * 0.5;
-            double centerY = image.Height * 0.75;
+            double centerX = image.ActualWidth * 0.5;
+            double centerY = image.ActualHeight * 0.75;
 
             //Grab the image reference and move it to the correct place
             Canvas.SetLeft(image, point.X - centerX);

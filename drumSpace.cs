@@ -148,6 +148,8 @@ namespace Moto
         {
             FrameworkElement image = player.instrumentImage;
 
+            image.Width = scaledWidth(player, player.instrument);
+
             ColorImagePoint point = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Position, ColorImageFormat.RgbResolution640x480Fps30);
 
             //Grab the image reference and move it to the correct place

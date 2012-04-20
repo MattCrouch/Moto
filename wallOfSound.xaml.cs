@@ -433,9 +433,23 @@ namespace Moto
             setWallPosition(player);
         }
 
+        private double scaledWidth(MainWindow.Player player)
+        {
+            //y = 696.24e-0.007x
+
+            //Player distance (Converted to centimetres)
+            double distance = player.skeleton.Position.Z * 100;
+
+            double width = 696.24 * Math.Pow(Math.E,-0.007 * distance);
+
+            return width;
+        }
+
         private void setWallPosition(MainWindow.Player player)
         {
             FrameworkElement image = player.instrumentImage;
+
+            image.Width = scaledWidth(player);
 
             ColorImagePoint point = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Joints[JointType.Spine].Position, ColorImageFormat.RgbResolution640x480Fps30);
 

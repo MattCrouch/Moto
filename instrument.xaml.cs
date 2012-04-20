@@ -263,6 +263,26 @@ namespace Moto
             }
         }
 
+        private double scaledWidth(MainWindow.Player player, instrumentList instrument)
+        {
+            //Player distance (Converted to centimetres)
+            double distance = player.skeleton.Position.Z * 100;
+            double width = 0;
+
+            switch (instrument)
+            {
+                case instrumentList.Drums:
+                    width = 1112.5 * Math.Pow(Math.E, -0.006 * distance);
+                    break;
+                case instrumentList.GuitarRight:
+                case instrumentList.GuitarLeft:
+                    width = 680.35 * Math.Pow(Math.E, -0.004 * distance);
+                    break;
+            }
+
+            return width;
+        }
+
         //Voice navigation
         private void RecognizerSaidSomething(object sender, SpeechRecognizer.SaidSomethingEventArgs e)
         {
@@ -330,8 +350,8 @@ namespace Moto
                 case instrumentList.GuitarLeft:
                 case instrumentList.GuitarRight:
                     image.Source = new BitmapImage(new Uri("images/guitar.png", UriKind.Relative));
-                    image.Height = 225;
-                    image.Width = image.Height * 0.35;
+                    //image.Height = 225;
+                    //image.Width = image.Height * 0.35;
                     break;
             }
 
