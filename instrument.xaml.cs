@@ -344,8 +344,8 @@ namespace Moto
             {
                 case instrumentList.Drums:
                     image.Source = new BitmapImage(new Uri("images/drums.png", UriKind.Relative));
-                    image.Width = 360;
-                    image.Height = image.Width * 0.80;
+                    //image.Width = 360;
+                    //image.Height = image.Width * 0.80;
                     break;
                 case instrumentList.GuitarLeft:
                 case instrumentList.GuitarRight:

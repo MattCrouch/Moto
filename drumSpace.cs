@@ -153,8 +153,8 @@ namespace Moto
             ColorImagePoint point = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Position, ColorImageFormat.RgbResolution640x480Fps30);
 
             //Grab the image reference and move it to the correct place
-            Canvas.SetLeft(image, point.X - (image.Width / 2));
-            Canvas.SetTop(image, point.Y - (image.Height / 2));
+            Canvas.SetLeft(image, point.X - (image.ActualWidth / 2));
+            Canvas.SetTop(image, point.Y - (image.ActualHeight / 2));
         }
     }
 }
