@@ -372,12 +372,12 @@ namespace Moto
                 upwards = true;
             }
 
-            if (angleValue > 75)
+            if (angleValue > 65)
             {
                 //No movement
                 return scrollDirection.None;
             }
-            else if (angleValue > 50)
+            else if (angleValue > 40)
             {
                 //Small increment
                 if (upwards)

@@ -945,6 +945,11 @@ namespace Moto
         {
             if (MainWindow.sensor.ColorStream.Format != format)
             {
+                foreach (var player in MainWindow.activeSkeletons)
+                {
+                    player.Value.instrumentImage.Visibility = System.Windows.Visibility.Hidden;
+                }
+
                 MainWindow.sensor.ColorStream.Enable(format);
 
                 MainWindow.colorImageBitmap = new WriteableBitmap(MainWindow.sensor.ColorStream.FrameWidth, MainWindow.sensor.ColorStream.FrameHeight, 96, 96, PixelFormats.Bgr32, null);
@@ -965,6 +970,11 @@ namespace Moto
                 imgProcessDelay.Tick -= imgProcessDelay_Tick;
                 imgProcessDelay.Stop();
                 imgProcessDelay = null;
+            }
+
+            foreach (var player in MainWindow.activeSkeletons)
+            {
+                player.Value.instrumentImage.Visibility = System.Windows.Visibility.Visible;
             }
 
             userImage.Source = MainWindow.colorImageBitmap;

@@ -311,6 +311,7 @@ namespace Moto
                         else if (player.mode == MainWindow.PlayerMode.Create)
                         {
                             //Creation mode code
+                            Console.WriteLine("LOL CREATE MODE");
                         }
                     }
                 }
@@ -678,15 +679,17 @@ namespace Moto
                     returnToStart();
                     break;
                 case menuOptions.RecordNewWall:
-                    
+                    MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].mode = MainWindow.PlayerMode.Create;
                     break;
                 case menuOptions.CustomWall:
-                    
+                    MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].mode = MainWindow.PlayerMode.Custom;
                     break;
                 case menuOptions.Technologic:
+                    MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].mode = MainWindow.PlayerMode.Technologic;
                     technologicAudio();
                     break;
                 case menuOptions.Drum:
+                    MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].mode = MainWindow.PlayerMode.Drum;
                     drumsetAudio();
                     break;
             }
@@ -849,6 +852,11 @@ namespace Moto
         {
             if (MainWindow.sensor.ColorStream.Format != format)
             {
+                foreach (var player in MainWindow.activeSkeletons)
+                {
+                    player.Value.instrumentImage.Visibility = System.Windows.Visibility.Hidden;
+                }
+
                 MainWindow.sensor.ColorStream.Enable(format);
 
                 MainWindow.colorImageBitmap = new WriteableBitmap(MainWindow.sensor.ColorStream.FrameWidth, MainWindow.sensor.ColorStream.FrameHeight, 96, 96, PixelFormats.Bgr32, null);
@@ -870,6 +878,12 @@ namespace Moto
                 imgProcessDelay.Stop();
                 imgProcessDelay = null;
             }
+
+            foreach (var player in MainWindow.activeSkeletons)
+            {
+                player.Value.instrumentImage.Visibility = System.Windows.Visibility.Visible;
+            }
+
 
             userImage.Source = MainWindow.colorImageBitmap;
 
