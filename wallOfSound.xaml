@@ -228,15 +228,17 @@
             </Canvas.OpacityMask>      
 			<Canvas Canvas.Left="0" Canvas.Top="0" Height="481" Name="kinectGuideCanvas" Width="158" RenderTransformOrigin="0.5,0.5" Visibility="Hidden">
 	            <Image Canvas.Left="0" Canvas.Top="187" Height="60" Name="image2" Stretch="Fill" Width="163" Source="/Moto;component/images/menu-item.png" />
-	            <Image Canvas.Left="0" Canvas.Top="127" Height="60" Name="image3" Source="/Moto;component/images/menu-item.png" Stretch="Fill" Width="163" />
-	            <Image Canvas.Left="0" Canvas.Top="68" Height="60" Name="image4" Source="/Moto;component/images/menu-item.png" Stretch="Fill" Width="163" />
-	            <Image Canvas.Left="0" Canvas.Top="6" Height="60" Name="image5" Source="/Moto;component/images/menu-item.png" Stretch="Fill" Width="163" />
-                <Image Canvas.Left="0" Canvas.Top="-52" Height="60" Name="image6" Source="/Moto;component/images/menu-item.png" Stretch="Fill" Width="163" />
+	            <Image Canvas.Left="0" Canvas.Top="67" Height="60" Name="image3" Source="/Moto;component/images/menu-item.png" Stretch="Fill" Width="163" />
+	            <Image Canvas.Left="0" Canvas.Top="8" Height="60" Name="image4" Source="/Moto;component/images/menu-item.png" Stretch="Fill" Width="163" />
+	            <Image Canvas.Left="0" Canvas.Top="-54" Height="60" Name="image5" Source="/Moto;component/images/menu-item.png" Stretch="Fill" Width="163" />
+                <Image Canvas.Left="0" Canvas.Top="-112" Height="60" Name="image6" Source="/Moto;component/images/menu-item.png" Stretch="Fill" Width="163" />
                 <TextBlock Canvas.Left="15" Canvas.Top="199" Height="36" Name="textBlock1" Text="Cancel" FontSize="24" Width="77" />
-                <TextBlock Canvas.Left="15" Canvas.Top="140" FontSize="24" Height="36" Name="textBlock2" Text="Custom Wall" Width="143" />
-                <TextBlock Canvas.Left="15" Canvas.Top="79" FontSize="24" Height="36" Name="textBlock3" Text="Record New" Width="137" />
-                <TextBlock Canvas.Left="15" Canvas.Top="18" FontSize="24" Height="36" Name="textBlock4" Text="Technologic" Width="144" />
-                <TextBlock Canvas.Left="15" Canvas.Top="-41" FontSize="24" Height="36" Name="textBlock5" Text="Drums" Width="77" />
+                <TextBlock Canvas.Left="15" Canvas.Top="80" FontSize="24" Height="36" Name="textBlock2" Text="Custom Wall" Width="143" />
+                <TextBlock Canvas.Left="15" Canvas.Top="19" FontSize="24" Height="36" Name="textBlock3" Text="Record New" Width="137" />
+                <TextBlock Canvas.Left="15" Canvas.Top="-42" FontSize="24" Height="36" Name="textBlock4" Text="Technologic" Width="144" />
+                <TextBlock Canvas.Left="15" Canvas.Top="-101" FontSize="24" Height="36" Name="textBlock5" Text="Drums" Width="77" />
+                <Image Canvas.Left="0" Canvas.Top="127" Height="60" Name="image7" Source="/Moto;component/images/menu-item.png" Stretch="Fill" Width="163" />
+                <TextBlock Canvas.Left="15" Canvas.Top="139" FontSize="24" Height="36" Name="textBlock6" Text="Go Back" Width="137" />
             </Canvas>
 	        <Image Canvas.Left="0" Canvas.Top="187" Height="60" Name="imgMenuSelected" Source="/Moto;component/images/menu-item-selected.png" Stretch="Fill" Width="163" IsHitTestVisible="True" Visibility="Hidden" />
 	        <Rectangle Fill="Black" Height="8" Canvas.Left="632" Canvas.Top="472" Width="8"/>

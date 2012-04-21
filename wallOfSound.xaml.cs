@@ -72,6 +72,7 @@ namespace Moto
         enum menuOptions
         {
             //All menu items
+            Cancel,
             GoBack,
             CustomWall,
             RecordNewWall,
@@ -113,6 +114,9 @@ namespace Moto
                 blankDefinitions.Add(5, new MainWindow.HitBox());
                 blankDefinitions.Add(6, new MainWindow.HitBox());
                 blankDefinitions.Add(7, new MainWindow.HitBox());
+                blankDefinitions.Add(8, new MainWindow.HitBox());
+                blankDefinitions.Add(9, new MainWindow.HitBox());
+                blankDefinitions.Add(10, new MainWindow.HitBox());
 
                 hitArea.Add(player.skeleton.TrackingId, blankDefinitions);
 
@@ -173,72 +177,37 @@ namespace Moto
         {
             if (player.skeleton != null)
             {
-                double boxSize = 0.2; //Size of drum edges (in metres)
+                //Front panels
+                double panelHeight = 0.2;
+                double panelWidth = panelHeight;
+                double panelDepth = 0.1;
 
-                //First box
-                hitArea[player.skeleton.TrackingId][0].X1 = player.skeleton.Joints[JointType.HipCenter].Position.X - 0.4532758;
-                hitArea[player.skeleton.TrackingId][0].X2 = hitArea[player.skeleton.TrackingId][0].X1 + boxSize;
-                hitArea[player.skeleton.TrackingId][0].Y1 = player.skeleton.Joints[JointType.HipCenter].Position.Y + 0.36289116;
-                hitArea[player.skeleton.TrackingId][0].Y2 = hitArea[player.skeleton.TrackingId][0].Y1 + boxSize;
-                hitArea[player.skeleton.TrackingId][0].Z1 = player.skeleton.Joints[JointType.HipCenter].Position.Z - 0.5014166;
-                hitArea[player.skeleton.TrackingId][0].Z2 = hitArea[player.skeleton.TrackingId][0].Z1 + boxSize;
+                definePanel(player, 0, -0.3516321, 0.1761248, -0.4665765, panelHeight, panelWidth, panelDepth);
+                definePanel(player, 1, -0.1016321, 0.1761248, -0.4665765, panelHeight, panelWidth, panelDepth);
+                definePanel(player, 2, 0.1516321, 0.1761248, -0.4665765, panelHeight, panelWidth, panelDepth);
+                definePanel(player, 3, -0.3516321, -0.0861248, -0.4665765, panelHeight, panelWidth, panelDepth);
+                definePanel(player, 4, -0.1016321, -0.0861248, -0.4665765, panelHeight, panelWidth, panelDepth);
+                definePanel(player, 5, 0.1516321, -0.0861248, -0.4665765, panelHeight, panelWidth, panelDepth);
+                definePanel(player, 6, -0.3516321, -0.3361248, -0.4665765, panelHeight, panelWidth, panelDepth);
+                definePanel(player, 7, -0.1016321, -0.3361248, -0.4665765, panelHeight, panelWidth, panelDepth);
+                definePanel(player, 8, 0.1516321, 0.3361248, -0.4665765, panelHeight, panelWidth, panelDepth);
 
-                //Second box
-                hitArea[player.skeleton.TrackingId][1].X1 = player.skeleton.Joints[JointType.HipCenter].Position.X - 0.2032758;
-                hitArea[player.skeleton.TrackingId][1].X2 = hitArea[player.skeleton.TrackingId][1].X1 + boxSize;
-                hitArea[player.skeleton.TrackingId][1].Y1 = player.skeleton.Joints[JointType.HipCenter].Position.Y + 0.36289116;
-                hitArea[player.skeleton.TrackingId][1].Y2 = hitArea[player.skeleton.TrackingId][1].Y1 + boxSize;
-                hitArea[player.skeleton.TrackingId][1].Z1 = player.skeleton.Joints[JointType.HipCenter].Position.Z - 0.5014166;
-                hitArea[player.skeleton.TrackingId][1].Z2 = hitArea[player.skeleton.TrackingId][1].Z1 + boxSize;
+                //Side panels
+                panelHeight = 70;
 
-                //Third box
-                hitArea[player.skeleton.TrackingId][2].X1 = player.skeleton.Joints[JointType.HipCenter].Position.X - 0.0532758;
-                hitArea[player.skeleton.TrackingId][2].X2 = hitArea[player.skeleton.TrackingId][2].X1 + boxSize;
-                hitArea[player.skeleton.TrackingId][2].Y1 = player.skeleton.Joints[JointType.HipCenter].Position.Y + 0.36289116;
-                hitArea[player.skeleton.TrackingId][2].Y2 = hitArea[player.skeleton.TrackingId][2].Y1 + boxSize;
-                hitArea[player.skeleton.TrackingId][2].Z1 = player.skeleton.Joints[JointType.HipCenter].Position.Z - 0.4014166;
-                hitArea[player.skeleton.TrackingId][2].Z2 = hitArea[player.skeleton.TrackingId][2].Z1 + boxSize;
-
-                //Fourth box
-                hitArea[player.skeleton.TrackingId][3].X1 = player.skeleton.Joints[JointType.HipCenter].Position.X + 0.3032758;
-                hitArea[player.skeleton.TrackingId][3].X2 = hitArea[player.skeleton.TrackingId][3].X1 + boxSize;
-                hitArea[player.skeleton.TrackingId][3].Y1 = player.skeleton.Joints[JointType.HipCenter].Position.Y + 0.36289116;
-                hitArea[player.skeleton.TrackingId][3].Y2 = hitArea[player.skeleton.TrackingId][3].Y1 + boxSize;
-                hitArea[player.skeleton.TrackingId][3].Z1 = player.skeleton.Joints[JointType.HipCenter].Position.Z - 0.5014166;
-                hitArea[player.skeleton.TrackingId][3].Z2 = hitArea[player.skeleton.TrackingId][3].Z1 + boxSize;
-
-                //Fifth box
-                hitArea[player.skeleton.TrackingId][4].X1 = player.skeleton.Joints[JointType.HipCenter].Position.X - 0.4532758;
-                hitArea[player.skeleton.TrackingId][4].X2 = hitArea[player.skeleton.TrackingId][4].X1 + boxSize;
-                hitArea[player.skeleton.TrackingId][4].Y1 = player.skeleton.Joints[JointType.HipCenter].Position.Y + 0.11289116;
-                hitArea[player.skeleton.TrackingId][4].Y2 = hitArea[player.skeleton.TrackingId][4].Y1 + boxSize;
-                hitArea[player.skeleton.TrackingId][4].Z1 = player.skeleton.Joints[JointType.HipCenter].Position.Z - 0.5014166;
-                hitArea[player.skeleton.TrackingId][4].Z2 = hitArea[player.skeleton.TrackingId][4].Z1 + boxSize;
-
-                //Sixth box
-                hitArea[player.skeleton.TrackingId][5].X1 = player.skeleton.Joints[JointType.HipCenter].Position.X - 0.2032758;
-                hitArea[player.skeleton.TrackingId][5].X2 = hitArea[player.skeleton.TrackingId][5].X1 + boxSize;
-                hitArea[player.skeleton.TrackingId][5].Y1 = player.skeleton.Joints[JointType.HipCenter].Position.Y + 0.11289116;
-                hitArea[player.skeleton.TrackingId][5].Y2 = hitArea[player.skeleton.TrackingId][5].Y1 + boxSize;
-                hitArea[player.skeleton.TrackingId][5].Z1 = player.skeleton.Joints[JointType.HipCenter].Position.Z - 0.5014166;
-                hitArea[player.skeleton.TrackingId][5].Z2 = hitArea[player.skeleton.TrackingId][5].Z1 + boxSize;
-
-                //Seventh box
-                hitArea[player.skeleton.TrackingId][6].X1 = player.skeleton.Joints[JointType.HipCenter].Position.X - 0.0532758;
-                hitArea[player.skeleton.TrackingId][6].X2 = hitArea[player.skeleton.TrackingId][6].X1 + boxSize;
-                hitArea[player.skeleton.TrackingId][6].Y1 = player.skeleton.Joints[JointType.HipCenter].Position.Y + 0.11289116;
-                hitArea[player.skeleton.TrackingId][6].Y2 = hitArea[player.skeleton.TrackingId][6].Y1 + boxSize;
-                hitArea[player.skeleton.TrackingId][6].Z1 = player.skeleton.Joints[JointType.HipCenter].Position.Z - 0.5014166;
-                hitArea[player.skeleton.TrackingId][6].Z2 = hitArea[player.skeleton.TrackingId][6].Z1 + boxSize;
-
-                //Eighth box
-                hitArea[player.skeleton.TrackingId][7].X1 = player.skeleton.Joints[JointType.HipCenter].Position.X + 0.3032758;
-                hitArea[player.skeleton.TrackingId][7].X2 = hitArea[player.skeleton.TrackingId][7].X1 + boxSize;
-                hitArea[player.skeleton.TrackingId][7].Y1 = player.skeleton.Joints[JointType.HipCenter].Position.Y + 0.11289116;
-                hitArea[player.skeleton.TrackingId][7].Y2 = hitArea[player.skeleton.TrackingId][7].Y1 + boxSize;
-                hitArea[player.skeleton.TrackingId][7].Z1 = player.skeleton.Joints[JointType.HipCenter].Position.Z - 0.5014166;
-                hitArea[player.skeleton.TrackingId][7].Z2 = hitArea[player.skeleton.TrackingId][7].Z1 + boxSize;
+                //definePanel(player, 9, -0.3516321, 0.1761248, -0.2665765, panelHeight, panelWidth, panelDepth);
+                //definePanel(player, 10, -0.3516321, 0.1761248, -0.2665765, panelHeight, panelWidth, panelDepth);
             }
+        }
+
+        private void definePanel(MainWindow.Player player, int panel, double X, double Y, double Z, double panelHeight = 0.2, double panelWidth = 0.2, double panelDepth = 0.2)
+        {
+            hitArea[player.skeleton.TrackingId][panel].X1 = player.skeleton.Joints[JointType.HipCenter].Position.X + X;
+            hitArea[player.skeleton.TrackingId][panel].X2 = hitArea[player.skeleton.TrackingId][panel].X1 + panelWidth;
+            hitArea[player.skeleton.TrackingId][panel].Y1 = player.skeleton.Joints[JointType.HipCenter].Position.Y + Y;
+            hitArea[player.skeleton.TrackingId][panel].Y2 = hitArea[player.skeleton.TrackingId][panel].Y1 + panelHeight;
+            hitArea[player.skeleton.TrackingId][panel].Z1 = player.skeleton.Joints[JointType.HipCenter].Position.Z + Z;
+            hitArea[player.skeleton.TrackingId][panel].Z2 = hitArea[player.skeleton.TrackingId][panel].Z1 + panelDepth;
         }
 
         Dictionary<JointType, Dictionary<int, bool>> createPlayerDictionary()
@@ -334,7 +303,15 @@ namespace Moto
                         //Player-specific code
                         handMovements.trackJointProgression(player.skeleton, player.skeleton.Joints[JointType.HandLeft]);
                         handMovements.trackJointProgression(player.skeleton, player.skeleton.Joints[JointType.HandRight]);
-                        wallUpdate(player);
+
+                        if (player.mode != MainWindow.PlayerMode.Create)
+                        {
+                            wallUpdate(player);
+                        }
+                        else if (player.mode == MainWindow.PlayerMode.Create)
+                        {
+                            //Creation mode code
+                        }
                     }
                 }
 
@@ -427,8 +404,11 @@ namespace Moto
             //What we need to do every skeleton frame with respect to this player's Wall
             defineHitAreas(player);
 
-            checkBoxHit(player.skeleton, JointType.HandLeft);
-            checkBoxHit(player.skeleton, JointType.HandRight);
+            if (currentFocus == playerFocus.None)
+            {
+                checkBoxHit(player.skeleton, JointType.HandLeft);
+                checkBoxHit(player.skeleton, JointType.HandRight);
+            }
 
             setWallPosition(player);
         }
@@ -440,7 +420,7 @@ namespace Moto
             //Player distance (Converted to centimetres)
             double distance = player.skeleton.Position.Z * 100;
 
-            double width = 696.24 * Math.Pow(Math.E,-0.007 * distance);
+            double width = 1112.5 * Math.Pow(Math.E, -0.006 * distance);
 
             return width;
         }
@@ -454,8 +434,8 @@ namespace Moto
             ColorImagePoint point = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Joints[JointType.Spine].Position, ColorImageFormat.RgbResolution640x480Fps30);
 
             //Grab the image reference and move it to the correct place
-            Canvas.SetLeft(image, point.X - (image.Width / 2));
-            Canvas.SetTop(image, point.Y - (image.Height / 2));
+            Canvas.SetLeft(image, point.X - (image.ActualWidth / 2));
+            Canvas.SetTop(image, point.Y - (image.ActualHeight / 2));
         }
 
         private void playWallSound(int i, Skeleton skeleton, JointType joint)
@@ -483,8 +463,6 @@ namespace Moto
             
             Image image = new Image();
             image.Source = new BitmapImage(new Uri("images/wall-sample.png", UriKind.Relative));
-            image.Height = 250;
-            image.Width = 250;
 
             MainCanvas.Children.Add(image);
 
@@ -696,6 +674,15 @@ namespace Moto
 
             switch (kinectGuideMenu[menuPosition])
             {
+                case menuOptions.GoBack:
+                    returnToStart();
+                    break;
+                case menuOptions.RecordNewWall:
+                    
+                    break;
+                case menuOptions.CustomWall:
+                    
+                    break;
                 case menuOptions.Technologic:
                     technologicAudio();
                     break;
