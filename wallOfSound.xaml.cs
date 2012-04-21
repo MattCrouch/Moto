@@ -587,6 +587,7 @@ namespace Moto
             imgMenuSelected.Visibility = System.Windows.Visibility.Visible;
 
             menuPosition = 0;
+            Canvas.SetTop(kinectGuideCanvas, 0);
 
             //Listen for swipe gesture
             handMovements.LeftSwipeRight += new EventHandler<handMovements.GestureEventArgs>(handMovements_LeftSwipeRight);
