@@ -176,6 +176,8 @@ namespace Moto
 
                         handMovements.trackJointProgression(player.skeleton, player.skeleton.Joints[JointType.HandLeft]);
                         handMovements.trackJointProgression(player.skeleton, player.skeleton.Joints[JointType.HandRight]);
+                        handMovements.trackJointProgression(player.skeleton, player.skeleton.Joints[JointType.FootLeft]);
+                        handMovements.trackJointProgression(player.skeleton, player.skeleton.Joints[JointType.FootRight]);
                         instrumentUpdate(player);
                     }
                 }
@@ -242,6 +244,8 @@ namespace Moto
                     {
                         checkDrumHit(player, JointType.HandLeft);
                         checkDrumHit(player, JointType.HandRight);
+                        checkDrumHit(player, JointType.FootLeft);
+                        checkDrumHit(player, JointType.FootRight);
                     }
                     break;
                 case instrumentList.GuitarRight:
@@ -596,6 +600,23 @@ namespace Moto
                 instrumentSelectionTimer.Tick -= instrumentSelectionTimer_Tick;
                 instrumentSelectionTimer = null;
             }
+        }
+
+        //MediaPlayer Dictionary
+        int mpCounter = 0;
+
+        Dictionary<int, MediaPlayer> mpDictionary = new Dictionary<int, MediaPlayer>();
+
+        private void generateMediaPlayers()
+        {
+            mpDictionary.Add(0, new MediaPlayer());
+            mpDictionary.Add(1, new MediaPlayer());
+            mpDictionary.Add(2, new MediaPlayer());
+            mpDictionary.Add(3, new MediaPlayer());
+            mpDictionary.Add(4, new MediaPlayer());
+            mpDictionary.Add(5, new MediaPlayer());
+            mpDictionary.Add(6, new MediaPlayer());
+            mpDictionary.Add(7, new MediaPlayer());
         }
 
         //Metronome code

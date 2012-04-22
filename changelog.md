@@ -1,5 +1,15 @@
 CHANGELOG
 =========
+0.5.2.0 - 22/4/12
+-----------------
+- The guitar has been repositioned to align just above the hip, as opposed to on it
+- The guitar strumming action has been fixed and is now triggered by strumming in the centre of the guitar body
+- All components of the drum kit now function
+- Instruments in Band Mode and WoS now scale in Z
+- The vertical scrolling menu now resets it's position after being re-triggered
+- WoS is now 9 front panels, with two side panels
+- Instruments now no longer show while the image stream is preparing to take, or is showing you, the picture
+
 0.5.1.3 - 19/4/12
 -----------------
 - Fixed a crashing bug with high definition image capture within the Wall of Sound

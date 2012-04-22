@@ -36,7 +36,7 @@ namespace Moto
 
         internal double checkNeckDist(MainWindow.Player player, JointType fretHand)
         {
-            Joint hip = player.skeleton.Joints[JointType.HipCenter];
+            Joint hip = player.skeleton.Joints[JointType.Spine];
             Joint hand = player.skeleton.Joints[fretHand];
 
             double xLength = doPythag((hip.Position.Z - hand.Position.Z), (hip.Position.X - hand.Position.X));
@@ -47,23 +47,14 @@ namespace Moto
         }
         
         internal void defineStrumArea(MainWindow.Player player) {
-             double strumSize = 0.2; //Size of strum area edges (in metres)
+             double strumSize = 0.15; //Size of strum area edges (in metres)
 
-            strumArea[player.skeleton.TrackingId].X1 = player.skeleton.Joints[JointType.HipCenter].Position.X - (strumSize / 2);
-            strumArea[player.skeleton.TrackingId].X2 = player.skeleton.Joints[JointType.HipCenter].Position.X + (strumSize / 2);
-            strumArea[player.skeleton.TrackingId].Y1 = player.skeleton.Joints[JointType.HipCenter].Position.Y - (strumSize / 2);
-            strumArea[player.skeleton.TrackingId].Y2 = player.skeleton.Joints[JointType.HipCenter].Position.Y + (strumSize / 2);
-            strumArea[player.skeleton.TrackingId].Z1 = player.skeleton.Joints[JointType.HipCenter].Position.Z - strumSize;
-            strumArea[player.skeleton.TrackingId].Z2 = player.skeleton.Joints[JointType.HipCenter].Position.Z;
-
-            /*//Smaller values go here
-             strumAreaStart = new double[] { Convert.ToDouble(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HipCenter].Position.X) - (strumSize / 2), Convert.ToDouble(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HipCenter].Position.Y) - (strumSize / 2), Convert.ToDouble(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HipCenter].Position.Z) - strumSize };
-            
-            //Bigger values go here
-            strumAreaEnd = new double[] { strumAreaStart[0] + (strumSize), strumAreaStart[1] + (strumSize), strumAreaStart[2] + strumSize };
-
-            coordReadout.Content = "Z Start: " + strumAreaStart[2] + " Z End: " + strumAreaEnd[2];
-             */
+            strumArea[player.skeleton.TrackingId].X1 = player.skeleton.Joints[JointType.Spine].Position.X - (strumSize / 2);
+            strumArea[player.skeleton.TrackingId].X2 = player.skeleton.Joints[JointType.Spine].Position.X + (strumSize / 2);
+            strumArea[player.skeleton.TrackingId].Y1 = player.skeleton.Joints[JointType.Spine].Position.Y - (strumSize / 2);
+            strumArea[player.skeleton.TrackingId].Y2 = player.skeleton.Joints[JointType.Spine].Position.Y + (strumSize / 2);
+            strumArea[player.skeleton.TrackingId].Z1 = player.skeleton.Joints[JointType.Spine].Position.Z - (strumSize * 2);
+            strumArea[player.skeleton.TrackingId].Z2 = player.skeleton.Joints[JointType.Spine].Position.Z + (strumSize * 2);
 
             SetStrumPosition(player);
         }
@@ -83,14 +74,14 @@ namespace Moto
 
             image.Height = scaledWidth(player, player.instrument);
 
-            ColorImagePoint point = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Position, ColorImageFormat.RgbResolution640x480Fps30);
+            ColorImagePoint point = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Joints[JointType.Spine].Position, ColorImageFormat.RgbResolution640x480Fps30);
 
-            double angle = handMovements.getAngle(player.skeleton.Joints[JointType.HipCenter], player.skeleton.Joints[fretHand]);
+            double angle = handMovements.getAngle(player.skeleton.Joints[JointType.Spine], player.skeleton.Joints[fretHand]);
 
-            if (player.skeleton.Joints[fretHand].Position.Y > player.skeleton.Joints[JointType.HipCenter].Position.Y)
+            if (player.skeleton.Joints[fretHand].Position.Y > player.skeleton.Joints[JointType.Spine].Position.Y)
             {
                 //Upper quadrant
-                if (player.skeleton.Joints[fretHand].Position.X > player.skeleton.Joints[JointType.HipCenter].Position.X)
+                if (player.skeleton.Joints[fretHand].Position.X > player.skeleton.Joints[JointType.Spine].Position.X)
                 {
                     
                 }
@@ -102,7 +93,7 @@ namespace Moto
             else
             {
                 //Lower quadrant
-                if (player.skeleton.Joints[fretHand].Position.X > player.skeleton.Joints[JointType.HipCenter].Position.X)
+                if (player.skeleton.Joints[fretHand].Position.X > player.skeleton.Joints[JointType.Spine].Position.X)
                 {
                     angle = 180 - angle;
                 }
@@ -121,19 +112,6 @@ namespace Moto
             Canvas.SetTop(image, point.Y - centerY);
 
             image.RenderTransform = new RotateTransform(angle, centerX, centerY);
-
-            /*(FrameworkElement square)
-             * double posStartX = (strumAreaStart[0] * 320) + 320;
-            double posStartY = 480 - ((strumAreaStart[1] * 240) + 240);
-
-            double posEndX = (strumAreaEnd[0] * 320) + 320;
-            double posEndY = 480 - ((strumAreaEnd[1] * 240) + 240);
-
-            square.Height = Math.Abs(posEndY - posStartY);
-            square.Width = Math.Abs(posEndX - posStartX);
-
-            Canvas.SetLeft(square, posStartX);
-            Canvas.SetTop(square, posEndY);*/
         }
 
         public void checkStrum(MainWindow.Player player, JointType joint)
@@ -169,28 +147,28 @@ namespace Moto
             }
         }
 
-        MediaPlayer mp = new MediaPlayer();
-
         void strumGuitar(double neckDist)
         {
             if (neckDist > 0.7)
             {
-                mp.Open(new Uri("audio/guitar/guitar1.wav", UriKind.Relative));
+                mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/guitar/guitar1.wav", UriKind.Relative));
             }
             else if (neckDist > 0.55)
             {
-                mp.Open(new Uri("audio/guitar/guitar2.wav", UriKind.Relative));
+                mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/guitar/guitar2.wav", UriKind.Relative));
             }
             else if (neckDist > 0.4)
             {
-                mp.Open(new Uri("audio/guitar/guitar3.wav", UriKind.Relative));
+                mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/guitar/guitar3.wav", UriKind.Relative));
             }
             else
             {
-                mp.Open(new Uri("audio/guitar/guitar4.wav", UriKind.Relative));
+                mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/guitar/guitar4.wav", UriKind.Relative));
             }
 
-            mp.Play();
+            mpDictionary[(mpCounter % mpDictionary.Count)].Play();
+
+            mpCounter++;
         }
 
         private BitmapImage guitarImage(MainWindow.Player player)

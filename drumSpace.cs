@@ -35,6 +35,11 @@ namespace Moto
                 blankDefinitions.Add(0,new MainWindow.HitBox());
                 blankDefinitions.Add(1,new MainWindow.HitBox());
                 blankDefinitions.Add(2, new MainWindow.HitBox());
+                blankDefinitions.Add(3, new MainWindow.HitBox());
+                blankDefinitions.Add(4, new MainWindow.HitBox());
+                blankDefinitions.Add(5, new MainWindow.HitBox());
+                blankDefinitions.Add(6, new MainWindow.HitBox());
+                blankDefinitions.Add(7, new MainWindow.HitBox());
 
                 hitArea.Add(player.skeleton.TrackingId, blankDefinitions);
             }
@@ -47,15 +52,46 @@ namespace Moto
         {
             Dictionary<JointType, Dictionary<int, bool>> dictionary = new Dictionary<JointType, Dictionary<int, bool>>();
 
-            dictionary.Add(JointType.HandLeft, new Dictionary<int, bool>());
-            dictionary.Add(JointType.HandRight, new Dictionary<int, bool>());
+            dictionary.Add(JointType.HandLeft, defaultInsideAreaVals());
+            dictionary.Add(JointType.HandRight, defaultInsideAreaVals());
+            dictionary.Add(JointType.FootLeft, defaultInsideAreaVals());
+            dictionary.Add(JointType.FootRight, defaultInsideAreaVals());
 
-            dictionary[JointType.HandLeft].Add(0, false);
+            /*dictionary.Add(JointType.HandLeft, new Dictionary<int, bool>());
+            dictionary.Add(JointType.HandRight, new Dictionary<int, bool>());
+            dictionary.Add(JointType.FootLeft, new Dictionary<int, bool>());
+            dictionary.Add(JointType.FootRight, new Dictionary<int, bool>());*/
+
+
+            /*dictionary[JointType.HandLeft].Add(0, false);
             dictionary[JointType.HandLeft].Add(1, false);
             dictionary[JointType.HandLeft].Add(2, false);
+            dictionary[JointType.HandLeft].Add(3, false);
+            dictionary[JointType.HandLeft].Add(4, false);
+            dictionary[JointType.HandLeft].Add(5, false);
+            dictionary[JointType.HandLeft].Add(6, false);
             dictionary[JointType.HandRight].Add(0, false);
             dictionary[JointType.HandRight].Add(1, false);
             dictionary[JointType.HandRight].Add(2, false);
+            dictionary[JointType.HandRight].Add(3, false);
+            dictionary[JointType.HandRight].Add(4, false);
+            dictionary[JointType.HandRight].Add(5, false);
+            dictionary[JointType.HandRight].Add(6, false);*/
+
+            return dictionary;
+        }
+
+        internal Dictionary<int,bool> defaultInsideAreaVals()
+        {
+            Dictionary<int, bool> dictionary = new Dictionary<int, bool>();
+
+            dictionary.Add(0, false);
+            dictionary.Add(1, false);
+            dictionary.Add(2, false);
+            dictionary.Add(3, false);
+            dictionary.Add(4, false);
+            dictionary.Add(5, false);
+            dictionary.Add(6, false);
 
             return dictionary;
         }
@@ -64,9 +100,18 @@ namespace Moto
         {
             if (player.skeleton != null)
             {
-                defineDrum(player, 0, -0.3035938, 0.0450525, -0.3892172);
-                defineDrum(player, 1, 0.1035938, 0.0450525, -0.3892172);
-                defineDrum(player, 2, 0.17892, 0.2215563, -0.4976295);
+                //Drums
+                defineDrum(player, 0, -0.3035938, -0.0150525, -0.3892172);
+                defineDrum(player, 1, 0.1035938, -0.0150525, -0.3892172);
+                defineDrum(player, 2, -0.4431849, -0.15812907, -0.2434439);
+                defineDrum(player, 3, 0.2913417, -0.15812907, -0.2434439);
+
+                //Cymbal
+                defineDrum(player, 4, -0.4074842, 0.2215563, -0.4976295);
+                defineDrum(player, 5, 0.17892, 0.2215563, -0.4976295);
+
+                //Kick drum
+                defineDrum(player, 6, -0.3076267, -0.7402052, -0.8686381,0.4);
 
                 SetDrumPosition(player);
             }
@@ -93,7 +138,7 @@ namespace Moto
                 double posY = player.skeleton.Joints[joint].Position.Y;
                 double posZ = player.skeleton.Joints[joint].Position.Z;
 
-                for (int i = 0; i <= 2; i++)
+                for (int i = 0; i <= hitArea[player.skeleton.TrackingId].Count - 1; i++)
                 {
                     if (hitArea[player.skeleton.TrackingId][i].X1 < posX && hitArea[player.skeleton.TrackingId][i].X2 > posX && hitArea[player.skeleton.TrackingId][i].Y1 < posY && hitArea[player.skeleton.TrackingId][i].Y2 > posY && hitArea[player.skeleton.TrackingId][i].Z1 < posZ && hitArea[player.skeleton.TrackingId][i].Z2 > posZ)
                     {
@@ -112,29 +157,16 @@ namespace Moto
             }
         }
 
-        int mpCounter = 0;
-
-        //MediaPlayer[] mpArray;
-        Dictionary<int, MediaPlayer> mpDictionary = new Dictionary<int, MediaPlayer>();
-
-        private void generateMediaPlayers()
-        {
-            mpDictionary.Add(0, new MediaPlayer());
-            mpDictionary.Add(1, new MediaPlayer());
-            mpDictionary.Add(2, new MediaPlayer());
-            mpDictionary.Add(3, new MediaPlayer());
-        }
-
         private void hitDrum(string drumName, Skeleton skeleton, JointType joint)
         {
             //MessageBox.Show("HIT DRUM!");
             if (handMovements.difference != null)
             {
                 //MessageBox.Show(Convert.ToString(difference["X"]));
-                if (handMovements.difference[skeleton.TrackingId][joint].Y < -0.01)
+                if (handMovements.difference[skeleton.TrackingId][joint].Y < -0.01 || ((joint == JointType.FootLeft || joint == JointType.FootRight) && handMovements.difference[skeleton.TrackingId][joint].Z < -0.02))
                 {
-                    mpDictionary[(mpCounter % 4)].Open(new Uri("audio/drums/" + drumName + ".wav", UriKind.Relative));
-                    mpDictionary[(mpCounter % 4)].Play();
+                    mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/drums/" + drumName + ".wav", UriKind.Relative));
+                    mpDictionary[(mpCounter % mpDictionary.Count)].Play();
 
                     mpCounter++;
                                         
