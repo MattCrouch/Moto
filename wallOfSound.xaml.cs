@@ -833,6 +833,9 @@ namespace Moto
             pictureCountdown.Tick += new EventHandler(pictureCountdown_Tick);
             pictureCountdown.Start();
 
+            Canvas.SetZIndex(imgCamera, 1);
+            Canvas.SetZIndex(imgGetReady, 1);
+
             Storyboard sb = this.FindResource("cameraCountdown") as Storyboard;
             sb.Begin();
         }
