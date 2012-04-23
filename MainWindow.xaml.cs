@@ -64,6 +64,7 @@ namespace Moto
             //Wall of Sound
             Technologic,
             Drum,
+            EightBit,
             Custom,
             Create,
         }
@@ -244,7 +245,7 @@ namespace Moto
                     }
                     else
                     {
-                        if (player.Value.skeleton.Position.Z > skeletons[skeletonId].skeleton.Position.Z)
+                        if (player.Value.skeleton.Position.Z < skeletons[skeletonId].skeleton.Position.Z)
                         {
                             skeletonId = player.Key;
                         }

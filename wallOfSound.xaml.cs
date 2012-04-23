@@ -56,7 +56,7 @@ namespace Moto
         Dictionary<int, Dictionary<JointType, Dictionary<int, bool>>> insideArea = new Dictionary<int, Dictionary<JointType, Dictionary<int, bool>>>();
 
         //Wall audio
-        string[] wallAudio = new string[9];
+        string[] wallAudio = new string[11];
 
         //Audio dictionarys
         Dictionary<int, MediaPlayer> mpDictionary = new Dictionary<int, MediaPlayer>();
@@ -74,10 +74,12 @@ namespace Moto
             //All menu items
             Cancel,
             GoBack,
+            TakeAPicture,
             CustomWall,
             RecordNewWall,
             Technologic,
             Drum,
+            EightBit,
         }
 
         //Player's current focus
@@ -128,6 +130,9 @@ namespace Moto
                     case MainWindow.PlayerMode.Drum:
                         drumsetAudio();
                         break;
+                    case MainWindow.PlayerMode.EightBit:
+                        drumsetAudio();
+                        break;
                 }
             }
 
@@ -173,6 +178,21 @@ namespace Moto
             wallAudio[2] = "audio/drums/drum2.wav";
         }
 
+        private void eightBitAudio()
+        {
+            wallAudio[0] = "audio/wall/8bit/0.wav";
+            wallAudio[1] = "audio/wall/8bit/1.wav";
+            wallAudio[2] = "audio/wall/8bit/2.wav";
+            wallAudio[3] = "audio/wall/8bit/3.wav";
+            wallAudio[4] = "audio/wall/8bit/4.wav";
+            wallAudio[5] = "audio/wall/8bit/5.wav";
+            wallAudio[6] = "audio/wall/8bit/6.wav";
+            wallAudio[7] = "audio/wall/8bit/7.wav";
+            wallAudio[8] = "audio/wall/8bit/8.wav";
+            wallAudio[9] = "audio/wall/8bit/9.wav";
+            wallAudio[10] = "audio/wall/8bit/10.wav";
+        }
+
         internal void defineHitAreas(MainWindow.Player player)
         {
             if (player.skeleton != null)
@@ -194,9 +214,10 @@ namespace Moto
 
                 //Side panels
                 panelHeight = 70;
+                panelDepth = 70;
 
-                //definePanel(player, 9, -0.3516321, 0.1761248, -0.2665765, panelHeight, panelWidth, panelDepth);
-                //definePanel(player, 10, -0.3516321, 0.1761248, -0.2665765, panelHeight, panelWidth, panelDepth);
+                definePanel(player, 9, -0.3516321, 0.1761248, -0.2665765, panelHeight, panelWidth, panelDepth);
+                definePanel(player, 10, -0.3516321, 0.1761248, -0.2665765, panelHeight, panelWidth, panelDepth);
             }
         }
 
@@ -678,6 +699,9 @@ namespace Moto
                 case menuOptions.GoBack:
                     returnToStart();
                     break;
+                case menuOptions.TakeAPicture:
+                    takeAPicture();
+                    break;
                 case menuOptions.RecordNewWall:
                     MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].mode = MainWindow.PlayerMode.Create;
                     break;
@@ -691,6 +715,10 @@ namespace Moto
                 case menuOptions.Drum:
                     MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].mode = MainWindow.PlayerMode.Drum;
                     drumsetAudio();
+                    break;
+                case menuOptions.EightBit:
+                    MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].mode = MainWindow.PlayerMode.EightBit;
+                    eightBitAudio();
                     break;
             }
         }
