@@ -47,12 +47,14 @@ namespace Moto
                 instrument = Moto.instrument.instrumentList.None;
                 mode = PlayerMode.None;
                 instrumentImage = null;
+                instrumentOverlay = null;
             }
 
             public Skeleton skeleton { get; set; }
             public instrument.instrumentList instrument { get; set; }
             public PlayerMode mode { get; set; }
             public Image instrumentImage {get; set; }
+            public Image instrumentOverlay { get; set; }
         }
 
         public enum PlayerMode

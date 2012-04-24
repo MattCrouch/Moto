@@ -7,6 +7,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
+using System.IO;
+using System.Text;
+using System.Threading;
 using Microsoft.Kinect;
 using Coding4Fun.Kinect.Wpf;
 using Moto.Speech;
@@ -92,6 +95,11 @@ namespace Moto
             Picture
         }
 
+        //Wall record variables
+        string boxToRecord;
+        bool boxRecording = false;
+
+
         //Housekeeping
         private void processExistingSkeletons(Dictionary<int, MainWindow.Player> activeSkeletons)
         {
@@ -159,6 +167,21 @@ namespace Moto
             }
         }
 
+        private void customAudio()
+        {
+            wallAudio[0] = "audio/wall/create/0.wav";
+            wallAudio[1] = "audio/wall/create/1.wav";
+            wallAudio[2] = "audio/wall/create/2.wav";
+            wallAudio[3] = "audio/wall/create/3.wav";
+            wallAudio[4] = "audio/wall/create/4.wav";
+            wallAudio[5] = "audio/wall/create/5.wav";
+            wallAudio[6] = "audio/wall/create/6.wav";
+            wallAudio[7] = "audio/wall/create/7.wav";
+            wallAudio[8] = "audio/wall/create/8.wav";
+            wallAudio[9] = "audio/wall/create/9.wav";
+            wallAudio[10] = "audio/wall/create/10.wav";
+        }
+
         private void technologicAudio()
         {
             wallAudio[0] = "audio/wall/technologic/buyit.wav";
@@ -213,11 +236,11 @@ namespace Moto
                 definePanel(player, 8, 0.1516321, 0.3361248, -0.4665765, panelHeight, panelWidth, panelDepth);
 
                 //Side panels
-                panelHeight = 70;
-                panelDepth = 70;
+                panelHeight = 0.5;
+                panelDepth = 1;
 
-                definePanel(player, 9, -0.3516321, 0.1761248, -0.2665765, panelHeight, panelWidth, panelDepth);
-                definePanel(player, 10, -0.3516321, 0.1761248, -0.2665765, panelHeight, panelWidth, panelDepth);
+                definePanel(player, 9, -0.5973037, -0.0743588, -0.5065765, panelHeight, panelWidth, panelDepth);
+                definePanel(player, 10, 0.3473037, -0.0743588, -0.5065765, panelHeight, panelWidth, panelDepth);
             }
         }
 
@@ -332,7 +355,7 @@ namespace Moto
                         else if (player.mode == MainWindow.PlayerMode.Create)
                         {
                             //Creation mode code
-                            Console.WriteLine("LOL CREATE MODE");
+                            wallCreateUpdate(player);
                         }
                     }
                 }
@@ -408,9 +431,15 @@ namespace Moto
                     {
                         if (!insideArea[skeleton.TrackingId][joint][i])
                         {
-                            playWallSound(i, skeleton, joint);
-                            Console.WriteLine("HIT! " + i);
-                            insideArea[skeleton.TrackingId][joint][i] = true;
+                            if (handMovements.difference != null)
+                            {
+                                if (i <= 8 && handMovements.difference[skeleton.TrackingId][joint].Z < -0.01 || (i == 9 && handMovements.difference[skeleton.TrackingId][joint].X < -0.01) || (i == 10 && handMovements.difference[skeleton.TrackingId][joint].X > 0.01))
+                                {
+                                    playWallSound(i, skeleton, joint);
+                                    Console.WriteLine("HIT! " + i);
+                                    insideArea[skeleton.TrackingId][joint][i] = true;
+                                }
+                            }
                         }
                     }
                     else
@@ -419,6 +448,199 @@ namespace Moto
                     }
                 }
             }
+        }
+
+        internal void checkBoxRecordHit(MainWindow.Player player, JointType joint)
+        {
+            //checkDrumHit code
+            //MessageBox.Show(Convert.ToString(hitAreaStart[0][1]));
+            if (player.skeleton != null)
+            {
+
+                double posX = player.skeleton.Joints[joint].Position.X;
+                double posY = player.skeleton.Joints[joint].Position.Y;
+                double posZ = player.skeleton.Joints[joint].Position.Z;
+
+                for (int i = 0; i <= hitArea[player.skeleton.TrackingId].Count - 1; i++)
+                {
+                    if (hitArea[player.skeleton.TrackingId][i].X1 < posX && hitArea[player.skeleton.TrackingId][i].X2 > posX && hitArea[player.skeleton.TrackingId][i].Y1 < posY && hitArea[player.skeleton.TrackingId][i].Y2 > posY && hitArea[player.skeleton.TrackingId][i].Z1 < posZ && hitArea[player.skeleton.TrackingId][i].Z2 > posZ)
+                    {
+                        if (!insideArea[player.skeleton.TrackingId][joint][i])
+                        {
+                            if (handMovements.difference != null)
+                            {
+                                if (i <= 8 && handMovements.difference[player.skeleton.TrackingId][joint].Z < -0.01 || (i == 9 && handMovements.difference[player.skeleton.TrackingId][joint].X < -0.01) || (i == 10 && handMovements.difference[player.skeleton.TrackingId][joint].X > 0.01))
+                                {
+                                    //Hit - Selected, start recording, finish recording
+                                    if (boxToRecord == null && !boxRecording)
+                                    {
+                                        //Select a box to record into
+                                        boxRecordSelection(player, i);
+                                    }
+                                    else if (boxToRecord != null && !boxRecording)
+                                    {
+                                        //Record into this box
+                                        if (boxToRecord == i.ToString())
+                                        {
+                                            if (!boxRecording)
+                                            {
+                                                var t = new Thread(new ParameterizedThreadStart((boxRecordStart)));
+                                                t.Start(MainWindow.sensor);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            boxRecordSelection(player, i);
+                                        }
+                                        
+                                    }
+                                    /*else if (boxRecording)
+                                    {
+                                        //Stop recording
+                                        boxRecordStop(player);
+                                    }*/
+                                    insideArea[player.skeleton.TrackingId][joint][i] = true;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        insideArea[player.skeleton.TrackingId][joint][i] = false;
+                    }
+                }
+            }
+        }
+
+        private void boxRecordStart(object sensor)
+        {
+            KinectSensor aSensor = (KinectSensor)sensor;
+            boxRecordStart();
+        }
+
+        private void boxRecordSelection(MainWindow.Player player, int box)
+        {
+            Console.WriteLine("Selected box: " + box);
+            boxToRecord = box.ToString();
+            removeWallInteractionVisual(player);
+            wallInteractionVisual(player, box);
+        }
+
+        private event RoutedEventHandler FinishedRecording;
+
+        private void boxRecordStart()
+        {
+            FinishedRecording += new RoutedEventHandler(wallOfSound_FinishedRecording);
+            Console.WriteLine("Start recording: " + boxToRecord);
+            boxRecording = true;
+
+            byte[] buffer = new byte[1024];
+
+            if (!Directory.Exists("audio/wall/create"))
+            {
+                Directory.CreateDirectory("audio/wall/create");
+            }
+
+
+            using (FileStream _fileStream = new FileStream("audio/wall/create/" + boxToRecord + ".wav", FileMode.Create))
+            {
+                WriteWavHeader(_fileStream, 2 * 2 * 16000);
+
+                //Start capturing audio                               
+                using (Stream audioStream = MainWindow.sensor.AudioSource.Start())
+                {
+                    //Simply copy the data from the stream down to the file
+                    int count, totalCount = 0;
+                    while ((count = audioStream.Read(buffer, 0, buffer.Length)) > 0 && totalCount < (2 * 2 * 16000))
+                    {
+                        _fileStream.Write(buffer, 0, count);
+                        totalCount += count;
+                    }
+                }
+            }
+
+            if (FinishedRecording != null)
+            {
+                FinishedRecording(null, null);
+            }
+
+        }
+
+        void wallOfSound_FinishedRecording(object sender, RoutedEventArgs e)
+        {
+            //Finished recording
+            FinishedRecording -= wallOfSound_FinishedRecording;
+            Console.WriteLine("##################LOL FINISHED RECORDING###############");
+            boxRecording = false;
+            boxToRecord = null;
+        }
+
+        static void WriteWavHeader(Stream stream, int dataLength)
+        {
+            //We need to use a memory stream because the BinaryWriter will close the underlying stream when it is closed
+            using (var memStream = new MemoryStream(64))
+            {
+                int cbFormat = 18; //sizeof(WAVEFORMATEX)
+                WAVEFORMATEX format = new WAVEFORMATEX()
+                {
+                    wFormatTag = 1,
+                    nChannels = 1,
+                    nSamplesPerSec = 16000,
+                    nAvgBytesPerSec = 32000,
+                    nBlockAlign = 2,
+                    wBitsPerSample = 16,
+                    cbSize = 0
+                };
+
+                using (var bw = new BinaryWriter(memStream))
+                {
+                    //RIFF header
+                    WriteString(memStream, "RIFF");
+                    bw.Write(dataLength + cbFormat + 4); //File size - 8
+                    WriteString(memStream, "WAVE");
+                    WriteString(memStream, "fmt ");
+                    bw.Write(cbFormat);
+
+                    //WAVEFORMATEX
+                    bw.Write(format.wFormatTag);
+                    bw.Write(format.nChannels);
+                    bw.Write(format.nSamplesPerSec);
+                    bw.Write(format.nAvgBytesPerSec);
+                    bw.Write(format.nBlockAlign);
+                    bw.Write(format.wBitsPerSample);
+                    bw.Write(format.cbSize);
+
+                    //data header
+                    WriteString(memStream, "data");
+                    bw.Write(dataLength);
+                    memStream.WriteTo(stream);
+                }
+            }
+        }
+
+        static void WriteString(Stream stream, string s)
+        {
+            byte[] bytes = Encoding.ASCII.GetBytes(s);
+            stream.Write(bytes, 0, bytes.Length);
+        }
+
+        struct WAVEFORMATEX
+        {
+            public ushort wFormatTag;
+            public ushort nChannels;
+            public uint nSamplesPerSec;
+            public uint nAvgBytesPerSec;
+            public ushort nBlockAlign;
+            public ushort wBitsPerSample;
+            public ushort cbSize;
+        }
+
+        private void boxRecordStop(MainWindow.Player player)
+        {
+            Console.WriteLine("Stop recording");
+            boxRecording = false;
+            boxToRecord = null;
+            removeWallInteractionVisual(player);
         }
 
         private void wallUpdate(MainWindow.Player player)
@@ -430,6 +652,20 @@ namespace Moto
             {
                 checkBoxHit(player.skeleton, JointType.HandLeft);
                 checkBoxHit(player.skeleton, JointType.HandRight);
+            }
+
+            setWallPosition(player);
+        }
+
+        private void wallCreateUpdate(MainWindow.Player player)
+        {
+            //What we need to do every skeleton frame with respect to this player's Wall
+            defineHitAreas(player);
+
+            if (currentFocus == playerFocus.None)
+            {
+                checkBoxRecordHit(player, JointType.HandLeft);
+                checkBoxRecordHit(player, JointType.HandRight);
             }
 
             setWallPosition(player);
@@ -458,23 +694,37 @@ namespace Moto
             //Grab the image reference and move it to the correct place
             Canvas.SetLeft(image, point.X - (image.ActualWidth / 2));
             Canvas.SetTop(image, point.Y - (image.ActualHeight / 2));
+
+            if (player.instrumentOverlay != null)
+            {
+                //If the player currently has an overlay to display, align that too
+                image = player.instrumentOverlay;
+
+                image.Width = scaledWidth(player);
+
+                Canvas.SetLeft(image, point.X - (image.ActualWidth / 2));
+                Canvas.SetTop(image, point.Y - (image.ActualHeight / 2));
+            }
         }
 
         private void playWallSound(int i, Skeleton skeleton, JointType joint)
         {
-            if (handMovements.difference != null)
+            if (wallAudio[i] != null)
             {
-                if (handMovements.difference[skeleton.TrackingId][joint].Z < -0.01)
-                {
-                    if (wallAudio[i] != null)
-                    {
-                        mpDictionary[(mpCounter % 4)].Open(new Uri(wallAudio[i], UriKind.Relative));
-                        mpDictionary[(mpCounter % 4)].Play();
+                mpDictionary[(mpCounter % 4)].Open(new Uri(wallAudio[i], UriKind.Relative));
+                mpDictionary[(mpCounter % 4)].Play();
 
-                        mpCounter++;
-                    }
-                }
+                mpDictionary[(mpCounter % 4)].MediaEnded += new EventHandler(wallOfSound_MediaEnded);
+
+                mpCounter++;
             }
+        }
+
+        void wallOfSound_MediaEnded(object sender, EventArgs e)
+        {
+            MediaPlayer player = (MediaPlayer)sender;
+            player.Close();
+            player.MediaEnded -= wallOfSound_MediaEnded;
         }
 
         private void newPlayerWall(MainWindow.Player player)
@@ -493,10 +743,29 @@ namespace Moto
             setupWall(player);
         }
 
+        private void wallInteractionVisual(MainWindow.Player player, int box)
+        {
+            Image image = new Image();
+            image.Source = new BitmapImage(new Uri("images/wall-selection/wall" + box + ".png", UriKind.Relative));
+
+            player.instrumentOverlay = image;
+
+            MainCanvas.Children.Add(image);
+        }
+
         private void removePlayerWall(MainWindow.Player player)
         {
             //Clean up player wall data
             MainCanvas.Children.Remove(player.instrumentImage);
+        }
+
+        private void removeWallInteractionVisual(MainWindow.Player player)
+        {
+            if (player.instrumentOverlay != null)
+            {
+                MainCanvas.Children.Remove(player.instrumentOverlay);
+                player.instrumentOverlay = null;
+            }
         }
 
         //Voice navigation
@@ -707,6 +976,7 @@ namespace Moto
                     break;
                 case menuOptions.CustomWall:
                     MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].mode = MainWindow.PlayerMode.Custom;
+                    customAudio();
                     break;
                 case menuOptions.Technologic:
                     MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].mode = MainWindow.PlayerMode.Technologic;

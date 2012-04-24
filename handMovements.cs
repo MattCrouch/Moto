@@ -117,7 +117,7 @@ namespace Moto
 
         public static void listenForGestures(Skeleton skeleton)
         {
-            int angleDrift = 10;
+            int angleDrift = 20;
             double anAngle;
             bool failed;
 
@@ -133,7 +133,7 @@ namespace Moto
 
                 if (Math.Abs(anAngle - 90) < angleDrift)
                 {
-                    if (isLimbStraight(skeleton.Joints[JointType.ShoulderLeft], skeleton.Joints[JointType.ElbowLeft], skeleton.Joints[JointType.HandLeft], angleDrift))
+                    if (isLimbStraight(skeleton.Joints[JointType.ShoulderLeft], skeleton.Joints[JointType.ElbowLeft], skeleton.Joints[JointType.HandLeft], 30))
                     {
                         failed = false;
                         if (!LeftGestureStatus)
@@ -155,11 +155,11 @@ namespace Moto
                 failed = true;
 
                 anAngle = getAngle(skeleton.Joints[JointType.ShoulderLeft], skeleton.Joints[JointType.HandLeft]);
-                //Console.WriteLine(anAngle);
+                //Console.WriteLine(Math.Abs(anAngle - 45));
                 //'Kinect Guide' gesture
-                if ((Math.Abs(anAngle - 45) < angleDrift) && (skeleton.Joints[JointType.HandLeft].Position.Y < skeleton.Position.Y))
+                if ((Math.Abs(anAngle - 45) < angleDrift) && (skeleton.Joints[JointType.HandLeft].Position.Y < skeleton.Joints[JointType.Spine].Position.Y))
                 {
-                    if (isLimbStraight(skeleton.Joints[JointType.ShoulderLeft], skeleton.Joints[JointType.ElbowLeft], skeleton.Joints[JointType.HandLeft], angleDrift))
+                    if (isLimbStraight(skeleton.Joints[JointType.ShoulderLeft], skeleton.Joints[JointType.ElbowLeft], skeleton.Joints[JointType.HandLeft], 30))
                     {
                         failed = false;
                         if (!KinectGuideGestureStatus)
@@ -184,7 +184,7 @@ namespace Moto
 
                 if (Math.Abs(anAngle - 90) < angleDrift)
                 {
-                    if (isLimbStraight(skeleton.Joints[JointType.ShoulderRight], skeleton.Joints[JointType.ElbowRight], skeleton.Joints[JointType.HandRight], angleDrift))
+                    if (isLimbStraight(skeleton.Joints[JointType.ShoulderRight], skeleton.Joints[JointType.ElbowRight], skeleton.Joints[JointType.HandRight], 30))
                     {
                         failed = false;
                         if (!RightGestureStatus)
