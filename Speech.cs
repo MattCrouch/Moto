@@ -56,7 +56,6 @@ namespace Moto.Speech
                 { "Yeah", new WhatSaid { Verb = Verbs.True } },
                 { "Sure", new WhatSaid { Verb = Verbs.True } },
                 { "Okay", new WhatSaid { Verb = Verbs.True } },
-                { "Continue", new WhatSaid { Verb = Verbs.True } },
                 { "No", new WhatSaid { Verb = Verbs.False } },
                 { "Nope", new WhatSaid { Verb = Verbs.False } },
                 { "Cancel", new WhatSaid { Verb = Verbs.False } },
