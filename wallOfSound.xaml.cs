@@ -59,7 +59,7 @@ namespace Moto
         Dictionary<int, Dictionary<JointType, Dictionary<int, bool>>> insideArea = new Dictionary<int, Dictionary<JointType, Dictionary<int, bool>>>();
 
         //Wall audio
-        string[] wallAudio = new string[11];
+        Dictionary<int, string[]> wallAudio = new Dictionary<int, string[]>();
 
         //Audio dictionarys
         Dictionary<int, MediaPlayer> mpDictionary = new Dictionary<int, MediaPlayer>();
@@ -134,19 +134,24 @@ namespace Moto
                 switch (player.mode)
                 {
                     case MainWindow.PlayerMode.Technologic:
-                        technologicAudio();
+                        technologicAudio(player);
                         break;
                     case MainWindow.PlayerMode.Drum:
-                        drumsetAudio();
+                        drumsetAudio(player);
                         break;
                     case MainWindow.PlayerMode.EightBit:
-                        drumsetAudio();
+                        drumsetAudio(player);
                         break;
                 }
             }
 
             //Make sure the hands aren't in the drums areas in the first place
             insideArea.Add(player.skeleton.TrackingId, createPlayerDictionary());
+        }
+
+        private void setupPlayerAudio(MainWindow.Player player)
+        {
+            wallAudio.Add(player.skeleton.TrackingId, new string[11]);
         }
 
         private void setupVoice()
@@ -168,53 +173,53 @@ namespace Moto
             }
         }
 
-        private void customAudio()
+        private void customAudio(MainWindow.Player player)
         {
-            wallAudio[0] = "audio/wall/create/0.wav";
-            wallAudio[1] = "audio/wall/create/1.wav";
-            wallAudio[2] = "audio/wall/create/2.wav";
-            wallAudio[3] = "audio/wall/create/3.wav";
-            wallAudio[4] = "audio/wall/create/4.wav";
-            wallAudio[5] = "audio/wall/create/5.wav";
-            wallAudio[6] = "audio/wall/create/6.wav";
-            wallAudio[7] = "audio/wall/create/7.wav";
-            wallAudio[8] = "audio/wall/create/8.wav";
-            wallAudio[9] = "audio/wall/create/9.wav";
-            wallAudio[10] = "audio/wall/create/10.wav";
+            wallAudio[player.skeleton.TrackingId][0] = "audio/wall/create/0.wav";
+            wallAudio[player.skeleton.TrackingId][1] = "audio/wall/create/1.wav";
+            wallAudio[player.skeleton.TrackingId][2] = "audio/wall/create/2.wav";
+            wallAudio[player.skeleton.TrackingId][3] = "audio/wall/create/3.wav";
+            wallAudio[player.skeleton.TrackingId][4] = "audio/wall/create/4.wav";
+            wallAudio[player.skeleton.TrackingId][5] = "audio/wall/create/5.wav";
+            wallAudio[player.skeleton.TrackingId][6] = "audio/wall/create/6.wav";
+            wallAudio[player.skeleton.TrackingId][7] = "audio/wall/create/7.wav";
+            wallAudio[player.skeleton.TrackingId][8] = "audio/wall/create/8.wav";
+            wallAudio[player.skeleton.TrackingId][9] = "audio/wall/create/9.wav";
+            wallAudio[player.skeleton.TrackingId][10] = "audio/wall/create/10.wav";
         }
 
-        private void technologicAudio()
+        private void technologicAudio(MainWindow.Player player)
         {
-            wallAudio[0] = "audio/wall/technologic/buyit.wav";
-            wallAudio[1] = "audio/wall/technologic/useit.wav";
-            wallAudio[2] = "audio/wall/technologic/breakit.wav";
-            wallAudio[3] = "audio/wall/technologic/fixit.wav";
-            wallAudio[4] = "audio/wall/technologic/trashit.wav";
-            wallAudio[5] = "audio/wall/technologic/changeit.wav";
-            wallAudio[6] = "audio/wall/technologic/mail.wav";
-            wallAudio[7] = "audio/wall/technologic/upgradeit.wav";
+            wallAudio[player.skeleton.TrackingId][0] = "audio/wall/technologic/buyit.wav";
+            wallAudio[player.skeleton.TrackingId][1] = "audio/wall/technologic/useit.wav";
+            wallAudio[player.skeleton.TrackingId][2] = "audio/wall/technologic/breakit.wav";
+            wallAudio[player.skeleton.TrackingId][3] = "audio/wall/technologic/fixit.wav";
+            wallAudio[player.skeleton.TrackingId][4] = "audio/wall/technologic/trashit.wav";
+            wallAudio[player.skeleton.TrackingId][5] = "audio/wall/technologic/changeit.wav";
+            wallAudio[player.skeleton.TrackingId][6] = "audio/wall/technologic/mail.wav";
+            wallAudio[player.skeleton.TrackingId][7] = "audio/wall/technologic/upgradeit.wav";
         }
 
-        private void drumsetAudio()
+        private void drumsetAudio(MainWindow.Player player)
         {
-            wallAudio[0] = "audio/drums/drum0.wav";
-            wallAudio[1] = "audio/drums/drum1.wav";
-            wallAudio[2] = "audio/drums/drum2.wav";
+            wallAudio[player.skeleton.TrackingId][0] = "audio/drums/drum0.wav";
+            wallAudio[player.skeleton.TrackingId][1] = "audio/drums/drum1.wav";
+            wallAudio[player.skeleton.TrackingId][2] = "audio/drums/drum2.wav";
         }
 
-        private void eightBitAudio()
+        private void eightBitAudio(MainWindow.Player player)
         {
-            wallAudio[0] = "audio/wall/8bit/0.wav";
-            wallAudio[1] = "audio/wall/8bit/1.wav";
-            wallAudio[2] = "audio/wall/8bit/2.wav";
-            wallAudio[3] = "audio/wall/8bit/3.wav";
-            wallAudio[4] = "audio/wall/8bit/4.wav";
-            wallAudio[5] = "audio/wall/8bit/5.wav";
-            wallAudio[6] = "audio/wall/8bit/6.wav";
-            wallAudio[7] = "audio/wall/8bit/7.wav";
-            wallAudio[8] = "audio/wall/8bit/8.wav";
-            wallAudio[9] = "audio/wall/8bit/9.wav";
-            wallAudio[10] = "audio/wall/8bit/10.wav";
+            wallAudio[player.skeleton.TrackingId][0] = "audio/wall/8bit/0.wav";
+            wallAudio[player.skeleton.TrackingId][1] = "audio/wall/8bit/1.wav";
+            wallAudio[player.skeleton.TrackingId][2] = "audio/wall/8bit/2.wav";
+            wallAudio[player.skeleton.TrackingId][3] = "audio/wall/8bit/3.wav";
+            wallAudio[player.skeleton.TrackingId][4] = "audio/wall/8bit/4.wav";
+            wallAudio[player.skeleton.TrackingId][5] = "audio/wall/8bit/5.wav";
+            wallAudio[player.skeleton.TrackingId][6] = "audio/wall/8bit/6.wav";
+            wallAudio[player.skeleton.TrackingId][7] = "audio/wall/8bit/7.wav";
+            wallAudio[player.skeleton.TrackingId][8] = "audio/wall/8bit/8.wav";
+            wallAudio[player.skeleton.TrackingId][9] = "audio/wall/8bit/9.wav";
+            wallAudio[player.skeleton.TrackingId][10] = "audio/wall/8bit/10.wav";
         }
 
         internal void defineHitAreas(MainWindow.Player player)
@@ -234,7 +239,7 @@ namespace Moto
                 definePanel(player, 5, 0.1516321, -0.0861248, -0.4665765, panelHeight, panelWidth, panelDepth);
                 definePanel(player, 6, -0.3516321, -0.3361248, -0.4665765, panelHeight, panelWidth, panelDepth);
                 definePanel(player, 7, -0.1016321, -0.3361248, -0.4665765, panelHeight, panelWidth, panelDepth);
-                definePanel(player, 8, 0.1516321, 0.3361248, -0.4665765, panelHeight, panelWidth, panelDepth);
+                definePanel(player, 8, 0.1516321, -0.3361248, -0.4665765, panelHeight, panelWidth, panelDepth);
 
                 //Side panels
                 panelHeight = 0.5;
@@ -415,37 +420,37 @@ namespace Moto
             }
         }
 
-        internal void checkBoxHit(Skeleton skeleton, JointType joint)
+        internal void checkBoxHit(MainWindow.Player player, JointType joint)
         {
             //checkDrumHit code
             //MessageBox.Show(Convert.ToString(hitAreaStart[0][1]));
-            if (skeleton != null)
+            if (player.skeleton != null)
             {
 
-                double posX = skeleton.Joints[joint].Position.X;
-                double posY = skeleton.Joints[joint].Position.Y;
-                double posZ = skeleton.Joints[joint].Position.Z;
+                double posX = player.skeleton.Joints[joint].Position.X;
+                double posY = player.skeleton.Joints[joint].Position.Y;
+                double posZ = player.skeleton.Joints[joint].Position.Z;
 
-                for (int i = 0; i <= hitArea[skeleton.TrackingId].Count-1; i++)
+                for (int i = 0; i <= hitArea[player.skeleton.TrackingId].Count-1; i++)
                 {
-                    if (hitArea[skeleton.TrackingId][i].X1 < posX && hitArea[skeleton.TrackingId][i].X2 > posX && hitArea[skeleton.TrackingId][i].Y1 < posY && hitArea[skeleton.TrackingId][i].Y2 > posY && hitArea[skeleton.TrackingId][i].Z1 < posZ && hitArea[skeleton.TrackingId][i].Z2 > posZ)
+                    if (hitArea[player.skeleton.TrackingId][i].X1 < posX && hitArea[player.skeleton.TrackingId][i].X2 > posX && hitArea[player.skeleton.TrackingId][i].Y1 < posY && hitArea[player.skeleton.TrackingId][i].Y2 > posY && hitArea[player.skeleton.TrackingId][i].Z1 < posZ && hitArea[player.skeleton.TrackingId][i].Z2 > posZ)
                     {
-                        if (!insideArea[skeleton.TrackingId][joint][i])
+                        if (!insideArea[player.skeleton.TrackingId][joint][i])
                         {
                             if (handMovements.difference != null)
                             {
-                                if (i <= 8 && handMovements.difference[skeleton.TrackingId][joint].Z < -0.01 || (i == 9 && handMovements.difference[skeleton.TrackingId][joint].X < -0.01) || (i == 10 && handMovements.difference[skeleton.TrackingId][joint].X > 0.01))
+                                if (i <= 8 && handMovements.difference[player.skeleton.TrackingId][joint].Z < -0.01 || (i == 9 && handMovements.difference[player.skeleton.TrackingId][joint].X < -0.01) || (i == 10 && handMovements.difference[player.skeleton.TrackingId][joint].X > 0.01))
                                 {
-                                    playWallSound(i, skeleton, joint);
+                                    playWallSound(i, player, joint);
                                     Console.WriteLine("HIT! " + i);
-                                    insideArea[skeleton.TrackingId][joint][i] = true;
+                                    insideArea[player.skeleton.TrackingId][joint][i] = true;
                                 }
                             }
                         }
                     }
                     else
                     {
-                        insideArea[skeleton.TrackingId][joint][i] = false;
+                        insideArea[player.skeleton.TrackingId][joint][i] = false;
                     }
                 }
             }
@@ -595,7 +600,7 @@ namespace Moto
             //TODO: Surely there's a better way than reinitialising the speech recogniser?
             MainWindow.mySpeechRecognizer.Start(MainWindow.sensor.AudioSource);
         }
-
+        #region .wav creation code
         static void WriteWavHeader(Stream stream, int dataLength)
         {
             //We need to use a memory stream because the BinaryWriter will close the underlying stream when it is closed
@@ -655,6 +660,7 @@ namespace Moto
             public ushort wBitsPerSample;
             public ushort cbSize;
         }
+        #endregion
 
         private void boxRecordStop(MainWindow.Player player)
         {
@@ -671,8 +677,8 @@ namespace Moto
 
             if (currentFocus == playerFocus.None)
             {
-                checkBoxHit(player.skeleton, JointType.HandLeft);
-                checkBoxHit(player.skeleton, JointType.HandRight);
+                checkBoxHit(player, JointType.HandLeft);
+                checkBoxHit(player, JointType.HandRight);
             }
 
             setWallPosition(player);
@@ -728,11 +734,11 @@ namespace Moto
             }
         }
 
-        private void playWallSound(int i, Skeleton skeleton, JointType joint)
+        private void playWallSound(int i, MainWindow.Player player, JointType joint)
         {
-            if (wallAudio[i] != null)
+            if (wallAudio[player.skeleton.TrackingId][i] != null)
             {
-                mpDictionary[(mpCounter % 4)].Open(new Uri(wallAudio[i], UriKind.Relative));
+                mpDictionary[(mpCounter % 4)].Open(new Uri(wallAudio[player.skeleton.TrackingId][i], UriKind.Relative));
                 mpDictionary[(mpCounter % 4)].Play();
 
                 mpDictionary[(mpCounter % 4)].MediaEnded += new EventHandler(wallOfSound_MediaEnded);
@@ -761,6 +767,7 @@ namespace Moto
 
             player.instrumentImage = image;
 
+            setupPlayerAudio(player);
             setupWall(player);
         }
 
@@ -788,7 +795,16 @@ namespace Moto
         private void removePlayerWall(MainWindow.Player player)
         {
             //Clean up player wall data
+            
+            //Remove all audio references
+            if (wallAudio.ContainsKey(player.skeleton.TrackingId))
+            {
+                wallAudio.Remove(player.skeleton.TrackingId);
+            }
+
+            //Remove their wall graphic
             MainCanvas.Children.Remove(player.instrumentImage);
+            removeWallInteractionVisual(player);
         }
 
         private void removeWallInteractionVisual(MainWindow.Player player)
@@ -1008,19 +1024,19 @@ namespace Moto
                     break;
                 case menuOptions.CustomWall:
                     MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].mode = MainWindow.PlayerMode.Custom;
-                    customAudio();
+                    customAudio(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
                     break;
                 case menuOptions.Technologic:
                     MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].mode = MainWindow.PlayerMode.Technologic;
-                    technologicAudio();
+                    technologicAudio(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
                     break;
                 case menuOptions.Drum:
                     MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].mode = MainWindow.PlayerMode.Drum;
-                    drumsetAudio();
+                    drumsetAudio(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
                     break;
                 case menuOptions.EightBit:
                     MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].mode = MainWindow.PlayerMode.EightBit;
-                    eightBitAudio();
+                    eightBitAudio(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
                     break;
             }
         }
@@ -1188,6 +1204,10 @@ namespace Moto
                 foreach (var player in MainWindow.activeSkeletons)
                 {
                     player.Value.instrumentImage.Visibility = System.Windows.Visibility.Hidden;
+                    if (player.Value.instrumentOverlay != null)
+                    {
+                        player.Value.instrumentOverlay.Visibility = System.Windows.Visibility.Hidden;
+                    }
                 }
 
                 MainWindow.sensor.ColorStream.Enable(format);
@@ -1215,6 +1235,10 @@ namespace Moto
             foreach (var player in MainWindow.activeSkeletons)
             {
                 player.Value.instrumentImage.Visibility = System.Windows.Visibility.Visible;
+                if (player.Value.instrumentOverlay != null)
+                {
+                    player.Value.instrumentOverlay.Visibility = System.Windows.Visibility.Hidden;
+                }
             }
 
 
