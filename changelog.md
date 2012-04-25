@@ -1,5 +1,15 @@
 CHANGELOG
 =========
+0.5.2.1 - 25/4/12
+-----------------
+- You can now record your own custom Wall of Sound by using the 'Record New' option in the Kinect Guide menu
+	- To play a custom wall, select 'Custom Wall' in the Kinect Guide menu
+- Added an 8-bit Wall of Sound
+- Two players can each control their own wall content
+- Graphics now appropriately layer on top of each other when taking a photo
+- Improved the reliability of the 'Kinect' listening keyword
+- The Kinect Guide gesture has now been slightly refined to avoid any false triggers.
+
 0.5.2.0 - 22/4/12
 -----------------
 - The guitar has been repositioned to align just above the hip, as opposed to on it
