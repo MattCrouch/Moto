@@ -157,7 +157,7 @@ namespace Moto
                 anAngle = getAngle(skeleton.Joints[JointType.ShoulderLeft], skeleton.Joints[JointType.HandLeft]);
                 //Console.WriteLine(Math.Abs(anAngle - 45));
                 //'Kinect Guide' gesture
-                if ((Math.Abs(anAngle - 45) < angleDrift) && (skeleton.Joints[JointType.HandLeft].Position.Y < skeleton.Joints[JointType.Spine].Position.Y))
+                if ((Math.Abs(anAngle - 45) < angleDrift) && (skeleton.Joints[JointType.HandLeft].Position.Y < skeleton.Joints[JointType.Spine].Position.Y) && (skeleton.Joints[JointType.HandLeft].Position.X < skeleton.Joints[JointType.Spine].Position.X))
                 {
                     if (isLimbStraight(skeleton.Joints[JointType.ShoulderLeft], skeleton.Joints[JointType.ElbowLeft], skeleton.Joints[JointType.HandLeft], 30))
                     {

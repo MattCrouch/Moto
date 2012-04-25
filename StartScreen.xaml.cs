@@ -65,7 +65,6 @@ namespace Moto
         private void setupStartScreen()
         {
             MainWindow.sensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(sensor_AllFramesReady);
-            handMovements.KinectGuideGesture += new EventHandler<handMovements.GestureEventArgs>(handMovements_KinectGuideGesture);
             handMovements.LeftGesture += new EventHandler<handMovements.GestureEventArgs>(handMovements_LeftGesture);
             handMovements.RightGesture += new EventHandler<handMovements.GestureEventArgs>(handMovements_RightGesture);
         }
@@ -251,11 +250,6 @@ namespace Moto
                     imgRightHand.Visibility = Visibility.Visible;
                     break;
             }
-        }
-
-        void handMovements_KinectGuideGesture(object sender, handMovements.GestureEventArgs e)
-        {
-            Console.WriteLine("Kinect guide: " + e.Trigger);
         }
 
         void modeDecisionI_Tick(object sender, EventArgs e)
@@ -532,7 +526,6 @@ namespace Moto
             unlistenVoice();
 
             MainWindow.sensor.AllFramesReady -= new EventHandler<AllFramesReadyEventArgs>(sensor_AllFramesReady);
-            handMovements.KinectGuideGesture -= new EventHandler<handMovements.GestureEventArgs>(handMovements_KinectGuideGesture);
             handMovements.LeftGesture -= new EventHandler<handMovements.GestureEventArgs>(handMovements_LeftGesture);
             handMovements.RightGesture -= new EventHandler<handMovements.GestureEventArgs>(handMovements_RightGesture);
         }
