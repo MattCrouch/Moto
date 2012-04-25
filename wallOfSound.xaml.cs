@@ -98,6 +98,7 @@ namespace Moto
         //Wall record variables
         string boxToRecord;
         bool boxRecording = false;
+        DispatcherTimer recordingTimer;
 
 
         //Housekeeping
@@ -484,6 +485,12 @@ namespace Moto
                                         {
                                             if (!boxRecording)
                                             {
+                                                boxRecordSelection(player, i, true);
+                                                recordingTimer = new DispatcherTimer();
+                                                recordingTimer.Interval = TimeSpan.FromSeconds(2);
+                                                recordingTimer.Tick += new EventHandler(recordingTimer_Tick);
+                                                recordingTimer.Start();
+
                                                 var t = new Thread(new ParameterizedThreadStart((boxRecordStart)));
                                                 t.Start(MainWindow.sensor);
                                             }
@@ -512,18 +519,30 @@ namespace Moto
             }
         }
 
+        void recordingTimer_Tick(object sender, EventArgs e)
+        {
+            if (recordingTimer != null)
+            {
+                recordingTimer.Stop();
+                recordingTimer.Tick -= recordingTimer_Tick;
+                recordingTimer = null;
+
+                removeWallInteractionVisual(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
+            }
+        }
+
         private void boxRecordStart(object sensor)
         {
             KinectSensor aSensor = (KinectSensor)sensor;
             boxRecordStart();
         }
 
-        private void boxRecordSelection(MainWindow.Player player, int box)
+        private void boxRecordSelection(MainWindow.Player player, int box, bool recording = false)
         {
             Console.WriteLine("Selected box: " + box);
             boxToRecord = box.ToString();
             removeWallInteractionVisual(player);
-            wallInteractionVisual(player, box);
+            wallInteractionVisual(player, box, recording);
         }
 
         private event RoutedEventHandler FinishedRecording;
@@ -570,9 +589,11 @@ namespace Moto
         {
             //Finished recording
             FinishedRecording -= wallOfSound_FinishedRecording;
-            Console.WriteLine("##################LOL FINISHED RECORDING###############");
             boxRecording = false;
             boxToRecord = null;
+
+            //TODO: Surely there's a better way than reinitialising the speech recogniser?
+            MainWindow.mySpeechRecognizer.Start(MainWindow.sensor.AudioSource);
         }
 
         static void WriteWavHeader(Stream stream, int dataLength)
@@ -743,10 +764,21 @@ namespace Moto
             setupWall(player);
         }
 
-        private void wallInteractionVisual(MainWindow.Player player, int box)
+        private void wallInteractionVisual(MainWindow.Player player, int box, bool recording = false)
         {
             Image image = new Image();
-            image.Source = new BitmapImage(new Uri("images/wall-selection/wall" + box + ".png", UriKind.Relative));
+
+            string url;
+
+            if (recording)
+            {
+                url = "images/wall-selection/wall" + box + "-rec.png";
+            }
+            else
+            {
+                url = "images/wall-selection/wall" + box + ".png";
+            }
+            image.Source = new BitmapImage(new Uri(url, UriKind.Relative));
 
             player.instrumentOverlay = image;
 
