@@ -149,6 +149,11 @@ namespace Moto
 
         void strumGuitar(double neckDist)
         {
+            if (mpDictionary[(mpCounter % mpDictionary.Count)] == null)
+            {
+                mpDictionary[(mpCounter % mpDictionary.Count)] = new MediaPlayer();
+            }
+
             if (neckDist > 0.7)
             {
                 mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/guitar/guitar1.wav", UriKind.Relative));
@@ -167,6 +172,8 @@ namespace Moto
             }
 
             mpDictionary[(mpCounter % mpDictionary.Count)].Play();
+
+            mpDictionary[(mpCounter % mpDictionary.Count)].MediaEnded += new EventHandler(instruments_MediaEnded);
 
             mpCounter++;
         }

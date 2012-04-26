@@ -144,9 +144,16 @@ namespace Moto
                     {
                         if (!insideArea[player.skeleton.TrackingId][joint][i])
                         {
-                            hitDrum("drum" + i, player.skeleton, joint);
-                            Debug.Print("HIT! " + i);
-                            insideArea[player.skeleton.TrackingId][joint][i] = true;
+                            if (handMovements.difference != null)
+                            {
+                                //MessageBox.Show(Convert.ToString(difference["X"]));
+                                if (handMovements.difference[player.skeleton.TrackingId][joint].Y < -0.01 || ((joint == JointType.FootLeft || joint == JointType.FootRight) && handMovements.difference[player.skeleton.TrackingId][joint].Z < -0.02))
+                                {
+                                    hitDrum("drum" + i);
+                                    Debug.Print("HIT! " + i);
+                                    insideArea[player.skeleton.TrackingId][joint][i] = true;
+                                }
+                            }
                         }
                     }
                     else
@@ -157,23 +164,36 @@ namespace Moto
             }
         }
 
-        private void hitDrum(string drumName, Skeleton skeleton, JointType joint)
+        private void hitDrum(string drumName)
         {
-            //MessageBox.Show("HIT DRUM!");
-            if (handMovements.difference != null)
+            if (mpDictionary[(mpCounter % mpDictionary.Count)] == null)
             {
-                //MessageBox.Show(Convert.ToString(difference["X"]));
-                if (handMovements.difference[skeleton.TrackingId][joint].Y < -0.01 || ((joint == JointType.FootLeft || joint == JointType.FootRight) && handMovements.difference[skeleton.TrackingId][joint].Z < -0.02))
-                {
-                    mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/drums/" + drumName + ".wav", UriKind.Relative));
-                    mpDictionary[(mpCounter % mpDictionary.Count)].Play();
+                mpDictionary[(mpCounter % mpDictionary.Count)] = new MediaPlayer();
+            }
 
-                    mpCounter++;
-                                        
-                    //SoundPlayer drumSound = new SoundPlayer(drumName + ".wav");
-                    //drumSound.Play();
+            mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/drums/" + drumName + ".wav", UriKind.Relative));
+            mpDictionary[(mpCounter % mpDictionary.Count)].Play();
+
+            mpDictionary[(mpCounter % mpDictionary.Count)].MediaEnded += new EventHandler(instruments_MediaEnded);
+
+            mpCounter++;
+        }
+
+        void instruments_MediaEnded(object sender, EventArgs e)
+        {
+            MediaPlayer player = (MediaPlayer)sender;
+            foreach (var entry in mpDictionary)
+            {
+                if (entry.Value == player)
+                {
+                    mpDictionary[entry.Key] = null;
+                    return;
                 }
             }
+
+            player.Close();
+
+            player.MediaEnded -= instruments_MediaEnded;
         }
 
         private void SetDrumPosition(MainWindow.Player player)

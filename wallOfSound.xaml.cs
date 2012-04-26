@@ -278,10 +278,10 @@ namespace Moto
 
         private void generateMediaPlayers()
         {
-            mpDictionary.Add(0, new MediaPlayer());
-            mpDictionary.Add(1, new MediaPlayer());
-            mpDictionary.Add(2, new MediaPlayer());
-            mpDictionary.Add(3, new MediaPlayer());
+            mpDictionary.Add(0, null);
+            mpDictionary.Add(1, null);
+            mpDictionary.Add(2, null);
+            mpDictionary.Add(3, null);
         }
 
         //Skeleton data processing (ran every frame)
@@ -738,10 +738,14 @@ namespace Moto
         {
             if (wallAudio[player.skeleton.TrackingId][i] != null)
             {
-                mpDictionary[(mpCounter % 4)].Open(new Uri(wallAudio[player.skeleton.TrackingId][i], UriKind.Relative));
-                mpDictionary[(mpCounter % 4)].Play();
+                if (mpDictionary[(mpCounter % mpDictionary.Count)] == null)
+                {
+                    mpDictionary[(mpCounter % mpDictionary.Count)] = new MediaPlayer();
+                }
+                mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri(wallAudio[player.skeleton.TrackingId][i], UriKind.Relative));
+                mpDictionary[(mpCounter % mpDictionary.Count)].Play();
 
-                mpDictionary[(mpCounter % 4)].MediaEnded += new EventHandler(wallOfSound_MediaEnded);
+                mpDictionary[(mpCounter % mpDictionary.Count)].MediaEnded += new EventHandler(wallOfSound_MediaEnded);
 
                 mpCounter++;
             }
@@ -750,7 +754,17 @@ namespace Moto
         void wallOfSound_MediaEnded(object sender, EventArgs e)
         {
             MediaPlayer player = (MediaPlayer)sender;
+            foreach (var entry in mpDictionary)
+            {
+                if (entry.Value == player)
+                {
+                    mpDictionary[entry.Key] = null;
+                    return;
+                }
+            }
+            
             player.Close();
+            
             player.MediaEnded -= wallOfSound_MediaEnded;
         }
 

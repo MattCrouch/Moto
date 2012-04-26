@@ -609,14 +609,14 @@ namespace Moto
 
         private void generateMediaPlayers()
         {
-            mpDictionary.Add(0, new MediaPlayer());
-            mpDictionary.Add(1, new MediaPlayer());
-            mpDictionary.Add(2, new MediaPlayer());
-            mpDictionary.Add(3, new MediaPlayer());
-            mpDictionary.Add(4, new MediaPlayer());
-            mpDictionary.Add(5, new MediaPlayer());
-            mpDictionary.Add(6, new MediaPlayer());
-            mpDictionary.Add(7, new MediaPlayer());
+            mpDictionary.Add(0, null);
+            mpDictionary.Add(1, null);
+            mpDictionary.Add(2, null);
+            mpDictionary.Add(3, null);
+            mpDictionary.Add(4, null);
+            mpDictionary.Add(5, null);
+            mpDictionary.Add(6, null);
+            mpDictionary.Add(7, null);
         }
 
         //Metronome code
