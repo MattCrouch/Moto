@@ -62,8 +62,20 @@ namespace Moto
         Dictionary<int, string[]> wallAudio = new Dictionary<int, string[]>();
 
         //Audio dictionarys
-        Dictionary<int, MediaPlayer> mpDictionary = new Dictionary<int, MediaPlayer>();
+        Dictionary<int, playerSound> mpDictionary = new Dictionary<int, playerSound>();
         int mpCounter = 0;
+
+        class playerSound
+        {
+            public int skeleton;
+            public int box;
+            public MediaPlayer mediaPlayer;
+
+            public playerSound()
+            {
+                mediaPlayer = new MediaPlayer();
+            }
+        }
 
         //Kinect Guide variables
         DispatcherTimer kinectGuideTimer;
@@ -282,6 +294,10 @@ namespace Moto
             mpDictionary.Add(1, null);
             mpDictionary.Add(2, null);
             mpDictionary.Add(3, null);
+            mpDictionary.Add(4, null);
+            mpDictionary.Add(5, null);
+            mpDictionary.Add(6, null);
+            mpDictionary.Add(7, null);
         }
 
         //Skeleton data processing (ran every frame)
@@ -550,6 +566,12 @@ namespace Moto
             wallInteractionVisual(player, box, recording);
         }
 
+        private void boxSelection(MainWindow.Player player, int box, bool recording = false)
+        {
+            
+            wallInteractionVisual(player, box);
+        }
+
         private event RoutedEventHandler FinishedRecording;
 
         private void boxRecordStart()
@@ -725,12 +747,15 @@ namespace Moto
             if (player.instrumentOverlay != null)
             {
                 //If the player currently has an overlay to display, align that too
-                image = player.instrumentOverlay;
+                foreach (var overlay in player.instrumentOverlay)
+                {
+                    image = overlay.Value;
 
-                image.Width = scaledWidth(player);
+                    image.Width = scaledWidth(player);
 
-                Canvas.SetLeft(image, point.X - (image.ActualWidth / 2));
-                Canvas.SetTop(image, point.Y - (image.ActualHeight / 2));
+                    Canvas.SetLeft(image, point.X - (image.ActualWidth / 2));
+                    Canvas.SetTop(image, point.Y - (image.ActualHeight / 2));
+                }
             }
         }
 
@@ -740,24 +765,44 @@ namespace Moto
             {
                 if (mpDictionary[(mpCounter % mpDictionary.Count)] == null)
                 {
-                    mpDictionary[(mpCounter % mpDictionary.Count)] = new MediaPlayer();
+                    mpDictionary[(mpCounter % mpDictionary.Count)] = new playerSound();
                 }
-                mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri(wallAudio[player.skeleton.TrackingId][i], UriKind.Relative));
-                mpDictionary[(mpCounter % mpDictionary.Count)].Play();
+                else
+                {
+                    mpDictionary[(mpCounter % mpDictionary.Count)].mediaPlayer.MediaEnded -= wallOfSound_MediaEnded;
+                    if (mpDictionary[(mpCounter % mpDictionary.Count)].box != i)
+                    {
+                        removeWallInteractionVisual(player, mpDictionary[(mpCounter % mpDictionary.Count)].box);
+                    }
+                }
 
-                mpDictionary[(mpCounter % mpDictionary.Count)].MediaEnded += new EventHandler(wallOfSound_MediaEnded);
+                mpDictionary[(mpCounter % mpDictionary.Count)].skeleton = player.skeleton.TrackingId;
+                mpDictionary[(mpCounter % mpDictionary.Count)].box = i;
+
+                mpDictionary[(mpCounter % mpDictionary.Count)].mediaPlayer.Open(new Uri(wallAudio[player.skeleton.TrackingId][i], UriKind.Relative));
+                mpDictionary[(mpCounter % mpDictionary.Count)].mediaPlayer.Play();
+
+                mpDictionary[(mpCounter % mpDictionary.Count)].mediaPlayer.MediaEnded += new EventHandler(wallOfSound_MediaEnded);
 
                 mpCounter++;
+
+                boxSelection(player, i);
             }
         }
 
         void wallOfSound_MediaEnded(object sender, EventArgs e)
         {
             MediaPlayer player = (MediaPlayer)sender;
+
             foreach (var entry in mpDictionary)
             {
-                if (entry.Value == player)
+                if (entry.Value != null && entry.Value.mediaPlayer == player)
                 {
+                    if (MainWindow.activeSkeletons.ContainsKey(mpDictionary[entry.Key].skeleton))
+                    {
+                        removeWallInteractionVisual(MainWindow.activeSkeletons[mpDictionary[entry.Key].skeleton],entry.Value.box);
+                    }
+
                     mpDictionary[entry.Key] = null;
                     return;
                 }
@@ -787,23 +832,25 @@ namespace Moto
 
         private void wallInteractionVisual(MainWindow.Player player, int box, bool recording = false)
         {
-            Image image = new Image();
-
-            string url;
-
-            if (recording)
+            if (!player.instrumentOverlay.ContainsKey(box))
             {
-                url = "images/wall-selection/wall" + box + "-rec.png";
-            }
-            else
-            {
-                url = "images/wall-selection/wall" + box + ".png";
-            }
-            image.Source = new BitmapImage(new Uri(url, UriKind.Relative));
+                Image image = new Image();
 
-            player.instrumentOverlay = image;
+                string url;
 
-            MainCanvas.Children.Add(image);
+                if (recording)
+                {
+                    url = "images/wall-selection/wall" + box + "-rec.png";
+                }
+                else
+                {
+                    url = "images/wall-selection/wall" + box + ".png";
+                }
+                image.Source = new BitmapImage(new Uri(url, UriKind.Relative));
+
+                player.instrumentOverlay.Add(box, image);
+                MainCanvas.Children.Add(image);
+            }
         }
 
         private void removePlayerWall(MainWindow.Player player)
@@ -821,12 +868,40 @@ namespace Moto
             removeWallInteractionVisual(player);
         }
 
-        private void removeWallInteractionVisual(MainWindow.Player player)
+        private void removeWallInteractionVisual(MainWindow.Player player, int box = 99)
         {
-            if (player.instrumentOverlay != null)
+            if (player.instrumentOverlay.Count > 0)
             {
-                MainCanvas.Children.Remove(player.instrumentOverlay);
-                player.instrumentOverlay = null;
+                if (box == 99)
+                {
+                    //Remove all
+                    Dictionary<int, Image> overlays = new Dictionary<int,Image>(player.instrumentOverlay);
+
+                    foreach (var image in overlays)
+                    {
+                        MainCanvas.Children.Remove(image.Value);
+                        player.instrumentOverlay.Remove(image.Key);
+                    }
+                }
+                else
+                {
+                    //Remove specified
+                    int typeCount = 0;
+
+                    foreach (var mp in mpDictionary)
+                    {
+                        if (mp.Value != null && mp.Value.box == box)
+                        {
+                            typeCount++;
+                        }
+                    }
+
+                    if (typeCount < 2)
+                    {
+                        MainCanvas.Children.Remove(player.instrumentOverlay[box]);
+                        player.instrumentOverlay.Remove(box);
+                    }
+                }
             }
         }
 
@@ -1220,7 +1295,11 @@ namespace Moto
                     player.Value.instrumentImage.Visibility = System.Windows.Visibility.Hidden;
                     if (player.Value.instrumentOverlay != null)
                     {
-                        player.Value.instrumentOverlay.Visibility = System.Windows.Visibility.Hidden;
+                        foreach (var image in player.Value.instrumentOverlay)
+                        {
+                            image.Value.Visibility = System.Windows.Visibility.Hidden;
+                        }
+                        
                     }
                 }
 
@@ -1251,7 +1330,9 @@ namespace Moto
                 player.Value.instrumentImage.Visibility = System.Windows.Visibility.Visible;
                 if (player.Value.instrumentOverlay != null)
                 {
-                    player.Value.instrumentOverlay.Visibility = System.Windows.Visibility.Hidden;
+                    foreach(var image in player.Value.instrumentOverlay) {
+                        image.Value.Visibility = System.Windows.Visibility.Hidden;
+                    }
                 }
             }
 
@@ -1281,10 +1362,16 @@ namespace Moto
         {
             MainWindow.sensor.AllFramesReady -= new EventHandler<AllFramesReadyEventArgs>(sensor_AllFramesReady);
 
-            MainWindow.mySpeechRecognizer.SaidSomething -= this.RecognizerSaidSomething;
-            MainWindow.mySpeechRecognizer.ListeningChanged -= this.ListeningChanged;
+            destroyVoice();
 
             this.NavigationService.GoBack();
+        }
+
+        private void destroyVoice()
+        {
+            MainWindow.mySpeechRecognizer.toggleListening(false);
+            MainWindow.mySpeechRecognizer.SaidSomething -= this.RecognizerSaidSomething;
+            MainWindow.mySpeechRecognizer.ListeningChanged -= this.ListeningChanged;
         }
 
         //Development code

@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+0.5.2.2 - 26/4/12
+-----------------
+- Removed audio glitches when sounds were interrupted
+- All WoS panels now glow while they are playing
+
 0.5.2.1 - 25/4/12
 -----------------
 - You can now record your own custom Wall of Sound by using the 'Record New' option in the Kinect Guide menu
