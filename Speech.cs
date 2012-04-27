@@ -62,6 +62,18 @@ namespace Moto.Speech
                 { "Stop", new WhatSaid { Verb = Verbs.False } },
             };
 
+        private readonly Dictionary<string, WhatSaid> wallPhrases = new Dictionary<string, WhatSaid>
+            {
+                { "Custom", new WhatSaid { Verb = Verbs.CustomWall } },
+                { "Custom Wall", new WhatSaid { Verb = Verbs.CustomWall } },
+                { "Create", new WhatSaid { Verb = Verbs.CreateWall } },
+                { "Record New Wall", new WhatSaid { Verb = Verbs.CreateWall } },
+                { "Eight Bit", new WhatSaid { Verb = Verbs.EightBitWall } },
+                { "8 Bit", new WhatSaid { Verb = Verbs.EightBitWall } },
+                { "Technologic", new WhatSaid { Verb = Verbs.TechnologicWall } },
+                { "Drum Wall", new WhatSaid { Verb = Verbs.DrumWall } },
+            };
+
         private readonly Dictionary<string, WhatSaid> kinectMotorPhrases = new Dictionary<string, WhatSaid>
             {
                 { "Angle Up", new WhatSaid { Verb = Verbs.KinectUp } },
@@ -91,24 +103,37 @@ namespace Moto.Speech
         public enum Verbs
         {
             None = 0,
+            //Close Moto
+            Close,
+            //Return To Start Screen
+            ReturnToStart,
+            //Take A Picture
+            Capture,
+            //Confirmation
             True,
             False,
+            //Kinect Angle
+            KinectUp,
+            KinectUpSmall,
+            KinectDown,
+            KinectDownSmall,
+            //Start/Stop Listening
             SpeechStart,
             SpeechStop,
+            //Band Mode
             Instrument,
-            WallOfSound,
-            Close,
-            Capture,
             GuitarSwitch,
             DrumsSwitch,
             StartMetronome,
             StopMetronome,
             BackToInstruments,
-            ReturnToStart,
-            KinectUp,
-            KinectUpSmall,
-            KinectDown,
-            KinectDownSmall,
+            //Wall Of Sound
+            WallOfSound,
+            CustomWall,
+            CreateWall,
+            EightBitWall,
+            TechnologicWall,
+            DrumWall,
         }
 
         public void changeListenState(bool state) {
@@ -276,7 +301,6 @@ namespace Moto.Speech
 
         private void LoadGrammar(SpeechRecognitionEngine speechRecognitionEngine)
         {
-            // Build a simple grammar of shapes, colors, and some simple program control
             var startScreen = new Choices();
             foreach (var phrase in this.startScreenPhrases)
             {
@@ -293,6 +317,12 @@ namespace Moto.Speech
             foreach (var phrase in this.instrumentPhrases)
             {
                 instrument.Add(phrase.Key);
+            }
+
+            var wall = new Choices();
+            foreach (var phrase in this.wallPhrases)
+            {
+                wall.Add(phrase.Key);
             }
 
             var kinectMotor = new Choices();
@@ -312,6 +342,7 @@ namespace Moto.Speech
             allChoices.Add(startScreen);
             allChoices.Add(boolean);
             allChoices.Add(instrument);
+            allChoices.Add(wall);
             allChoices.Add(kinectMotor);
 
             // This is needed to ensure that it will work on machines with any culture, not just en-us.
@@ -364,7 +395,7 @@ namespace Moto.Speech
                 var said = new SaidSomethingEventArgs { Verb = 0, Phrase = e.Result.Text };
 
                 // Look for a match in the order of the lists below, first match wins.
-                List<Dictionary<string, WhatSaid>> allDicts = new List<Dictionary<string, WhatSaid>> { this.startScreenPhrases, this.booleanPhrases, this.instrumentPhrases, this.kinectMotorPhrases };
+                List<Dictionary<string, WhatSaid>> allDicts = new List<Dictionary<string, WhatSaid>> { this.startScreenPhrases, this.booleanPhrases, this.instrumentPhrases, this.wallPhrases, this.kinectMotorPhrases };
 
                 bool found = false;
                 for (int i = 0; i < allDicts.Count && !found; ++i)

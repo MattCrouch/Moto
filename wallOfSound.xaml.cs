@@ -77,6 +77,14 @@ namespace Moto
             }
         }
 
+        //Speech variables
+        SpeechRecognizer.SaidSomethingEventArgs voiceConfirmEvent;
+        bool showingConfirmDialog = false;
+        DispatcherTimer voiceConfirmTime;
+
+        Dictionary<SpeechRecognizer.Verbs, BitmapImage> voiceVisuals = new Dictionary<SpeechRecognizer.Verbs, BitmapImage>();
+        Image confirmationVisual = new Image();
+
         //Kinect Guide variables
         DispatcherTimer kinectGuideTimer;
         DispatcherTimer menuMovementTimer;
@@ -170,8 +178,27 @@ namespace Moto
         {
             MainWindow.mySpeechRecognizer.SaidSomething += this.RecognizerSaidSomething;
             MainWindow.mySpeechRecognizer.ListeningChanged += this.ListeningChanged;
+
+            setupVoiceVisuals();
         }
 
+        private void setupVoiceVisuals()
+        {
+            voiceVisuals.Add(SpeechRecognizer.Verbs.CustomWall, new BitmapImage(new Uri("/Moto;component/images/voice/customwall.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.CreateWall, new BitmapImage(new Uri("/Moto;component/images/voice/createwall.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.EightBitWall, new BitmapImage(new Uri("/Moto;component/images/voice/eightbit.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.TechnologicWall, new BitmapImage(new Uri("/Moto;component/images/voice/technologic.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.DrumWall, new BitmapImage(new Uri("/Moto;component/images/voice/drumsamples.png", UriKind.Relative)));
+
+            voiceVisuals.Add(SpeechRecognizer.Verbs.KinectUp, new BitmapImage(new Uri("/Moto;component/images/voice/angleup.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.KinectUpSmall, new BitmapImage(new Uri("/Moto;component/images/voice/angleslightlyup.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.KinectDown, new BitmapImage(new Uri("/Moto;component/images/voice/angledown.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.KinectDownSmall, new BitmapImage(new Uri("/Moto;component/images/voice/angleslightlydown.png", UriKind.Relative)));
+
+            voiceVisuals.Add(SpeechRecognizer.Verbs.Capture, new BitmapImage(new Uri("/Moto;component/images/voice/takeapicture.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.ReturnToStart, new BitmapImage(new Uri("/Moto;component/images/voice/backtostart.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.Close, new BitmapImage(new Uri("/Moto;component/images/voice/close.png", UriKind.Relative)));
+        }
 
         private void setupKinectGuide()
         {
@@ -281,9 +308,27 @@ namespace Moto
 
             dictionary[JointType.HandLeft].Add(0, false);
             dictionary[JointType.HandLeft].Add(1, false);
+            dictionary[JointType.HandLeft].Add(2, false);
+            dictionary[JointType.HandLeft].Add(3, false);
+            dictionary[JointType.HandLeft].Add(4, false);
+            dictionary[JointType.HandLeft].Add(5, false);
+            dictionary[JointType.HandLeft].Add(6, false);
+            dictionary[JointType.HandLeft].Add(7, false);
+            dictionary[JointType.HandLeft].Add(8, false);
+            dictionary[JointType.HandLeft].Add(9, false);
+            dictionary[JointType.HandLeft].Add(10, false);
 
             dictionary[JointType.HandRight].Add(0, false);
             dictionary[JointType.HandRight].Add(1, false);
+            dictionary[JointType.HandRight].Add(2, false);
+            dictionary[JointType.HandRight].Add(3, false);
+            dictionary[JointType.HandRight].Add(4, false);
+            dictionary[JointType.HandRight].Add(5, false);
+            dictionary[JointType.HandRight].Add(6, false);
+            dictionary[JointType.HandRight].Add(7, false);
+            dictionary[JointType.HandRight].Add(8, false);
+            dictionary[JointType.HandRight].Add(9, false);
+            dictionary[JointType.HandRight].Add(10, false);
 
             return dictionary;
         }
@@ -905,12 +950,151 @@ namespace Moto
             }
         }
 
+        #region Voice Navigation
         //Voice navigation
-
         private void RecognizerSaidSomething(object sender, SpeechRecognizer.SaidSomethingEventArgs e)
         {
+            //What to do when we're pretty certain the player said something we know
+
+            if (e.Verb == SpeechRecognizer.Verbs.SpeechStart || e.Verb == SpeechRecognizer.Verbs.SpeechStop || e.Verb == SpeechRecognizer.Verbs.None)
+            {
+                return;
+            }
+
+            if (!showingConfirmDialog)
+            {
+                //Confirm the action
+                showConfirmation(e);
+            }
+            else
+            {
+                //We're already at that stage, shall we do it yes or no?
+                if (e.Verb == SpeechRecognizer.Verbs.True)
+                {
+                    actOnVoiceDecision(true);
+                }
+                else if (e.Verb == SpeechRecognizer.Verbs.False)
+                {
+                    actOnVoiceDecision(false);
+                }
+            }
+        }
+
+        private void showConfirmation(SpeechRecognizer.SaidSomethingEventArgs e)
+        {
+            voiceConfirmEvent = e;
+
             switch (e.Verb)
             {
+                case SpeechRecognizer.Verbs.CustomWall:
+                case SpeechRecognizer.Verbs.CreateWall:
+                case SpeechRecognizer.Verbs.EightBitWall:
+                case SpeechRecognizer.Verbs.TechnologicWall:
+                case SpeechRecognizer.Verbs.DrumWall:
+                case SpeechRecognizer.Verbs.KinectUp:
+                case SpeechRecognizer.Verbs.KinectUpSmall:
+                case SpeechRecognizer.Verbs.KinectDown:
+                case SpeechRecognizer.Verbs.KinectDownSmall:
+                case SpeechRecognizer.Verbs.Capture:
+                case SpeechRecognizer.Verbs.ReturnToStart:
+                case SpeechRecognizer.Verbs.Close:
+                    voicePromptVisual(true);
+
+                    voiceConfirmTime = new DispatcherTimer();
+                    voiceConfirmTime.Interval = TimeSpan.FromMilliseconds(5000);
+                    voiceConfirmTime.Tick += new EventHandler(voiceConfirmTime_Tick);
+                    voiceConfirmTime.Start();
+                    break;
+            }
+        }
+
+        void voiceConfirmTime_Tick(object sender, EventArgs e)
+        {
+            //What happens when the confirm box has been there a while
+            actOnVoiceDecision(true);
+        }
+
+        private void actOnVoiceDecision(bool trigger)
+        {
+            removeConfirmationTime();
+            voicePromptVisual(false);
+            if (trigger)
+            {
+                voiceGoDoThis(voiceConfirmEvent);
+            }
+        }
+
+        private void removeConfirmationTime()
+        {
+           
+            if (voiceConfirmTime != null)
+            {
+                voiceConfirmTime.Stop(); 
+                voiceConfirmTime.Tick -= new EventHandler(voiceConfirmTime_Tick);
+                voiceConfirmTime = null;
+            }
+        }
+
+        private void voicePromptVisual(bool showing)
+        {
+            if (showing)
+            {
+                showingConfirmDialog = true;
+                confirmationVisual = new Image();
+                MainCanvas.Children.Add(confirmationVisual);
+                MainWindow.animateSlide(confirmationVisual);
+                confirmationVisual.Source = voiceVisuals[voiceConfirmEvent.Verb];
+                confirmationVisual.Height = 50;
+                Canvas.SetTop(confirmationVisual, (MainCanvas.ActualHeight - confirmationVisual.Height - 15));
+                Canvas.SetLeft(confirmationVisual, 75);
+            }
+            else
+            {
+                showingConfirmDialog = false;
+                MainWindow.animateSlide(confirmationVisual, true);
+            }
+        }
+
+        void voiceGoDoThis(SpeechRecognizer.SaidSomethingEventArgs voiceCommand)
+        {
+            switch (voiceCommand.Verb)
+            {
+                case SpeechRecognizer.Verbs.CustomWall:
+                    //Switch to the Custom wall
+                    wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], menuOptions.CustomWall);
+                    break;
+                case SpeechRecognizer.Verbs.CreateWall:
+                    //Record new samples for the Custom wall
+                    wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], menuOptions.RecordNewWall);
+                    break;
+                case SpeechRecognizer.Verbs.EightBitWall:
+                    wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], menuOptions.EightBit);
+                    //Switch to the 8-bit Wall
+                    break;
+                case SpeechRecognizer.Verbs.TechnologicWall:
+                    wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], menuOptions.Technologic);
+                    //Switch to the Technologic wall
+                    break;
+                case SpeechRecognizer.Verbs.DrumWall:
+                    //Switch to the Drum Samples wall
+                    wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], menuOptions.Drum);
+                    break;
+                case SpeechRecognizer.Verbs.KinectUp:
+                    //Angle Kinect up
+                    MainWindow.adjustKinectAngle(8);
+                    break;
+                case SpeechRecognizer.Verbs.KinectUpSmall:
+                    //Angle Kinect slightly up
+                    MainWindow.adjustKinectAngle(4);
+                    break;
+                case SpeechRecognizer.Verbs.KinectDown:
+                    //Angle Kinect down
+                    MainWindow.adjustKinectAngle(-8);
+                    break;
+                case SpeechRecognizer.Verbs.KinectDownSmall:
+                    //Angle Kinect sligtly down
+                    MainWindow.adjustKinectAngle(-4);
+                    break;
                 case SpeechRecognizer.Verbs.Capture:
                     //Take a picture
                     takeAPicture();
@@ -918,6 +1102,10 @@ namespace Moto
                 case SpeechRecognizer.Verbs.ReturnToStart:
                     //Back to StartScreen
                     returnToStart();
+                    break;
+                case SpeechRecognizer.Verbs.Close:
+                    //Close Moto
+                    Application.Current.Shutdown();
                     break;
             }
         }
@@ -931,6 +1119,33 @@ namespace Moto
             else
             {
                 MainWindow.mySpeechRecognizer.startListening(MainCanvas);
+            }
+        }
+        #endregion
+
+        private void wallSwitchPlayerTo(MainWindow.Player player, menuOptions option)
+        {
+            switch (option)
+            {
+                case menuOptions.RecordNewWall:
+                    player.mode = MainWindow.PlayerMode.Create;
+                    break;
+                case menuOptions.CustomWall:
+                    player.mode = MainWindow.PlayerMode.Custom;
+                    customAudio(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
+                    break;
+                case menuOptions.Technologic:
+                    player.mode = MainWindow.PlayerMode.Technologic;
+                    technologicAudio(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
+                    break;
+                case menuOptions.Drum:
+                    player.mode = MainWindow.PlayerMode.Drum;
+                    drumsetAudio(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
+                    break;
+                case menuOptions.EightBit:
+                    player.mode = MainWindow.PlayerMode.EightBit;
+                    eightBitAudio(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
+                    break;
             }
         }
 

@@ -1,5 +1,11 @@
 CHANGELOG
 =========
+0.5.2.3 - 27/4/12
+-----------------
+- Audio confirmation is now in all parts of Moto
+- You can now change the angle of the Kinect wherever you are within Moto
+- Fixed an intermittent crash when confirming voice navigation actions
+
 0.5.2.2 - 26/4/12
 -----------------
 - Removed audio glitches when sounds were interrupted

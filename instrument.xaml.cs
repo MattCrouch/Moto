@@ -36,6 +36,7 @@ namespace Moto
             handMovements.KinectGuideGesture += new EventHandler<handMovements.GestureEventArgs>(handMovements_KinectGuideInstrument);
 
             setupVoice();
+
             currentFocus = playerFocus.None;
             processExistingSkeletons(MainWindow.activeSkeletons);
 
@@ -86,6 +87,14 @@ namespace Moto
 
         private DispatcherTimer beatSetTimeout;
 
+        //Speech variables
+        SpeechRecognizer.SaidSomethingEventArgs voiceConfirmEvent;
+        bool showingConfirmDialog = false;
+        DispatcherTimer voiceConfirmTime;
+
+        Dictionary<SpeechRecognizer.Verbs, BitmapImage> voiceVisuals = new Dictionary<SpeechRecognizer.Verbs, BitmapImage>();
+        Image confirmationVisual = new Image();
+
         //Image capture variables
         private Storyboard flashStoryboard;
         private Rectangle cameraFlash;
@@ -108,6 +117,20 @@ namespace Moto
         {
             MainWindow.mySpeechRecognizer.SaidSomething += this.RecognizerSaidSomething;
             MainWindow.mySpeechRecognizer.ListeningChanged += this.ListeningChanged;
+
+            setupVoiceVisuals();
+        }
+
+        private void setupVoiceVisuals()
+        {
+            voiceVisuals.Add(SpeechRecognizer.Verbs.DrumsSwitch, new BitmapImage(new Uri("/Moto;component/images/voice/switchtodrums.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.GuitarSwitch, new BitmapImage(new Uri("/Moto;component/images/voice/switchtoguitar.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.StartMetronome, new BitmapImage(new Uri("/Moto;component/images/voice/metronome.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.StopMetronome, new BitmapImage(new Uri("/Moto;component/images/voice/stopmetronome.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.BackToInstruments, new BitmapImage(new Uri("/Moto;component/images/voice/backtoinstruments.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.Capture, new BitmapImage(new Uri("/Moto;component/images/voice/takeapicture.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.ReturnToStart, new BitmapImage(new Uri("/Moto;component/images/voice/backtostart.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.Close, new BitmapImage(new Uri("/Moto;component/images/voice/close.png", UriKind.Relative)));
         }
 
         //Skeleton processing code (ran every frame)
@@ -287,10 +310,109 @@ namespace Moto
             return width;
         }
 
+        #region Voice Navigation
         //Voice navigation
         private void RecognizerSaidSomething(object sender, SpeechRecognizer.SaidSomethingEventArgs e)
         {
-            switch (e.Verb)
+            //What to do when we're pretty certain the player said something we know
+
+            if (e.Verb == SpeechRecognizer.Verbs.SpeechStart || e.Verb == SpeechRecognizer.Verbs.SpeechStop || e.Verb == SpeechRecognizer.Verbs.None)
+            {
+                return;
+            }
+
+            if (!showingConfirmDialog)
+            {
+                //Confirm the action
+                showConfirmation(e);
+            }
+            else
+            {
+                //We're already at that stage, shall we do it yes or no?
+                if (e.Verb == SpeechRecognizer.Verbs.True)
+                {
+                    actOnVoiceDecision(true);
+                }
+                else if (e.Verb == SpeechRecognizer.Verbs.False)
+                {
+                    actOnVoiceDecision(false);
+                }
+            }
+        }
+
+        private void showConfirmation(SpeechRecognizer.SaidSomethingEventArgs e)
+        {
+            voiceConfirmEvent = e;
+
+            switch (voiceConfirmEvent.Verb)
+            {
+                case SpeechRecognizer.Verbs.DrumsSwitch:
+                case SpeechRecognizer.Verbs.GuitarSwitch:
+                case SpeechRecognizer.Verbs.StartMetronome:
+                case SpeechRecognizer.Verbs.StopMetronome:
+                case SpeechRecognizer.Verbs.BackToInstruments:
+                case SpeechRecognizer.Verbs.Capture:
+                case SpeechRecognizer.Verbs.ReturnToStart:
+                case SpeechRecognizer.Verbs.Close:
+                    voicePromptVisual(true);
+
+                    voiceConfirmTime = new DispatcherTimer();
+                    voiceConfirmTime.Interval = TimeSpan.FromMilliseconds(5000);
+                    voiceConfirmTime.Tick += new EventHandler(voiceConfirmTime_Tick);
+                    voiceConfirmTime.Start();
+                    break;
+            }
+        }
+
+        void voiceConfirmTime_Tick(object sender, EventArgs e)
+        {
+            //What happens when the confirm box has been there a while
+            actOnVoiceDecision(true);
+        }
+        
+        private void actOnVoiceDecision(bool trigger)
+        {
+            removeConfirmationTime();
+            voicePromptVisual(false);
+            if (trigger)
+            {
+                voiceGoDoThis(voiceConfirmEvent);
+            }
+        }
+
+        private void removeConfirmationTime()
+        {
+            if (voiceConfirmTime != null)
+            {
+                voiceConfirmTime.Stop();
+                voiceConfirmTime.Tick -= new EventHandler(voiceConfirmTime_Tick);
+                voiceConfirmTime = null;
+            }
+        }
+
+        private void voicePromptVisual(bool showing)
+        {
+            if (showing)
+            {
+                showingConfirmDialog = true;
+                confirmationVisual = new Image();
+                MainCanvas.Children.Add(confirmationVisual);
+                MainWindow.animateSlide(confirmationVisual);
+                confirmationVisual.Source = voiceVisuals[voiceConfirmEvent.Verb];
+                confirmationVisual.Height = 50;
+                Canvas.SetTop(confirmationVisual, (MainCanvas.ActualHeight - confirmationVisual.Height - 15));
+                Canvas.SetLeft(confirmationVisual, 75);
+            }
+            else
+            {
+                showingConfirmDialog = false;
+                MainWindow.animateSlide(confirmationVisual, true);
+            }
+        }
+
+        void voiceGoDoThis(SpeechRecognizer.SaidSomethingEventArgs voiceCommand)
+        {
+            switch (voiceCommand.Verb)
             {
                 case SpeechRecognizer.Verbs.DrumsSwitch:
                     switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.Drums);
@@ -334,6 +456,7 @@ namespace Moto
                 MainWindow.mySpeechRecognizer.startListening(MainCanvas);
             }
         }
+        #endregion
 
         //Instrument management code
         private void manageInstrumentImage(MainWindow.Player player, instrumentList instrument)

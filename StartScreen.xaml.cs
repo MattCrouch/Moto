@@ -325,13 +325,13 @@ namespace Moto
                 case SpeechRecognizer.Verbs.KinectDown:
                 case SpeechRecognizer.Verbs.KinectDownSmall:
                     voicePromptVisual(true);
+
+                    voiceConfirmTime = new DispatcherTimer();
+                    voiceConfirmTime.Interval = TimeSpan.FromMilliseconds(5000);
+                    voiceConfirmTime.Tick += new EventHandler(voiceConfirmTime_Tick);
+                    voiceConfirmTime.Start();
                     break;
             }
-
-            voiceConfirmTime = new DispatcherTimer();
-            voiceConfirmTime.Interval = TimeSpan.FromMilliseconds(5000);
-            voiceConfirmTime.Tick += new EventHandler(voiceConfirmTime_Tick);
-            voiceConfirmTime.Start();
         }
 
         void voiceConfirmTime_Tick(object sender, EventArgs e)
