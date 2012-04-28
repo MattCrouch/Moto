@@ -759,7 +759,7 @@ namespace Moto
 
                         resetBeatSetTimeout(metronome.theMetronome.Interval);
                     }
-                    else if (Math.Abs(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandLeft].Position.X - MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandRight].Position.X) > 0.4)
+                    else if (Math.Abs(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandLeft].Position.X - MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandRight].Position.X) > 0.25)
                     {
                         beatSet = false;
                     }
