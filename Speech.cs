@@ -164,12 +164,9 @@ namespace Moto.Speech
         {
             if (silenceTimer != null)
             {
-                if (silenceTimer.IsEnabled)
-                {
-                    silenceTimer.Stop();
-                }
-
+                silenceTimer.Stop();
                 silenceTimer.Tick -= new EventHandler(silenceTimer_Tick);
+                silenceTimer = null;
             }
         }
 
@@ -220,7 +217,7 @@ namespace Moto.Speech
             this.CheckDisposed();
 
             this.kinectAudioSource = kinectSource;
-            this.kinectAudioSource.EchoCancellationMode = Microsoft.Kinect.EchoCancellationMode.CancellationOnly;
+            this.kinectAudioSource.EchoCancellationMode = Microsoft.Kinect.EchoCancellationMode.CancellationAndSuppression;
             this.kinectAudioSource.AutomaticGainControlEnabled = false;
             this.kinectAudioSource.BeamAngleMode = BeamAngleMode.Adaptive;
             var kinectStream = this.kinectAudioSource.Start();
@@ -360,14 +357,14 @@ namespace Moto.Speech
         {
             if (speechEnabled)
             {
-                var said = new SaidSomethingEventArgs { Verb = Verbs.None, Matched = "?" };
+                /*var said = new SaidSomethingEventArgs { Verb = Verbs.None, Matched = "?" };
 
                 if (this.SaidSomething != null)
                 {
                     this.SaidSomething(new object(), said);
                 }
 
-                Console.WriteLine("\nSpeech Rejected");
+                Console.WriteLine("\nSpeech Rejected");*/
             }
         }
 
@@ -390,7 +387,10 @@ namespace Moto.Speech
                     return;
                 }
 
-                resetSpeechTimeout(); //Reset the silence timeout if we think something was said
+                if (!this.paused)
+                {
+                    resetSpeechTimeout(); //Reset the silence timeout if we think something was said
+                }
 
                 var said = new SaidSomethingEventArgs { Verb = 0, Phrase = e.Result.Text };
 
@@ -419,13 +419,11 @@ namespace Moto.Speech
 
                 if (this.paused)
                 {
-                    // Only accept restart or reset
-                    if ((said.Verb != Verbs.SpeechStart) && (said.Verb != Verbs.SpeechStop))
+                    // Only accept start listening
+                    if ((said.Verb == Verbs.SpeechStart))
                     {
-                        return;
+                        toggleListening(true);
                     }
-
-                    toggleListening(true);
                 }
                 else
                 {
@@ -433,16 +431,17 @@ namespace Moto.Speech
                     {
                         return;
                     }
-                }
 
-                if (said.Verb == Verbs.SpeechStop)
-                {
-                    toggleListening(false);
-                }
 
-                if (this.SaidSomething != null)
-                {
-                    this.SaidSomething(new object(), said);
+                    if (said.Verb == Verbs.SpeechStop)
+                    {
+                        toggleListening(false);
+                    }
+
+                    if (this.SaidSomething != null)
+                    {
+                        this.SaidSomething(new object(), said);
+                    }
                 }
             }
         }

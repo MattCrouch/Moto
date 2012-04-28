@@ -955,7 +955,7 @@ namespace Moto
         private void RecognizerSaidSomething(object sender, SpeechRecognizer.SaidSomethingEventArgs e)
         {
             //What to do when we're pretty certain the player said something we know
-
+            
             if (e.Verb == SpeechRecognizer.Verbs.SpeechStart || e.Verb == SpeechRecognizer.Verbs.SpeechStop || e.Verb == SpeechRecognizer.Verbs.None)
             {
                 return;
@@ -1125,27 +1125,30 @@ namespace Moto
 
         private void wallSwitchPlayerTo(MainWindow.Player player, menuOptions option)
         {
-            switch (option)
+            if (MainWindow.activeSkeletons.ContainsKey(player.skeleton.TrackingId))
             {
-                case menuOptions.RecordNewWall:
-                    player.mode = MainWindow.PlayerMode.Create;
-                    break;
-                case menuOptions.CustomWall:
-                    player.mode = MainWindow.PlayerMode.Custom;
-                    customAudio(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
-                    break;
-                case menuOptions.Technologic:
-                    player.mode = MainWindow.PlayerMode.Technologic;
-                    technologicAudio(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
-                    break;
-                case menuOptions.Drum:
-                    player.mode = MainWindow.PlayerMode.Drum;
-                    drumsetAudio(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
-                    break;
-                case menuOptions.EightBit:
-                    player.mode = MainWindow.PlayerMode.EightBit;
-                    eightBitAudio(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
-                    break;
+                switch (option)
+                {
+                    case menuOptions.RecordNewWall:
+                        player.mode = MainWindow.PlayerMode.Create;
+                        break;
+                    case menuOptions.CustomWall:
+                        player.mode = MainWindow.PlayerMode.Custom;
+                        customAudio(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
+                        break;
+                    case menuOptions.Technologic:
+                        player.mode = MainWindow.PlayerMode.Technologic;
+                        technologicAudio(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
+                        break;
+                    case menuOptions.Drum:
+                        player.mode = MainWindow.PlayerMode.Drum;
+                        drumsetAudio(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
+                        break;
+                    case menuOptions.EightBit:
+                        player.mode = MainWindow.PlayerMode.EightBit;
+                        eightBitAudio(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
+                        break;
+                }
             }
         }
 

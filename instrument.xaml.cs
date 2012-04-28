@@ -490,24 +490,25 @@ namespace Moto
         private void switchInstrument(MainWindow.Player player, instrumentList instrument)
         {
             //Hide all the instrument-specific overlays & set the new instrument
-
-            manageInstrumentImage(MainWindow.activeSkeletons[player.skeleton.TrackingId], instrument);
-
-            switch (instrument)
+            if (MainWindow.activeSkeletons.ContainsKey(player.skeleton.TrackingId))
             {
-                case instrumentList.Drums:
-                    setupDrums(MainWindow.activeSkeletons[player.skeleton.TrackingId]);
-                    MainWindow.activeSkeletons[player.skeleton.TrackingId].mode = MainWindow.PlayerMode.None;
-                    break;
-                case instrumentList.GuitarLeft:
-                case instrumentList.GuitarRight:
-                    setupGuitar(MainWindow.activeSkeletons[player.skeleton.TrackingId]);
-                    MainWindow.activeSkeletons[player.skeleton.TrackingId].mode = MainWindow.PlayerMode.Acoustic;
-                    break;
+                manageInstrumentImage(MainWindow.activeSkeletons[player.skeleton.TrackingId], instrument);
+
+                switch (instrument)
+                {
+                    case instrumentList.Drums:
+                        setupDrums(MainWindow.activeSkeletons[player.skeleton.TrackingId]);
+                        MainWindow.activeSkeletons[player.skeleton.TrackingId].mode = MainWindow.PlayerMode.None;
+                        break;
+                    case instrumentList.GuitarLeft:
+                    case instrumentList.GuitarRight:
+                        setupGuitar(MainWindow.activeSkeletons[player.skeleton.TrackingId]);
+                        MainWindow.activeSkeletons[player.skeleton.TrackingId].mode = MainWindow.PlayerMode.Acoustic;
+                        break;
+                }
+
+                MainWindow.activeSkeletons[player.skeleton.TrackingId].instrument = instrument;
             }
-
-            MainWindow.activeSkeletons[player.skeleton.TrackingId].instrument = instrument;
-
         }
 
         //Kinect guide code
@@ -745,25 +746,28 @@ namespace Moto
         //Metronome code
         private void listenForMetronome(object sender, EventArgs e)
         {
-            if (currentInstrumentSelection == instrumentSelectionOptions.Metronome && MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton != null)
+            if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
             {
-                if (Math.Abs(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandLeft].Position.X - MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandRight].Position.X) < 0.1 && !beatSet)
+                if (currentInstrumentSelection == instrumentSelectionOptions.Metronome && MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton != null)
                 {
-                    Console.WriteLine("#############Set the beat##########\n\n");
+                    if (Math.Abs(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandLeft].Position.X - MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandRight].Position.X) < 0.1 && !beatSet)
+                    {
+                        Console.WriteLine("#############Set the beat##########\n\n");
 
-                    beatSet = true;
-                    metronome.metronomeBeat();
+                        beatSet = true;
+                        metronome.metronomeBeat();
 
-                    resetBeatSetTimeout(metronome.theMetronome.Interval);
+                        resetBeatSetTimeout(metronome.theMetronome.Interval);
+                    }
+                    else if (Math.Abs(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandLeft].Position.X - MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandRight].Position.X) > 0.4)
+                    {
+                        beatSet = false;
+                    }
                 }
-                else if (Math.Abs(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandLeft].Position.X - MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandRight].Position.X) > 0.4)
+                else
                 {
-                    beatSet = false;
+                    MainWindow.sensor.AllFramesReady -= listenForMetronome;
                 }
-            }
-            else
-            {
-                MainWindow.sensor.AllFramesReady -= listenForMetronome;
             }
         }
 
