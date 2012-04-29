@@ -33,9 +33,11 @@ namespace Moto
             //Create dictionary definitions for all the Media Players available
             generateMediaPlayers();
 
-            handMovements.KinectGuideGesture += new EventHandler<handMovements.GestureEventArgs>(handMovements_KinectGuideInstrument);
+            handMovements.KinectGuideGesture += new EventHandler<handMovements.GestureEventArgs>(handMovements_KinectGuideGesture);
 
             setupVoice();
+
+            setupKinectGuide();
 
             currentFocus = playerFocus.None;
             processExistingSkeletons(MainWindow.activeSkeletons);
@@ -68,18 +70,21 @@ namespace Moto
         //Kinect guide variables
         DispatcherTimer kinectGuideTimer;
 
-        bool handUp = false;
+        DispatcherTimer menuMovementTimer;
+        handMovements.scrollDirection menuScrollDirection;
+        menuOptions[] kinectGuideMenu = new menuOptions[Enum.GetValues(typeof(menuOptions)).Length];
+        int menuPosition;
 
-        DispatcherTimer instrumentSelectionTimer;
-        instrumentSelectionOptions currentInstrumentSelection = instrumentSelectionOptions.None;
-
-        enum instrumentSelectionOptions
+        enum menuOptions
         {
-            None = 0,
-            Guitar,
-            GuitarLeft,
-            Drums,
+            //All menu items
+            Cancel,
+            GoBack,
+            TakeAPicture,
             Metronome,
+            Guitar,
+            LeftyGuitar,
+            Drum,
         }
 
         //Metronome variables
@@ -131,6 +136,18 @@ namespace Moto
             voiceVisuals.Add(SpeechRecognizer.Verbs.Capture, new BitmapImage(new Uri("/Moto;component/images/voice/takeapicture.png", UriKind.Relative)));
             voiceVisuals.Add(SpeechRecognizer.Verbs.ReturnToStart, new BitmapImage(new Uri("/Moto;component/images/voice/backtostart.png", UriKind.Relative)));
             voiceVisuals.Add(SpeechRecognizer.Verbs.Close, new BitmapImage(new Uri("/Moto;component/images/voice/close.png", UriKind.Relative)));
+        }
+
+        private void setupKinectGuide()
+        {
+            //Loop through the 'menuOptions' enum and assign an array position for each
+
+            int i = 0;
+            foreach (menuOptions option in Enum.GetValues(typeof(menuOptions)))
+            {
+                kinectGuideMenu[i] = option;
+                i++;
+            }
         }
 
         //Skeleton processing code (ran every frame)
@@ -211,6 +228,11 @@ namespace Moto
                     MainWindow.primarySkeletonKey = MainWindow.selectPrimarySkeleton(MainWindow.activeSkeletons);
 
                     alignPrimaryGlow(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
+
+                    if (currentFocus == playerFocus.KinectGuide)
+                    {
+                        kinectGuideManipulation(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
+                    }
 
                     if (tempKey != MainWindow.primarySkeletonKey)
                     {
@@ -421,17 +443,17 @@ namespace Moto
                     switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.GuitarRight);
                     break;
                 case SpeechRecognizer.Verbs.StartMetronome:
+                    currentFocus = playerFocus.Metronome;
+                    metronome.destroyMetronome();
+                    MainWindow.sensor.AllFramesReady -= listenForMetronome;
                     metronome.setupMetronome();
-                    currentInstrumentSelection = instrumentSelectionOptions.Metronome;
                     MainWindow.sensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(listenForMetronome);
                     break;
                 case SpeechRecognizer.Verbs.StopMetronome:
                     metronome.destroyMetronome();
-                    currentInstrumentSelection = instrumentSelectionOptions.None;
                     MainWindow.sensor.AllFramesReady -= listenForMetronome;
                     break;
                 case SpeechRecognizer.Verbs.BackToInstruments:
-                    currentInstrumentSelection = instrumentSelectionOptions.None;
                     break;
                 case SpeechRecognizer.Verbs.Capture:
                     takeAPicture();
@@ -511,221 +533,6 @@ namespace Moto
             }
         }
 
-        //Kinect guide code
-        void handMovements_KinectGuideInstrument(object sender, handMovements.GestureEventArgs e)
-        {
-            if (currentFocus != playerFocus.KinectGuide || currentFocus != playerFocus.None)
-            {
-                Storyboard sb = this.FindResource("kinectGuideStart") as Storyboard;
-                switch (e.Trigger)
-                {
-                    case handMovements.UserDecisions.Triggered:
-                        if (currentFocus != playerFocus.KinectGuide)
-                        {
-                            //imgKinectGuide.Visibility = Visibility.Visible;
-                            kinectGuideTimer = new DispatcherTimer();
-                            kinectGuideTimer.Interval = TimeSpan.FromSeconds(3);
-                            kinectGuideTimer.Start();
-                            kinectGuideTimer.Tick += new EventHandler(kinectGuideTimer_Tick);
-                            sb.Begin();
-                        }
-                        break;
-                    case handMovements.UserDecisions.NotTriggered:
-                        sb.Stop();
-                        if (kinectGuideTimer != null)
-                        {
-                            kinectGuideTimer.Stop();
-                            kinectGuideTimer.Tick -= new EventHandler(kinectGuideTimer_Tick);
-                            kinectGuideTimer = null;
-                        }
-                        imgKinectGuide.Visibility = Visibility.Hidden;
-                        break;
-                }
-            }
-        }
-
-        void kinectGuideTimer_Tick(object sender, EventArgs e)
-        {
-            showKinectGuide();
-
-            //MainWindow.sensor.AllFramesReady -= selectAnInstrument;
-        }
-
-        private void showKinectGuide()
-        {
-            //Show the instruments, and make sure nothing else can be triggered at this time
-            currentFocus = playerFocus.KinectGuide;
-
-            metronome.destroyMetronome();
-
-            MainWindow.sensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(selectAnInstrument);
-
-            Storyboard sb = this.FindResource("instrumentSelectionIn") as Storyboard;
-            sb.AutoReverse = false;
-            sb.Begin();
-        }
-
-        private void setupInstrumentSelectionTimer()
-        {
-            if (instrumentSelectionTimer != null)
-            {
-                destroyInstrumentSelectionTimer();
-            }
-            instrumentSelectionTimer = new DispatcherTimer();
-            instrumentSelectionTimer.Interval = TimeSpan.FromSeconds(3);
-            instrumentSelectionTimer.Tick += new EventHandler(instrumentSelectionTimer_Tick);
-            instrumentSelectionTimer.Start();
-        }
-
-        private void selectAnInstrument(object sender, EventArgs e)
-        {
-            if (MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton != null)
-            {
-                Joint leftHand = MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandLeft];
-                double relXPos = MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Position.X - MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandLeft].Position.X;
-
-                if (handUp)
-                {
-                    Canvas.SetLeft(imgSelRef, 640 - distQuotient(0, 0.5, relXPos, 0, userImage.Width));
-                    if (checkOverlay(imgSelRef, imgSelGuitar))
-                    {
-                        currentInstrumentSelection = instrumentSelectionOptions.Guitar;
-                        if (instrumentSelectionTimer == null)
-                        {
-                            Console.WriteLine("Setting up a timer for Guitar");
-                            setupInstrumentSelectionTimer();
-                        }
-                    }
-                    else if (checkOverlay(imgSelRef, imgSelGuitarLeft))
-                    {
-                        currentInstrumentSelection = instrumentSelectionOptions.GuitarLeft;
-                        if (instrumentSelectionTimer == null)
-                        {
-                            Console.WriteLine("Setting up a timer for Guitar Left");
-                            setupInstrumentSelectionTimer();
-                        }
-                    }
-                    else if (checkOverlay(imgSelRef, imgSelDrums))
-                    {
-                        currentInstrumentSelection = instrumentSelectionOptions.Drums;
-                        if (instrumentSelectionTimer == null)
-                        {
-                            Console.WriteLine("Setting up a timer for Drums");
-                            setupInstrumentSelectionTimer();
-                        }
-                    }
-                    else if (checkOverlay(imgSelRef, imgSelMetronome))
-                    {
-                        currentInstrumentSelection = instrumentSelectionOptions.Metronome;
-                        if (instrumentSelectionTimer == null)
-                        {
-                            Console.WriteLine("Setting up a timer for Metronome");
-                            setupInstrumentSelectionTimer();
-                        }
-                    }
-                    else
-                    {
-                        currentInstrumentSelection = instrumentSelectionOptions.None;
-                    }
-
-
-
-                    if (instrumentSelectionTimer != null && currentInstrumentSelection == instrumentSelectionOptions.None)
-                    {
-                        destroyInstrumentSelectionTimer();
-                    }
-                }
-
-                if (handUp && leftHand.Position.Y < MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Position.Y)
-                {
-                    handUp = false;
-                    Console.WriteLine(handUp);
-                    exitKinectGuide();
-                    return;
-                }
-
-                if (leftHand.Position.Y > MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Position.Y)
-                {
-                    handUp = true;
-                }
-            }
-        }
-
-        void instrumentSelectionTimer_Tick(object sender, EventArgs e)
-        {
-            destroyInstrumentSelectionTimer();
-            if (currentInstrumentSelection != instrumentSelectionOptions.Metronome)
-            {
-                clearInstrumentRefs(MainWindow.activeSkeletons[MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.TrackingId]);
-            }
-
-            switch (currentInstrumentSelection)
-            {
-                case instrumentSelectionOptions.Guitar:
-                    switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.GuitarRight);
-                    currentInstrumentSelection = instrumentSelectionOptions.None;
-                    break;
-                case instrumentSelectionOptions.GuitarLeft:
-                    switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.GuitarLeft);
-                    currentInstrumentSelection = instrumentSelectionOptions.None;
-                    break;
-                case instrumentSelectionOptions.Drums:
-                    switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.Drums);
-                    currentInstrumentSelection = instrumentSelectionOptions.None;
-                    break;
-                case instrumentSelectionOptions.Metronome:
-                    currentInstrumentSelection = instrumentSelectionOptions.Metronome;
-                    //switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.None);
-                    metronome.setupMetronome();
-                    MainWindow.sensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(listenForMetronome);
-                    break;
-            }
-
-            handUp = false;
-            exitKinectGuide();
-        }
-
-        private bool checkOverlay(FrameworkElement top, FrameworkElement bottom, bool listenX = true, bool listenY = true)
-        {
-            //Checks if the centre of the top FE is anywhere within bottom FE
-            double centreX = Canvas.GetLeft(top) + (top.ActualWidth / 2);
-            double centreY = Canvas.GetTop(top) + (top.ActualHeight / 2);
-
-            if (centreX > Canvas.GetLeft(bottom) && centreX < (Canvas.GetLeft(bottom) + bottom.ActualWidth))
-            {
-                if (centreY > Canvas.GetTop(bottom) && centreY < (Canvas.GetTop(bottom) + bottom.ActualHeight))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private void exitKinectGuide()
-        {
-            currentFocus = playerFocus.None;
-
-            destroyInstrumentSelectionTimer();
-
-            MainWindow.sensor.AllFramesReady -= selectAnInstrument;
-
-            Storyboard sb = this.FindResource("instrumentSelectionIn") as Storyboard;
-            sb.AutoReverse = true;
-            sb.Begin(this, true);
-            sb.Seek(this, new TimeSpan(0, 0, 0), TimeSeekOrigin.Duration);
-        }
-
-        private void destroyInstrumentSelectionTimer()
-        {
-            if (instrumentSelectionTimer != null)
-            {
-                instrumentSelectionTimer.Stop();
-                instrumentSelectionTimer.Tick -= instrumentSelectionTimer_Tick;
-                instrumentSelectionTimer = null;
-            }
-        }
-
         //MediaPlayer Dictionary
         int mpCounter = 0;
 
@@ -748,7 +555,7 @@ namespace Moto
         {
             if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
             {
-                if (currentInstrumentSelection == instrumentSelectionOptions.Metronome && MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton != null)
+                if (MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton != null)
                 {
                     if (Math.Abs(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandLeft].Position.X - MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandRight].Position.X) < 0.1 && !beatSet)
                     {
@@ -794,7 +601,8 @@ namespace Moto
         void beatSetTimeout_Tick(object sender, EventArgs e)
         {
             //Stop listening for the metronome
-            currentInstrumentSelection = instrumentSelectionOptions.None;
+            currentFocus = playerFocus.None;
+            MainWindow.sensor.AllFramesReady -= listenForMetronome;
             beatSetTimeout.Tick -= beatSetTimeout_Tick;
             beatSetTimeout = null;
         }
@@ -967,6 +775,215 @@ namespace Moto
 
         #endregion
 
+        void handMovements_KinectGuideGesture(object sender, handMovements.GestureEventArgs e)
+        {
+            Storyboard sb = this.FindResource("kinectGuideStart") as Storyboard;
+            Console.WriteLine("Kinect Guide: " + e.Trigger);
+            switch (e.Trigger)
+            {
+                case handMovements.UserDecisions.Triggered:
+                    if (currentFocus != playerFocus.KinectGuide)
+                    {
+                        sb.Begin();
+                        kinectGuideTimer = new DispatcherTimer();
+                        kinectGuideTimer.Interval = TimeSpan.FromSeconds(3);
+                        kinectGuideTimer.Tick += new EventHandler(kinectGuideTimer_Tick);
+                        kinectGuideTimer.Start();
+                    }
+                    break;
+                case handMovements.UserDecisions.NotTriggered:
+                    sb.Stop();
+                    if (kinectGuideTimer != null)
+                    {
+                        kinectGuideTimer.Stop();
+                        kinectGuideTimer.Tick -= kinectGuideTimer_Tick;
+                        kinectGuideTimer = null;
+                    }
+                    break;
+            }
+        }
+
+        void kinectGuideTimer_Tick(object sender, EventArgs e)
+        {
+            currentFocus = playerFocus.KinectGuide;
+
+            MainWindow.animateSlide(kinectGuideCanvas, false, false, -150, 0.5);
+
+            kinectGuideCanvas.Visibility = System.Windows.Visibility.Visible;
+            imgDimmer.Visibility = System.Windows.Visibility.Visible;
+
+            MainWindow.animateFade(imgDimmer, 0, 0.5, 0.5);
+
+            menuPosition = 0;
+            Canvas.SetTop(kinectGuideCanvas, 0);
+
+            //Listen for swipe gesture
+            handMovements.LeftSwipeRight += new EventHandler<handMovements.GestureEventArgs>(handMovements_LeftSwipeRight);
+
+            menuMovementTimer = new DispatcherTimer();
+            menuMovementTimer.Interval = TimeSpan.FromMilliseconds(500);
+            menuMovementTimer.Tick += new EventHandler(menuMovementTimer_Tick);
+            menuMovementTimer.Start();
+        }
+
+        void menuMovementTimer_Tick(object sender, EventArgs e)
+        {
+            menuTick();
+
+            Console.WriteLine(kinectGuideMenu[menuPosition]);
+        }
+
+        private void menuTick()
+        {
+            Skeleton player = MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton;
+
+            if (menuScrollDirection == handMovements.scrollDirection.SmallDown || menuScrollDirection == handMovements.scrollDirection.LargeDown)
+            {
+                if (menuPosition > 0)
+                {
+                    animateMenu(false);
+                }
+            }
+            else if (menuScrollDirection == handMovements.scrollDirection.SmallUp || menuScrollDirection == handMovements.scrollDirection.LargeUp)
+            {
+                if (menuPosition < kinectGuideMenu.Length - 1)
+                {
+                    animateMenu(true);
+                }
+            }
+        }
+
+        private void kinectGuideManipulation(MainWindow.Player player)
+        {
+            if (handMovements.leftSwipeRightIn == null)
+            {
+                //Manipulate the guide if we're not currently swiping to select
+                SkeletonPoint bodyMidpoint = handMovements.getMidpoint(player.skeleton.Joints[JointType.HipCenter], player.skeleton.Joints[JointType.ShoulderCenter]);
+
+                double angleValue = handMovements.getAngle(bodyMidpoint, player.skeleton.Joints[JointType.HandLeft].Position);
+
+                handMovements.scrollDirection oldDirection = menuScrollDirection;
+
+                menuScrollDirection = handMovements.sliderMenuValue(player, angleValue);
+
+                if (oldDirection != menuScrollDirection)
+                {
+                    //Console.WriteLine("CHANGE IN DIRECTION: " + menuScrollDirection);
+                    adjustMenuSpeed(menuScrollDirection);
+
+                    if ((oldDirection == handMovements.scrollDirection.None && menuScrollDirection == handMovements.scrollDirection.SmallUp) || (oldDirection == handMovements.scrollDirection.SmallUp && menuScrollDirection == handMovements.scrollDirection.LargeUp) || (oldDirection == handMovements.scrollDirection.None && menuScrollDirection == handMovements.scrollDirection.SmallDown) || (oldDirection == handMovements.scrollDirection.SmallDown && menuScrollDirection == handMovements.scrollDirection.LargeDown))
+                    {
+                        //If we're increasing in any direction, tick when the speed changes
+                        menuTick();
+                    }
+                }
+            }
+        }
+
+        private void adjustMenuSpeed(handMovements.scrollDirection scrollDirection)
+        {
+            if (scrollDirection == handMovements.scrollDirection.SmallUp || scrollDirection == handMovements.scrollDirection.SmallDown)
+            {
+                menuMovementTimer.Interval = TimeSpan.FromMilliseconds(1000);
+                menuMovementTimer.Start();
+            }
+            else if (scrollDirection == handMovements.scrollDirection.LargeUp || scrollDirection == handMovements.scrollDirection.LargeDown)
+            {
+                menuMovementTimer.Interval = TimeSpan.FromMilliseconds(250);
+                menuMovementTimer.Start();
+            }
+            else
+            {
+                menuMovementTimer.Stop();
+            }
+        }
+
+        void handMovements_LeftSwipeRight(object sender, handMovements.GestureEventArgs e)
+        {
+            Console.WriteLine("Left swipe right");
+
+            Canvas.SetTop(kinectGuideCanvas, 60 * menuPosition);
+
+            MainWindow.animateSlide(kinectGuideCanvas, true, false, -150, 0.5);
+            MainWindow.animateFade(imgDimmer, 0.5, 0, 0.5);
+
+            currentFocus = playerFocus.None;
+
+            //Stop listening and reset the flag for next time
+            handMovements.LeftSwipeRight -= handMovements_LeftSwipeRight;
+            handMovements.LeftSwipeRightStatus = false;
+
+            //Remove menu nav tick
+            if (menuMovementTimer != null)
+            {
+                menuMovementTimer.Stop();
+                menuMovementTimer.Tick -= menuMovementTimer_Tick;
+                menuMovementTimer = null;
+            }
+
+            switch (kinectGuideMenu[menuPosition])
+            {
+                case menuOptions.GoBack:
+                    returnToStart();
+                    break;
+                case menuOptions.TakeAPicture:
+                    takeAPicture();
+                    break;
+                case menuOptions.Metronome:
+                    currentFocus = playerFocus.Metronome;
+                    metronome.destroyMetronome();
+                    MainWindow.sensor.AllFramesReady -= listenForMetronome;
+                    metronome.setupMetronome();
+                    MainWindow.sensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(listenForMetronome);
+                    break;
+                case menuOptions.Guitar:
+                    switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.GuitarRight);
+                    break;
+                case menuOptions.LeftyGuitar:
+                    switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.GuitarLeft);
+                    break;
+                case menuOptions.Drum:
+                    switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.Drums);
+                    break;
+            }
+        }
+
+        private void animateMenu(bool up = true, int count = 1)
+        {
+
+            Canvas.SetTop(kinectGuideCanvas, 60 * menuPosition);
+            //Canvas.SetTop(rectangle1, 60 * -menuPosition);
+
+            DoubleAnimation animation = new DoubleAnimation();
+
+            animation.Duration = TimeSpan.FromMilliseconds(200);
+            animation.From = 0;
+
+            if (up)
+            {
+                menuPosition++;
+                //Selection going up, move menu down
+                animation.By = animation.From + (60 * count);
+            }
+            else
+            {
+                menuPosition--;
+                //Selection going down, move menu up
+                animation.By = animation.From + (-60 * count);
+            }
+
+            TranslateTransform tt = new TranslateTransform();
+            kinectGuideCanvas.RenderTransform = tt;
+
+            CircleEase ease = new CircleEase();
+            ease.EasingMode = EasingMode.EaseOut;
+            animation.EasingFunction = ease;
+
+            tt.BeginAnimation(TranslateTransform.YProperty, animation);
+            Console.WriteLine(menuPosition);
+        }
+
+
         //Tidy up
         private void destroyVoice()
         {
@@ -1057,14 +1074,7 @@ namespace Moto
                     break;
                 case System.Windows.Input.Key.K:
                     //Invoke the Kinect Guide
-                    if (currentFocus != playerFocus.KinectGuide)
-                    {
-                        showKinectGuide();
-                    }
-                    else
-                    {
-                        exitKinectGuide();
-                    }
+                    
                     break;
                 case System.Windows.Input.Key.C:
                     //Take a picture

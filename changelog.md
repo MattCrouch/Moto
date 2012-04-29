@@ -1,5 +1,13 @@
 CHANGELOG
 =========
+0.5.2.4 - 29/4/12
+-----------------
+- Vertical scrolling menus now have nicer graphics on them
+- Vertical scrolling menu now replaces the horizontal swipe menu within Band Mode
+- Vertical scrolling menus now require less emphasised movements to scroll. Fast scrolling is now achieved anywhere past either your shoulder or bellybutton area for the respective direction
+- Moto no longer crashes when issuing voice commands when no player is visible
+- It is now easier to set a faster beat on the metronome
+
 0.5.2.3 - 27/4/12
 -----------------
 - Audio confirmation is now in all parts of Moto

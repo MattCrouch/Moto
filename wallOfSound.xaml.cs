@@ -1254,6 +1254,7 @@ namespace Moto
         {
             if (handMovements.leftSwipeRightIn == null)
             {
+                
                 //Manipulate the guide if we're not currently swiping to select
                 SkeletonPoint bodyMidpoint = handMovements.getMidpoint(player.skeleton.Joints[JointType.HipCenter],player.skeleton.Joints[JointType.ShoulderCenter]);
 
@@ -1347,6 +1348,42 @@ namespace Moto
                     break;
             }
         }
+
+        private void animateMenu(bool up = true, int count = 1)
+        {
+
+            Canvas.SetTop(kinectGuideCanvas, 60 * menuPosition);
+            //Canvas.SetTop(rectangle1, 60 * -menuPosition);
+
+            DoubleAnimation animation = new DoubleAnimation();
+
+            animation.Duration = TimeSpan.FromMilliseconds(200);
+            animation.From = 0;
+
+            if (up)
+            {
+                menuPosition++;
+                //Selection going up, move menu down
+                animation.By = animation.From + (60 * count);
+            }
+            else
+            {
+                menuPosition--;
+                //Selection going down, move menu up
+                animation.By = animation.From + (-60 * count);
+            }
+
+            TranslateTransform tt = new TranslateTransform();
+            kinectGuideCanvas.RenderTransform = tt;
+
+            CircleEase ease = new CircleEase();
+            ease.EasingMode = EasingMode.EaseOut;
+            animation.EasingFunction = ease;
+
+            tt.BeginAnimation(TranslateTransform.YProperty, animation);
+            Console.WriteLine(menuPosition);
+        }
+
 
         #region Image Capture
         private Storyboard flashStoryboard;
@@ -1646,41 +1683,6 @@ namespace Moto
                     Application.Current.Shutdown();
                     break;
             }
-        }
-
-        private void animateMenu(bool up = true, int count = 1)
-        {
-           
-           Canvas.SetTop(kinectGuideCanvas, 60 * menuPosition);
-           //Canvas.SetTop(rectangle1, 60 * -menuPosition);
-            
-            DoubleAnimation animation = new DoubleAnimation();
-
-            animation.Duration = TimeSpan.FromMilliseconds(200);
-            animation.From = 0;
-
-            if (up)
-            {
-                menuPosition++;
-                //Selection going up, move menu down
-                animation.By = animation.From + (60 * count);
-            }
-            else
-            {
-                menuPosition--;
-                //Selection going down, move menu up
-                animation.By = animation.From + (-60 * count);
-            }
-
-            TranslateTransform tt = new TranslateTransform();
-            kinectGuideCanvas.RenderTransform = tt;
-
-            CircleEase ease = new CircleEase();
-            ease.EasingMode = EasingMode.EaseOut;
-            animation.EasingFunction = ease;
-
-            tt.BeginAnimation(TranslateTransform.YProperty, animation);
-            Console.WriteLine(menuPosition);
         }
     }
 }

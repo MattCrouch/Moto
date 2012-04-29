@@ -254,59 +254,30 @@
         	</Image.RenderTransform>
         </Image>
         <Image x:Name="imgKinectGuide" Height="100" Source="/Moto;component/images/kinect-guide.png" Stretch="Fill" Canvas.Top="380" Width="100" Visibility="Hidden" />
-        <Image x:Name="imgSelGuitar" Height="100" Canvas.Left="12" Source="images/guitar-icon.png" Stretch="Fill" Canvas.Top="-104" Width="100" RenderTransformOrigin="0.5,0.5">
-        	<Image.RenderTransform>
-        		<TransformGroup>
-        			<ScaleTransform/>
-        			<SkewTransform/>
-        			<RotateTransform/>
-        			<TranslateTransform/>
-        		</TransformGroup>
-        	</Image.RenderTransform>
-        </Image>
-        <Image x:Name="imgSelGuitarLeft" Height="100" Canvas.Left="178" Source="images/guitar-lefty-icon.png" Stretch="Fill" Canvas.Top="-104" Width="100" RenderTransformOrigin="0.5,0.5">
-        	<Image.RenderTransform>
-        		<TransformGroup>
-        			<ScaleTransform/>
-        			<SkewTransform/>
-        			<RotateTransform/>
-        			<TranslateTransform/>
-        		</TransformGroup>
-        	</Image.RenderTransform>
-        </Image>
-        <Image x:Name="imgSelDrums" Height="100" Canvas.Left="354" Source="images/drums-icon.png" Stretch="Fill" Canvas.Top="-104" Width="100" RenderTransformOrigin="0.5,0.5">
-        	<Image.RenderTransform>
-        		<TransformGroup>
-        			<ScaleTransform/>
-        			<SkewTransform/>
-        			<RotateTransform/>
-        			<TranslateTransform/>
-        		</TransformGroup>
-        	</Image.RenderTransform>
-        </Image>
-        <Image x:Name="imgSelMetronome" Height="100" Canvas.Left="530" Source="images/metronome-icon.png" Stretch="Fill" Canvas.Top="-104" Width="100" RenderTransformOrigin="0.5,0.5">
-        	<Image.RenderTransform>
-        		<TransformGroup>
-        			<ScaleTransform/>
-        			<SkewTransform/>
-        			<RotateTransform/>
-        			<TranslateTransform/>
-        		</TransformGroup>
-        	</Image.RenderTransform>
-        </Image>
-        <Image x:Name="imgSelRef" Height="100" Canvas.Left="-100" Source="images/dot.png" Stretch="Fill" Canvas.Top="-100" Width="25" RenderTransformOrigin="0.5,0.5">
-        	<Image.RenderTransform>
-        		<TransformGroup>
-        			<ScaleTransform/>
-        			<SkewTransform/>
-        			<RotateTransform/>
-        			<TranslateTransform/>
-        		</TransformGroup>
-        	</Image.RenderTransform>
-        </Image>
+        <Rectangle x:Name="imgDimmer" Fill="Black" Height="480" Stroke="#00000000" Width="640" Opacity="0.495" Visibility="Hidden" />
+        <Canvas ClipToBounds="True"  Width="640" Height="480" Canvas.Left="0" Canvas.Top="0" MaxHeight="480" MinHeight="480">
+            <Canvas.OpacityMask>
+                <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
+                    <GradientStop Color="#00000000" Offset="0"/>
+                    <GradientStop Color="#22000000" Offset="0.4"/>
+                    <GradientStop Color="#FF000000" Offset="0.5"/>
+                    <GradientStop Color="#22000000" Offset="0.6"/>
+                    <GradientStop Color="#00000000" Offset="1"/>
+                </LinearGradientBrush>
+            </Canvas.OpacityMask>
+            <Rectangle Canvas.Left="0" Canvas.Top="-200" Height="900" Name="rectangle1" Stroke="Black" Width="640" />
+            <Canvas Canvas.Left="0" Canvas.Top="0" Height="480" Name="kinectGuideCanvas" Width="158" RenderTransformOrigin="0.5,0.5" Visibility="Hidden">
+                <Image Canvas.Left="0" Canvas.Top="220" Height="41" Name="imgKinectGuide1" Stretch="Fill" Width="250" Source="/Moto;component/images/menu-items/cancel.png" />
+                <Image Canvas.Left="0" Canvas.Top="160" Height="41" Name="imgKinectGuide2" Source="/Moto;component/images/menu-items/backtostart.png" Stretch="Fill" Width="250" />
+                <Image Canvas.Left="0" Canvas.Top="100" Height="41" Name="imgKinectGuide3" Source="/Moto;component/images/menu-items/takeapicture.png" Stretch="Fill" Width="250" />
+                <Image Canvas.Left="0" Canvas.Top="40" Height="41" Name="imgKinectGuide4" Source="/Moto;component/images/menu-items/metronome.png" Stretch="Fill" Width="250" />
+                <Image Canvas.Left="0" Canvas.Top="-20" Height="41" Name="imgKinectGuide5" Stretch="Fill" Width="250" Source="/Moto;component/images/menu-items/guitar.png" />
+                <Image Canvas.Left="0" Canvas.Top="-80" Height="41" Name="imgKinectGuide6" Source="/Moto;component/images/menu-items/leftyguitar.png" Stretch="Fill" Width="250" />
+                <Image Canvas.Left="0" Canvas.Top="-140" Height="41" Name="imgKinectGuide7" Source="/Moto;component/images/menu-items/drums.png" Stretch="Fill" Width="250" />
+            </Canvas>
+        </Canvas>
         <Image x:Name="imgPrimaryGlowLeft" Height="76" Source="images/glowing-point.png" Stretch="Fill" Width="76" Visibility="Hidden" />
         <Image x:Name="imgPrimaryGlowRight" Height="76" Source="images/glowing-point.png" Stretch="Fill" Width="76" Visibility="Hidden" />
-        <Rectangle x:Name="imgDimmer" Fill="Black" Height="480" Stroke="#00000000" Width="640" Opacity="0.495" Visibility="Hidden" />
         <Image x:Name="imgPrep" Height="109.02" Canvas.Left="122.5" Source="images/preparing.png" RenderOptions.BitmapScalingMode="HighQuality" Stretch="Fill" Canvas.Top="147" Width="395" RenderTransformOrigin="0.5,0.5" Visibility="Hidden">
         	<Image.RenderTransform>
         		<TransformGroup>
