@@ -217,40 +217,30 @@
         <Image x:Name="imgPrimaryGlowLeft" Height="76" Source="images/glowing-point.png" Stretch="Fill" Width="76" Visibility="Hidden" />
         <Image x:Name="imgPrimaryGlowRight" Height="76" Source="images/glowing-point.png" Stretch="Fill" Width="76" Visibility="Hidden" />
         <Image x:Name="imgKinectGuide" Height="100" Source="/Moto;component/images/kinect-guide.png" Stretch="Fill" Canvas.Top="380" Width="100" Visibility="Hidden" />
-		<Canvas Width="640" Height="480" MaxWidth="640" MaxHeight="480" Canvas.Left="0" Canvas.Top="0">
-        	<Canvas.OpacityMask>
+        <Rectangle x:Name="imgDimmer" Fill="Black" Height="480" Stroke="#00000000" Width="640" Opacity="0.495" Visibility="Hidden" />
+        <Canvas ClipToBounds="True"  Width="640" Height="480" Canvas.Left="0" Canvas.Top="0" MaxHeight="480" MinHeight="480">
+            <Canvas.OpacityMask>
                 <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
-                	<GradientStop Color="#3F000000" Offset="0"/>
-                    <GradientStop Color="#FF000000" Offset="0.4"/>
-					<GradientStop Color="#FF000000" Offset="0.6"/>
-					<GradientStop Color="#3F000000" Offset="1"/>
+                    <GradientStop Color="#00000000" Offset="0"/>
+                    <GradientStop Color="#22000000" Offset="0.4"/>
+                    <GradientStop Color="#FF000000" Offset="0.5"/>
+                    <GradientStop Color="#22000000" Offset="0.6"/>
+                    <GradientStop Color="#00000000" Offset="1"/>
                 </LinearGradientBrush>
-            </Canvas.OpacityMask>      
-			<Canvas Canvas.Left="0" Canvas.Top="0" Height="481" Name="kinectGuideCanvas" Width="158" RenderTransformOrigin="0.5,0.5" Visibility="Hidden">
-	            <Image Canvas.Left="0" Canvas.Top="187" Height="60" Name="image2" Stretch="Fill" Width="163" Source="/Moto;component/images/menu-item.png" />
-	            <Image Canvas.Left="0" Canvas.Top="8" Height="60" Name="image3" Source="/Moto;component/images/menu-item.png" Stretch="Fill" Width="163" />
-	            <Image Canvas.Left="0" Canvas.Top="-51" Height="60" Name="image4" Source="/Moto;component/images/menu-item.png" Stretch="Fill" Width="163" />
-	            <Image Canvas.Left="0" Canvas.Top="-112" Height="60" Name="image5" Source="/Moto;component/images/menu-item.png" Stretch="Fill" Width="163" />
-                <Image Canvas.Left="0" Canvas.Top="-171" Height="60" Name="image6" Source="/Moto;component/images/menu-item.png" Stretch="Fill" Width="163" />
-                <TextBlock Canvas.Left="15" Canvas.Top="199" Height="36" Name="textBlock1" Text="Cancel" FontSize="24" Width="77" />
-                <TextBlock Canvas.Left="15" Canvas.Top="21" FontSize="24" Height="36" Name="textBlock2" Text="Custom Wall" Width="143" />
-                <TextBlock Canvas.Left="15" Canvas.Top="-41" FontSize="24" Height="36" Name="textBlock3" Text="Record New" Width="137" />
-                <TextBlock Canvas.Left="15" Canvas.Top="-101" FontSize="24" Height="36" Name="textBlock4" Text="Technologic" Width="144" />
-                <TextBlock Canvas.Left="15" Canvas.Top="-161" FontSize="24" Height="36" Name="textBlock5" Text="Drums" Width="77" />
-                <Image Canvas.Left="0" Canvas.Top="127" Height="60" Name="image7" Source="/Moto;component/images/menu-item.png" Stretch="Fill" Width="163" />
-                <TextBlock Canvas.Left="15" Canvas.Top="139" FontSize="24" Height="36" Name="textBlock6" Text="Go Back" Width="137" />
-                <Image Canvas.Left="0" Canvas.Top="-229" Height="60" Name="image8" Source="/Moto;component/images/menu-item.png" Stretch="Fill" Width="163" />
-                <TextBlock Canvas.Left="18" Canvas.Top="-218" FontSize="24" Height="36" Name="textBlock7" Text="8 Bit" Width="77" />
-                <Image Canvas.Left="0" Canvas.Top="68" Height="60" Name="image9" Source="/Moto;component/images/menu-item.png" Stretch="Fill" Width="163" />
-                <TextBlock Canvas.Left="15" Canvas.Top="79" FontSize="24" Height="36" Name="textBlock8" Text="Picture" Width="137" />
+            </Canvas.OpacityMask>
+            <Rectangle Canvas.Left="0" Canvas.Top="-200" Height="900" Name="rectangle1" Stroke="Black" Width="640" />
+            <Canvas Canvas.Left="0" Canvas.Top="0" Height="480" Name="kinectGuideCanvas" Width="158" RenderTransformOrigin="0.5,0.5" Visibility="Hidden">
+                <Image Canvas.Left="0" Canvas.Top="220" Height="41" Name="imgKinectGuide1" Stretch="Fill" Width="250" Source="/Moto;component/images/menu-items/cancel.png" />
+                <Image Canvas.Left="0" Canvas.Top="160" Height="41" Name="imgKinectGuide2" Source="/Moto;component/images/menu-items/backtostart.png" Stretch="Fill" Width="250" />
+                <Image Canvas.Left="0" Canvas.Top="100" Height="41" Name="imgKinectGuide3" Source="/Moto;component/images/menu-items/takeapicture.png" Stretch="Fill" Width="250" />
+                <Image Canvas.Left="0" Canvas.Top="40" Height="41" Name="imgKinectGuide4" Source="/Moto;component/images/menu-items/recordnewwall.png" Stretch="Fill" Width="250" />
+                <Image Canvas.Left="0" Canvas.Top="-20" Height="41" Name="imgKinectGuide5" Stretch="Fill" Width="250" Source="/Moto;component/images/menu-items/customwall.png" />
+                <Image Canvas.Left="0" Canvas.Top="-80" Height="41" Name="imgKinectGuide6" Source="/Moto;component/images/menu-items/technologic.png" Stretch="Fill" Width="250" />
+                <Image Canvas.Left="0" Canvas.Top="-140" Height="41" Name="imgKinectGuide7" Source="/Moto;component/images/menu-items/drumsamples.png" Stretch="Fill" Width="250" />
+                <Image Canvas.Left="0" Canvas.Top="-200" Height="41" Name="imgKinectGuide8" Source="/Moto;component/images/menu-items/eightbit.png" Stretch="Fill" Width="250" />
+
             </Canvas>
-	        <Image Canvas.Left="0" Canvas.Top="187" Height="60" Name="imgMenuSelected" Source="/Moto;component/images/menu-item-selected.png" Stretch="Fill" Width="163" IsHitTestVisible="True" Visibility="Hidden" />
-	        <Rectangle Fill="Black" Height="8" Canvas.Left="632" Canvas.Top="472" Width="8"/>
-            <Canvas.Background>
-                <SolidColorBrush />
-            </Canvas.Background>
         </Canvas>
-		<Rectangle x:Name="imgDimmer" Fill="Black" Height="480" Stroke="#00000000" Width="640" Opacity="0.495" Visibility="Hidden" />
         <Image x:Name="imgPrep" Height="109.02" Canvas.Left="122.5" Source="images/preparing.png" RenderOptions.BitmapScalingMode="HighQuality" Stretch="Fill" Canvas.Top="147" Width="395" RenderTransformOrigin="0.5,0.5" Visibility="Hidden">
             <Image.RenderTransform>
                 <TransformGroup>

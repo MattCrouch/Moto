@@ -129,7 +129,7 @@ namespace Moto
                 failed = true;
 
                 //Check if left hand stretched out
-                anAngle = getAngle(skeleton.Joints[JointType.ShoulderLeft], skeleton.Joints[JointType.HandLeft]);
+                anAngle = getAngle(skeleton.Joints[JointType.ShoulderLeft].Position, skeleton.Joints[JointType.HandLeft].Position);
 
                 if (Math.Abs(anAngle - 90) < angleDrift)
                 {
@@ -154,7 +154,7 @@ namespace Moto
 
                 failed = true;
 
-                anAngle = getAngle(skeleton.Joints[JointType.ShoulderLeft], skeleton.Joints[JointType.HandLeft]);
+                anAngle = getAngle(skeleton.Joints[JointType.ShoulderLeft].Position, skeleton.Joints[JointType.HandLeft].Position);
                 //Console.WriteLine(Math.Abs(anAngle - 45));
                 //'Kinect Guide' gesture
                 if ((Math.Abs(anAngle - 45) < angleDrift) && (skeleton.Joints[JointType.HandLeft].Position.Y < skeleton.Joints[JointType.Spine].Position.Y) && (skeleton.Joints[JointType.HandLeft].Position.X < skeleton.Joints[JointType.Spine].Position.X))
@@ -180,7 +180,7 @@ namespace Moto
             if (RightGesture != null)
             {
                 //Check if right hand stretched out
-                anAngle = getAngle(skeleton.Joints[JointType.ShoulderRight], skeleton.Joints[JointType.HandRight]);
+                anAngle = getAngle(skeleton.Joints[JointType.ShoulderRight].Position, skeleton.Joints[JointType.HandRight].Position);
 
                 if (Math.Abs(anAngle - 90) < angleDrift)
                 {
@@ -268,16 +268,16 @@ namespace Moto
         /// <param name="joint2">A joint to measure to</param>
         /// <param name="axis">"X", "Y" or "Z"</param>
         /// <returns>distance in metres between joints</returns>
-        public static double jointDistance(Joint joint1, Joint joint2, string axis)
+        public static double jointDistance(SkeletonPoint joint1, SkeletonPoint joint2, string axis)
         {
             switch (axis)
             {
                 case "X":
-                    return Math.Abs(joint1.Position.X - joint2.Position.X);
+                    return Math.Abs(joint1.X - joint2.X);
                 case "Y":
-                    return Math.Abs(joint1.Position.Y - joint2.Position.Y);
+                    return Math.Abs(joint1.Y - joint2.Y);
                 case "Z":
-                    return Math.Abs(joint1.Position.Z - joint2.Position.Z);
+                    return Math.Abs(joint1.Z - joint2.Z);
             }
             return 100;
         }
@@ -324,8 +324,9 @@ namespace Moto
         /// <param name="joint1">A joint from which to get the angle</param>
         /// <param name="joint2">A joint to measure an angle with</param>
         /// <returns>double - size of the angle in degrees</returns>
-        public static double getAngle(Joint joint1, Joint joint2)
+        public static double getAngle(SkeletonPoint joint1, SkeletonPoint joint2)
         {
+            
             //Returns an angle created by two points from the first point
             /*
              * NOTE: This is as the RGB camera sees - 2D
@@ -353,8 +354,8 @@ namespace Moto
              * NOTE: This is as the RGB camera sees - 2D
              * NOTE: The 'intermediary' variable is either an elbow for the arm, or knee for leg
              */
-            double angle1 = getAngle(start, intermediary);
-            double angle2 = getAngle(start, end);
+            double angle1 = getAngle(start.Position, intermediary.Position);
+            double angle2 = getAngle(start.Position, end.Position);
 
             if (Math.Abs(angle1 - angle2) <= drift)
             {
@@ -372,12 +373,12 @@ namespace Moto
                 upwards = true;
             }
 
-            if (angleValue > 65)
+            if (angleValue > 75 || (player.skeleton.Joints[JointType.HandLeft].Position.X > player.skeleton.Joints[JointType.HipLeft].Position.X - 0.15))
             {
                 //No movement
                 return scrollDirection.None;
             }
-            else if (angleValue > 40)
+            else if (angleValue > 50)
             {
                 //Small increment
                 if (upwards)
@@ -419,6 +420,49 @@ namespace Moto
                     theEvent(null, new GestureEventArgs { Trigger = UserDecisions.NotTriggered });
                 }
             }
+        }
+
+        /// <summary>
+        /// Gives a point that lies exactly half way between the two supplied Joints
+        /// </summary>
+        /// <param name="joint1">A joint to measure from</param>
+        /// <param name="joint2">A joint to measure to</param>
+        /// <returns>A SkeletonPoint in between these joints</returns>
+        public static SkeletonPoint getMidpoint(Joint joint1, Joint joint2)
+        {
+            SkeletonPoint newPoint = new SkeletonPoint();
+
+            //Point in X
+            if (joint1.Position.X < joint2.Position.X)
+            {
+                newPoint.X = joint1.Position.X + ((joint2.Position.X - joint1.Position.X) / 2);
+            }
+            else
+            {
+                newPoint.X = joint2.Position.X + ((joint1.Position.X - joint2.Position.X) / 2);
+            }
+
+            //Point in Y
+            if (joint1.Position.Y < joint2.Position.Y)
+            {
+                newPoint.Y = joint1.Position.Y + ((joint2.Position.Y - joint1.Position.Y) / 2);
+            }
+            else
+            {
+                newPoint.Y = joint2.Position.Y + ((joint1.Position.Y - joint2.Position.Y) / 2);
+            }
+
+            //Point in Z
+            if (joint1.Position.Z < joint2.Position.Z)
+            {
+                newPoint.Z = joint1.Position.Z + ((joint2.Position.Z - joint1.Position.Z) / 2);
+            }
+            else
+            {
+                newPoint.Z = joint2.Position.Z + ((joint1.Position.Z - joint2.Position.Z) / 2);
+            }
+
+            return newPoint;
         }
     }
 }

@@ -76,7 +76,7 @@ namespace Moto
 
             ColorImagePoint point = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Joints[JointType.Spine].Position, ColorImageFormat.RgbResolution640x480Fps30);
 
-            double angle = handMovements.getAngle(player.skeleton.Joints[JointType.Spine], player.skeleton.Joints[fretHand]);
+            double angle = handMovements.getAngle(player.skeleton.Joints[JointType.Spine].Position, player.skeleton.Joints[fretHand].Position);
 
             if (player.skeleton.Joints[fretHand].Position.Y > player.skeleton.Joints[JointType.Spine].Position.Y)
             {

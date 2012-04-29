@@ -98,8 +98,8 @@ namespace Moto
             Cancel,
             GoBack,
             TakeAPicture,
-            CustomWall,
             RecordNewWall,
+            CustomWall,
             Technologic,
             Drum,
             EightBit,
@@ -1205,10 +1205,11 @@ namespace Moto
             currentFocus = playerFocus.KinectGuide;
 
             MainWindow.animateSlide(kinectGuideCanvas, false, false, -150, 0.5);
-            MainWindow.animateSlide(imgMenuSelected, false, false, -150, 0.5);
             
             kinectGuideCanvas.Visibility = System.Windows.Visibility.Visible;
-            imgMenuSelected.Visibility = System.Windows.Visibility.Visible;
+            imgDimmer.Visibility = System.Windows.Visibility.Visible;
+
+            MainWindow.animateFade(imgDimmer, 0, 0.5,0.5);
 
             menuPosition = 0;
             Canvas.SetTop(kinectGuideCanvas, 0);
@@ -1232,8 +1233,7 @@ namespace Moto
         private void menuTick()
         {
             Skeleton player = MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton;
-            if (handMovements.isLimbStraight(player.Joints[JointType.ShoulderLeft], player.Joints[JointType.ElbowLeft], player.Joints[JointType.HandLeft], 10))
-            {
+            
                 if (menuScrollDirection == handMovements.scrollDirection.SmallDown || menuScrollDirection == handMovements.scrollDirection.LargeDown)
                 {
                     if (menuPosition > 0)
@@ -1248,7 +1248,6 @@ namespace Moto
                         animateMenu(true);
                     }
                 }
-            }
         }
 
         private void kinectGuideManipulation(MainWindow.Player player)
@@ -1256,7 +1255,9 @@ namespace Moto
             if (handMovements.leftSwipeRightIn == null)
             {
                 //Manipulate the guide if we're not currently swiping to select
-                double angleValue = handMovements.getAngle(player.skeleton.Joints[JointType.ShoulderLeft], player.skeleton.Joints[JointType.HandLeft]);
+                SkeletonPoint bodyMidpoint = handMovements.getMidpoint(player.skeleton.Joints[JointType.HipCenter],player.skeleton.Joints[JointType.ShoulderCenter]);
+
+                double angleValue = handMovements.getAngle(bodyMidpoint, player.skeleton.Joints[JointType.HandLeft].Position);
 
                 handMovements.scrollDirection oldDirection = menuScrollDirection;
 
@@ -1301,8 +1302,7 @@ namespace Moto
             Canvas.SetTop(kinectGuideCanvas, 60 * menuPosition);
 
             MainWindow.animateSlide(kinectGuideCanvas, true, false, -150, 0.5);
-            MainWindow.animateSlide(imgMenuSelected, true, false, -150, 0.5);
-            //MainWindow.animateSlide(imgKinectGuideDimmer, true, false, -150, 0.5);
+            MainWindow.animateFade(imgDimmer, 0.5, 0, 0.5);
 
             currentFocus = playerFocus.None;
 
@@ -1650,7 +1650,9 @@ namespace Moto
 
         private void animateMenu(bool up = true, int count = 1)
         {
+           
            Canvas.SetTop(kinectGuideCanvas, 60 * menuPosition);
+           //Canvas.SetTop(rectangle1, 60 * -menuPosition);
             
             DoubleAnimation animation = new DoubleAnimation();
 

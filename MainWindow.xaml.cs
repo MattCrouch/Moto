@@ -332,6 +332,17 @@ namespace Moto
                 tt.BeginAnimation(TranslateTransform.XProperty, daMovement);
             }
         }
+
+        public static void animateFade(FrameworkElement item, double from = 0, double to = 1, double duration = 1)
+        {
+            DoubleAnimation fader = new DoubleAnimation();
+            
+            fader.From = from;
+            fader.To = to;
+            fader.Duration = TimeSpan.FromSeconds(duration);
+
+            item.BeginAnimation(FrameworkElement.OpacityProperty, fader);
+        }
     }
 }
 
