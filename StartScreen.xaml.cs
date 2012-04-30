@@ -196,12 +196,16 @@ namespace Moto
             switch (e.Trigger)
             {
                 case handMovements.UserDecisions.Triggered:
-                    selectedMode = modeSelected.Instrument;
-                    modeDecision = new DispatcherTimer();
-                    modeDecision.Interval = TimeSpan.FromSeconds(3);
-                    modeDecision.Start();
-                    modeDecision.Tick += new EventHandler(modeDecisionI_Tick);
-                    sb.Begin();
+                    if (modeDecision == null)
+                    {
+                        selectedMode = modeSelected.Instrument;
+                        modeDecision = new DispatcherTimer();
+                        modeDecision.Interval = TimeSpan.FromSeconds(3);
+                        modeDecision.Start();
+                        modeDecision.Tick += new EventHandler(modeDecisionI_Tick);
+                        sb.Begin();
+                    }
+                    
                     break;
                 case handMovements.UserDecisions.NotTriggered:
                     if (selectedMode == modeSelected.Instrument)
@@ -215,6 +219,10 @@ namespace Moto
                         modeDecision.Tick -= new EventHandler(modeDecisionI_Tick);
                         modeDecision = null;
                     }
+                    imgBandMode.Visibility = Visibility.Visible;
+                    imgLeftHand.Visibility = Visibility.Visible;
+                    imgWallOfSound.Visibility = Visibility.Visible;
+                    imgRightHand.Visibility = Visibility.Visible;
                     break;
             }
         }
@@ -225,12 +233,15 @@ namespace Moto
             switch (e.Trigger)
             {
                 case handMovements.UserDecisions.Triggered:
-                    selectedMode = modeSelected.WallOfSound;
-                    modeDecision = new DispatcherTimer();
-                    modeDecision.Interval = TimeSpan.FromSeconds(3);
-                    modeDecision.Start();
-                    modeDecision.Tick += new EventHandler(modeDecisionWOS_Tick);
-                    sb.Begin();
+                    if (modeDecision == null)
+                    {
+                        selectedMode = modeSelected.WallOfSound;
+                        modeDecision = new DispatcherTimer();
+                        modeDecision.Interval = TimeSpan.FromSeconds(3);
+                        modeDecision.Start();
+                        modeDecision.Tick += new EventHandler(modeDecisionWOS_Tick);
+                        sb.Begin();
+                    }
                     break;
                 case handMovements.UserDecisions.NotTriggered:
                     if (selectedMode == modeSelected.WallOfSound)
@@ -262,6 +273,8 @@ namespace Moto
                     modeDecision.Tick -= new EventHandler(modeDecisionI_Tick);
                     modeDecision = null;
 
+                    selectedMode = modeSelected.None;
+
                     loadInstrument();
                 }
             }
@@ -276,6 +289,8 @@ namespace Moto
                     modeDecision.Stop();
                     modeDecision.Tick -= new EventHandler(modeDecisionWOS_Tick);
                     modeDecision = null;
+
+                    selectedMode = modeSelected.None;
 
                     loadWallOfSound();
                 }
@@ -435,15 +450,24 @@ namespace Moto
             if (visible)
             {
                 //There wasn't someone visible, now there is
-                Storyboard sb = this.FindResource("stepUpToPlay") as Storyboard;
-                sb.AutoReverse = true;
-                sb.Begin();
-                sb.Seek(new TimeSpan(0, 0, 0), TimeSeekOrigin.Duration);
+                MainWindow.animateSlide(imgStepInToPlay, true, true, 10, 0.5);
+
+                imgBandMode.Visibility = System.Windows.Visibility.Visible;
+                imgLeftHand.Visibility = System.Windows.Visibility.Visible;
+                imgWallOfSound.Visibility = System.Windows.Visibility.Visible;
+                imgRightHand.Visibility = System.Windows.Visibility.Visible;
+
+                MainWindow.animateSlide(imgBandMode, false, true, 10, 0.5);
+                MainWindow.animateSlide(imgLeftHand, false, true, 10, 0.5);
+                MainWindow.animateSlide(imgWallOfSound, false, true, 10, 0.5);
+                MainWindow.animateSlide(imgRightHand, false, true, 10, 0.5);
             } else {
                 //There is now nobody visible
-                Storyboard sb = this.FindResource("stepUpToPlay") as Storyboard;
-                sb.AutoReverse = false;
-                sb.Begin();
+                MainWindow.animateSlide(imgStepInToPlay, false, true, 10, 0.5);
+                MainWindow.animateSlide(imgBandMode, true, true, 10, 0.5);
+                MainWindow.animateSlide(imgLeftHand, true, true, 10, 0.5);
+                MainWindow.animateSlide(imgWallOfSound, true, true, 10, 0.5);
+                MainWindow.animateSlide(imgRightHand, true, true, 10, 0.5);
             }
         }
 
