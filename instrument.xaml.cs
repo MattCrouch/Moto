@@ -169,17 +169,6 @@ namespace Moto
                 //userImage.Source = colorFrame.ToBitmapSource();
             }
 
-            using (DepthImageFrame depthFrame = e.OpenDepthImageFrame())
-            {
-                //DEPTH IMAGE CODE
-                if (depthFrame == null)
-                {
-                    return;
-                }
-
-                //userDepth.Source = depthFrame.ToBitmapSource();
-            }
-
             using (SkeletonFrame skeletonFrame = e.OpenSkeletonFrame())
             {
                 //SKELETON CODE

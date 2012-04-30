@@ -115,7 +115,7 @@ namespace Moto
                     case KinectStatus.Connected:
                         sensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
                         //sensor.ColorStream.Enable(ColorImageFormat.RgbResolution1280x960Fps12);
-                        sensor.DepthStream.Enable();
+                        //sensor.DepthStream.Enable();
                         sensor.SkeletonStream.Enable();
 
                         colorImageBitmap = new WriteableBitmap(sensor.ColorStream.FrameWidth, sensor.ColorStream.FrameHeight, 96, 96, PixelFormats.Bgr32, null);
