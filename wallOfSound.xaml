@@ -193,7 +193,6 @@
     <Canvas x:Name="MainCanvas">
         <Image Canvas.Left="0" Canvas.Top="0" Height="480" x:Name="userImage" Stretch="Fill" Width="640" />
         <Image Canvas.Left="0" Canvas.Top="0" Height="480" x:Name="image1" Stretch="Fill" Width="640" Source="/Moto;component/images/screenoverlay.png" />
-        <Image Canvas.Left="0" Canvas.Top="0" Height="120" x:Name="userDepth" Stretch="Fill" Width="160" />
         <Image x:Name="imgCamera" Height="101.739" Canvas.Left="252.478" Source="/Moto;component/images/camera-game.png" Stretch="Fill" Canvas.Top="157.261" Width="113.043" RenderTransformOrigin="0.5,0.5" Visibility="Hidden">
             <Image.RenderTransform>
                 <TransformGroup>

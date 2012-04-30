@@ -43,16 +43,12 @@ namespace Moto
             setupKinectGuide();
 
             userImage.Source = MainWindow.colorImageBitmap;
-            userDepth.Source = MainWindow.depthImageBitmap;
 
             processExistingSkeletons(MainWindow.activeSkeletons);
 
             this.FocusVisualStyle = null;
             this.Focus();
         }
-
-        //Image processing variables
-        short[] DepthPixelData = new short[MainWindow.sensor.DepthStream.FramePixelDataLength];
 
         //Wall of Sound areas
         Dictionary<int, Dictionary<int, MainWindow.HitBox>> hitArea = new Dictionary<int, Dictionary<int, MainWindow.HitBox>>();
@@ -153,6 +149,9 @@ namespace Moto
 
                 switch (player.mode)
                 {
+                    case MainWindow.PlayerMode.Custom:
+                        customAudio(player);
+                        break;
                     case MainWindow.PlayerMode.Technologic:
                         technologicAudio(player);
                         break;
@@ -212,6 +211,7 @@ namespace Moto
             }
         }
 
+        #region Wall Audio functions
         private void customAudio(MainWindow.Player player)
         {
             wallAudio[player.skeleton.TrackingId][0] = "audio/wall/create/0.wav";
@@ -260,6 +260,7 @@ namespace Moto
             wallAudio[player.skeleton.TrackingId][9] = "audio/wall/8bit/9.wav";
             wallAudio[player.skeleton.TrackingId][10] = "audio/wall/8bit/10.wav";
         }
+        #endregion
 
         internal void defineHitAreas(MainWindow.Player player)
         {
@@ -343,6 +344,10 @@ namespace Moto
             mpDictionary.Add(5, null);
             mpDictionary.Add(6, null);
             mpDictionary.Add(7, null);
+            mpDictionary.Add(8, null);
+            mpDictionary.Add(9, null);
+            mpDictionary.Add(10, null);
+            mpDictionary.Add(11, null);
         }
 
         //Skeleton data processing (ran every frame)
@@ -360,19 +365,6 @@ namespace Moto
                 colorFrame.CopyPixelDataTo(pixelData);
 
                 MainWindow.colorImageBitmap.WritePixels(MainWindow.colorImageBitmapRect, pixelData, MainWindow.colorImageStride, 0);
-            }
-
-            using (DepthImageFrame depthFrame = e.OpenDepthImageFrame())
-            {
-                //DEPTH IMAGE CODE
-                if (depthFrame == null)
-                {
-                    return;
-                }
-
-                depthFrame.CopyPixelDataTo(DepthPixelData);
-
-                CreatePlayerDepthImage(depthFrame, DepthPixelData);
             }
 
             using (SkeletonFrame skeletonFrame = e.OpenSkeletonFrame())
