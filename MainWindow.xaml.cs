@@ -343,6 +343,32 @@ namespace Moto
 
             item.BeginAnimation(FrameworkElement.OpacityProperty, fader);
         }
+
+        public static void hidePlayerOverlays()
+        {
+            foreach (var player in MainWindow.activeSkeletons)
+            {
+                player.Value.instrumentImage.Visibility = System.Windows.Visibility.Hidden;
+
+                foreach (var overlay in player.Value.instrumentOverlay.Values)
+                {
+                    overlay.Visibility = System.Windows.Visibility.Hidden;
+                }
+            }
+        }
+
+        public static void showPlayerOverlays()
+        {
+            foreach (var player in MainWindow.activeSkeletons)
+            {
+                player.Value.instrumentImage.Visibility = System.Windows.Visibility.Visible;
+
+                foreach (var overlay in player.Value.instrumentOverlay.Values)
+                {
+                    overlay.Visibility = System.Windows.Visibility.Visible;
+                }
+            }
+        }
     }
 }
 

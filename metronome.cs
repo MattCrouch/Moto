@@ -28,6 +28,9 @@ namespace Moto
         static SoundPlayer metronomeTick = new SoundPlayer("audio/metronome-tick.wav");
 
         public static void setupMetronome() {
+            timePile = 0;
+            beatCount = 0;
+            beatTime = 0;
             beatTimer = new Stopwatch();
             theMetronome = new DispatcherTimer();
             theMetronome.Interval = TimeSpan.FromMilliseconds(1000);

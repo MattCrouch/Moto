@@ -427,27 +427,6 @@ namespace Moto
                     }
                 }
 
-                if (MainWindow.activeSkeletons.Count > 0)
-                {
-                    int tempKey = MainWindow.primarySkeletonKey;
-                    MainWindow.primarySkeletonKey = MainWindow.selectPrimarySkeleton(MainWindow.activeSkeletons);
-
-                    alignPrimaryGlow(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
-
-                    handMovements.listenForGestures(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton);
-
-                    if (currentFocus == playerFocus.KinectGuide)
-                    {
-                        kinectGuideManipulation(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
-                    }
-
-                    if (tempKey != MainWindow.primarySkeletonKey)
-                    {
-                        //Primary Skeleton changed
-                        highlightPrimarySkeleton(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
-                    }
-                }
-
                 if (skeletonList.Count < MainWindow.activeSkeletons.Count)
                 {
                     List<int> activeList = new List<int>(MainWindow.activeSkeletons.Keys);
@@ -475,8 +454,23 @@ namespace Moto
 
                 if (MainWindow.activeSkeletons.Count > 0)
                 {
-                    //Listen for gestures from the primary skeleton
-                    //handMovements.listenForGestures(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton);
+                    int tempKey = MainWindow.primarySkeletonKey;
+                    MainWindow.primarySkeletonKey = MainWindow.selectPrimarySkeleton(MainWindow.activeSkeletons);
+
+                    alignPrimaryGlow(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
+
+                    handMovements.listenForGestures(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton);
+
+                    if (currentFocus == playerFocus.KinectGuide)
+                    {
+                        kinectGuideManipulation(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
+                    }
+
+                    if (tempKey != MainWindow.primarySkeletonKey)
+                    {
+                        //Primary Skeleton changed
+                        highlightPrimarySkeleton(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
+                    }
                 }
             }
         }
@@ -613,7 +607,6 @@ namespace Moto
 
         private void boxSelection(MainWindow.Player player, int box, bool recording = false)
         {
-            
             wallInteractionVisual(player, box);
         }
 
@@ -871,6 +864,11 @@ namespace Moto
 
             player.instrumentImage = image;
 
+            if (currentFocus == playerFocus.KinectGuide)
+            {
+                MainWindow.hidePlayerOverlays();
+            }
+
             setupPlayerAudio(player);
             setupWall(player);
         }
@@ -895,6 +893,13 @@ namespace Moto
 
                 player.instrumentOverlay.Add(box, image);
                 MainCanvas.Children.Add(image);
+
+                image.Width = scaledWidth(player);
+
+                ColorImagePoint point = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Joints[JointType.Spine].Position, ColorImageFormat.RgbResolution640x480Fps30);
+
+                Canvas.SetLeft(image, point.X - (image.ActualWidth / 2));
+                Canvas.SetTop(image, point.Y - (image.ActualHeight / 2));
             }
         }
 
@@ -1204,12 +1209,21 @@ namespace Moto
         {
             currentFocus = playerFocus.KinectGuide;
 
+            if (kinectGuideTimer != null)
+            {
+                kinectGuideTimer.Stop();
+                kinectGuideTimer.Tick -= kinectGuideTimer_Tick;
+                kinectGuideTimer = null;
+            }
+
             MainWindow.animateSlide(kinectGuideCanvas, false, false, -150, 0.5);
             
             kinectGuideCanvas.Visibility = System.Windows.Visibility.Visible;
             imgDimmer.Visibility = System.Windows.Visibility.Visible;
 
             MainWindow.animateFade(imgDimmer, 0, 0.5,0.5);
+
+            MainWindow.hidePlayerOverlays();
 
             menuPosition = 0;
             Canvas.SetTop(kinectGuideCanvas, 0);
@@ -1232,8 +1246,10 @@ namespace Moto
 
         private void menuTick()
         {
-            Skeleton player = MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton;
-            
+            if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
+            {
+                Skeleton player = MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton;
+
                 if (menuScrollDirection == handMovements.scrollDirection.SmallDown || menuScrollDirection == handMovements.scrollDirection.LargeDown)
                 {
                     if (menuPosition > 0)
@@ -1248,33 +1264,41 @@ namespace Moto
                         animateMenu(true);
                     }
                 }
+            }
         }
 
         private void kinectGuideManipulation(MainWindow.Player player)
         {
-            if (handMovements.leftSwipeRightIn == null)
+            if (MainWindow.activeSkeletons.Count > 0)
             {
-                
-                //Manipulate the guide if we're not currently swiping to select
-                SkeletonPoint bodyMidpoint = handMovements.getMidpoint(player.skeleton.Joints[JointType.HipCenter],player.skeleton.Joints[JointType.ShoulderCenter]);
-
-                double angleValue = handMovements.getAngle(bodyMidpoint, player.skeleton.Joints[JointType.HandLeft].Position);
-
-                handMovements.scrollDirection oldDirection = menuScrollDirection;
-
-                menuScrollDirection = handMovements.sliderMenuValue(player, angleValue);
-
-                if (oldDirection != menuScrollDirection)
+                if (handMovements.leftSwipeRightIn == null)
                 {
-                    //Console.WriteLine("CHANGE IN DIRECTION: " + menuScrollDirection);
-                    adjustMenuSpeed(menuScrollDirection);
 
-                    if ((oldDirection == handMovements.scrollDirection.None && menuScrollDirection == handMovements.scrollDirection.SmallUp) || (oldDirection == handMovements.scrollDirection.SmallUp && menuScrollDirection == handMovements.scrollDirection.LargeUp) || (oldDirection == handMovements.scrollDirection.None && menuScrollDirection == handMovements.scrollDirection.SmallDown) || (oldDirection == handMovements.scrollDirection.SmallDown && menuScrollDirection == handMovements.scrollDirection.LargeDown))
+                    //Manipulate the guide if we're not currently swiping to select
+                    SkeletonPoint bodyMidpoint = handMovements.getMidpoint(player.skeleton.Joints[JointType.HipCenter], player.skeleton.Joints[JointType.ShoulderCenter]);
+
+                    double angleValue = handMovements.getAngle(bodyMidpoint, player.skeleton.Joints[JointType.HandLeft].Position);
+
+                    handMovements.scrollDirection oldDirection = menuScrollDirection;
+
+                    menuScrollDirection = handMovements.sliderMenuValue(player, angleValue);
+
+                    if (oldDirection != menuScrollDirection)
                     {
-                        //If we're increasing in any direction, tick when the speed changes
-                        menuTick();
+                        //Console.WriteLine("CHANGE IN DIRECTION: " + menuScrollDirection);
+                        adjustMenuSpeed(menuScrollDirection);
+
+                        if ((oldDirection == handMovements.scrollDirection.None && menuScrollDirection == handMovements.scrollDirection.SmallUp) || (oldDirection == handMovements.scrollDirection.SmallUp && menuScrollDirection == handMovements.scrollDirection.LargeUp) || (oldDirection == handMovements.scrollDirection.None && menuScrollDirection == handMovements.scrollDirection.SmallDown) || (oldDirection == handMovements.scrollDirection.SmallDown && menuScrollDirection == handMovements.scrollDirection.LargeDown))
+                        {
+                            //If we're increasing in any direction, tick when the speed changes
+                            menuTick();
+                        }
                     }
                 }
+            }
+            else
+            {
+                exitKinectGuide();
             }
         }
 
@@ -1300,24 +1324,7 @@ namespace Moto
         {
             Console.WriteLine("Left swipe right");
 
-            Canvas.SetTop(kinectGuideCanvas, 60 * menuPosition);
-
-            MainWindow.animateSlide(kinectGuideCanvas, true, false, -150, 0.5);
-            MainWindow.animateFade(imgDimmer, 0.5, 0, 0.5);
-
-            currentFocus = playerFocus.None;
-
-            //Stop listening and reset the flag for next time
-            handMovements.LeftSwipeRight -= handMovements_LeftSwipeRight;
-            handMovements.LeftSwipeRightStatus = false;
-
-            //Remove menu nav tick
-            if (menuMovementTimer != null)
-            {
-                menuMovementTimer.Stop();
-                menuMovementTimer.Tick -= menuMovementTimer_Tick;
-                menuMovementTimer = null;
-            }
+            exitKinectGuide();
 
             switch (kinectGuideMenu[menuPosition])
             {
@@ -1346,6 +1353,30 @@ namespace Moto
                     MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].mode = MainWindow.PlayerMode.EightBit;
                     eightBitAudio(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
                     break;
+            }
+        }
+
+        private void exitKinectGuide()
+        {
+            Canvas.SetTop(kinectGuideCanvas, 60 * menuPosition);
+
+            MainWindow.animateSlide(kinectGuideCanvas, true, false, -150, 0.5);
+            MainWindow.animateFade(imgDimmer, 0.5, 0, 0.5);
+
+            MainWindow.showPlayerOverlays();
+
+            currentFocus = playerFocus.None;
+
+            //Stop listening and reset the flag for next time
+            handMovements.LeftSwipeRight -= handMovements_LeftSwipeRight;
+            handMovements.LeftSwipeRightStatus = false;
+
+            //Remove menu nav tick
+            if (menuMovementTimer != null)
+            {
+                menuMovementTimer.Stop();
+                menuMovementTimer.Tick -= menuMovementTimer_Tick;
+                menuMovementTimer = null;
             }
         }
 

@@ -270,7 +270,7 @@ namespace Moto
 
                 skeletonList = null;
 
-                if (MainWindow.activeSkeletons.Count > 0)
+                if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
                 {
                     handMovements.listenForGestures(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton);
                 }
@@ -507,6 +507,11 @@ namespace Moto
             MainCanvas.Children.Add(image);
 
             player.instrumentImage = image;
+
+            if (currentFocus == playerFocus.KinectGuide)
+            {
+                MainWindow.hidePlayerOverlays();
+            }
         }
 
         private void switchInstrument(MainWindow.Player player, instrumentList instrument)
@@ -807,12 +812,21 @@ namespace Moto
         {
             currentFocus = playerFocus.KinectGuide;
 
+            if (kinectGuideTimer != null)
+            {
+                kinectGuideTimer.Stop();
+                kinectGuideTimer.Tick -= kinectGuideTimer_Tick;
+                kinectGuideTimer = null;
+            }
+
             MainWindow.animateSlide(kinectGuideCanvas, false, false, -150, 0.5);
 
             kinectGuideCanvas.Visibility = System.Windows.Visibility.Visible;
             imgDimmer.Visibility = System.Windows.Visibility.Visible;
 
             MainWindow.animateFade(imgDimmer, 0, 0.5, 0.5);
+
+            MainWindow.hidePlayerOverlays();
 
             menuPosition = 0;
             Canvas.SetTop(kinectGuideCanvas, 0);
@@ -902,24 +916,7 @@ namespace Moto
         {
             Console.WriteLine("Left swipe right");
 
-            Canvas.SetTop(kinectGuideCanvas, 60 * menuPosition);
-
-            MainWindow.animateSlide(kinectGuideCanvas, true, false, -150, 0.5);
-            MainWindow.animateFade(imgDimmer, 0.5, 0, 0.5);
-
-            currentFocus = playerFocus.None;
-
-            //Stop listening and reset the flag for next time
-            handMovements.LeftSwipeRight -= handMovements_LeftSwipeRight;
-            handMovements.LeftSwipeRightStatus = false;
-
-            //Remove menu nav tick
-            if (menuMovementTimer != null)
-            {
-                menuMovementTimer.Stop();
-                menuMovementTimer.Tick -= menuMovementTimer_Tick;
-                menuMovementTimer = null;
-            }
+            exitKinectGuide();
 
             switch (kinectGuideMenu[menuPosition])
             {
@@ -945,6 +942,30 @@ namespace Moto
                 case menuOptions.Drum:
                     switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.Drums);
                     break;
+            }
+        }
+
+        private void exitKinectGuide()
+        {
+            Canvas.SetTop(kinectGuideCanvas, 60 * menuPosition);
+
+            MainWindow.animateSlide(kinectGuideCanvas, true, false, -150, 0.5);
+            MainWindow.animateFade(imgDimmer, 0.5, 0, 0.5);
+
+            MainWindow.showPlayerOverlays();
+
+            currentFocus = playerFocus.None;
+
+            //Stop listening and reset the flag for next time
+            handMovements.LeftSwipeRight -= handMovements_LeftSwipeRight;
+            handMovements.LeftSwipeRightStatus = false;
+
+            //Remove menu nav tick
+            if (menuMovementTimer != null)
+            {
+                menuMovementTimer.Stop();
+                menuMovementTimer.Tick -= menuMovementTimer_Tick;
+                menuMovementTimer = null;
             }
         }
 
@@ -1106,10 +1127,7 @@ namespace Moto
         {
             if (MainWindow.sensor.ColorStream.Format != format)
             {
-                foreach (var player in MainWindow.activeSkeletons)
-                {
-                    player.Value.instrumentImage.Visibility = System.Windows.Visibility.Hidden;
-                }
+                MainWindow.hidePlayerOverlays();
 
                 MainWindow.sensor.ColorStream.Enable(format);
 
@@ -1133,10 +1151,7 @@ namespace Moto
                 imgProcessDelay = null;
             }
 
-            foreach (var player in MainWindow.activeSkeletons)
-            {
-                player.Value.instrumentImage.Visibility = System.Windows.Visibility.Visible;
-            }
+            MainWindow.showPlayerOverlays();
 
             userImage.Source = MainWindow.colorImageBitmap;
 
