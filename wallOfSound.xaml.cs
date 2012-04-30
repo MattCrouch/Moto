@@ -35,10 +35,14 @@ namespace Moto
             //Listen for Kinect Guide gesture
             handMovements.KinectGuideGesture += new EventHandler<handMovements.GestureEventArgs>(handMovements_KinectGuideGesture);
 
+            //Handles error messages
+            KinectSensor.KinectSensors.StatusChanged += new EventHandler<StatusChangedEventArgs>(KinectSensors_StatusChanged);
+
             //Create dictionary definitions for all the Media Players available
             generateMediaPlayers();
 
             setupVoice();
+            setupVoiceVisuals();
 
             setupKinectGuide();
 
@@ -116,6 +120,9 @@ namespace Moto
         bool boxRecording = false;
         DispatcherTimer recordingTimer;
 
+        //Kinect error imagery
+        Image kinectError;
+        Image initialisingSpinner;
 
         //Housekeeping
         private void processExistingSkeletons(Dictionary<int, MainWindow.Player> activeSkeletons)
@@ -177,8 +184,6 @@ namespace Moto
         {
             MainWindow.mySpeechRecognizer.SaidSomething += this.RecognizerSaidSomething;
             MainWindow.mySpeechRecognizer.ListeningChanged += this.ListeningChanged;
-
-            setupVoiceVisuals();
         }
 
         private void setupVoiceVisuals()
@@ -1640,6 +1645,8 @@ namespace Moto
         {
             MainWindow.sensor.AllFramesReady -= new EventHandler<AllFramesReadyEventArgs>(sensor_AllFramesReady);
 
+            KinectSensor.KinectSensors.StatusChanged -= new EventHandler<StatusChangedEventArgs>(KinectSensors_StatusChanged);
+
             destroyVoice();
 
             this.NavigationService.GoBack();
@@ -1650,6 +1657,61 @@ namespace Moto
             MainWindow.mySpeechRecognizer.toggleListening(false);
             MainWindow.mySpeechRecognizer.SaidSomething -= this.RecognizerSaidSomething;
             MainWindow.mySpeechRecognizer.ListeningChanged -= this.ListeningChanged;
+        }
+
+        //Error handling
+        void KinectSensors_StatusChanged(object sender, StatusChangedEventArgs e)
+        {
+            if (kinectError != null)
+            {
+                MainWindow.animateSlide(kinectError, true, true);
+            }
+
+            if (initialisingSpinner != null)
+            {
+                MainWindow.animateSlide(initialisingSpinner, true);
+                initialisingSpinner = null;
+            }
+
+            if (e.Status == KinectStatus.Connected)
+            {
+                MainWindow.animateFade(imgDimmer, 0.5, 0);
+                MainWindow.animateSlide(kinectError, true);
+                kinectError = null;
+
+                MainWindow.setupKinect();
+                MainWindow.setupVoice();
+                setupVoice();
+                userImage.Source = MainWindow.colorImageBitmap;
+            }
+            else
+            {
+                imgDimmer.Visibility = System.Windows.Visibility.Visible;
+                MainWindow.animateFade(imgDimmer, 0, 0.5);
+
+                kinectError = MainWindow.generateError(e.Status);
+                MainCanvas.Children.Add(kinectError);
+                MainWindow.animateSlide(kinectError);
+
+                if (e.Status == KinectStatus.Initializing)
+                {
+                    //Spinny, turny progress animation
+                    initialisingSpinner = new Image();
+                    initialisingSpinner.Source = new BitmapImage(new Uri(
+        "/Moto;component/images/loading.png", UriKind.Relative));
+                    MainCanvas.Children.Add(initialisingSpinner);
+                    initialisingSpinner.Width = 150;
+                    initialisingSpinner.Height = 150;
+                    MainWindow.animateSlide(initialisingSpinner);
+                    MainWindow.animateSpin(initialisingSpinner);
+                    Canvas.SetTop(initialisingSpinner, 230);
+                    Canvas.SetLeft(initialisingSpinner, (MainCanvas.ActualWidth / 2) - (initialisingSpinner.Width / 2));
+                }
+                else if (e.Status == KinectStatus.Disconnected)
+                {
+                    MainWindow.stopKinect(MainWindow.sensor);
+                }
+            }
         }
 
         //Development code
@@ -1704,6 +1766,10 @@ namespace Moto
                 case System.Windows.Input.Key.Escape:
                     //Close the application
                     Application.Current.Shutdown();
+                    break;
+                case System.Windows.Input.Key.R:
+                    //Restart the Application
+                    MainWindow.restartMoto();
                     break;
             }
         }

@@ -39,6 +39,8 @@ namespace Moto
             voicePromptVisual(false);
             startScreenUserImage.Source = MainWindow.colorImageBitmap;
 
+            KinectSensor.KinectSensors.StatusChanged += new EventHandler<StatusChangedEventArgs>(KinectSensors_StatusChanged);
+
             this.FocusVisualStyle = null;
             this.Focus();
         }
@@ -61,6 +63,10 @@ namespace Moto
 
         Dictionary<SpeechRecognizer.Verbs, BitmapImage> voiceVisuals = new Dictionary<SpeechRecognizer.Verbs, BitmapImage>();
         Image confirmationVisual = new Image();
+
+        //Kinect error imagery
+        Image kinectError;
+        Image initialisingSpinner;
 
         private void setupStartScreen()
         {
@@ -552,6 +558,61 @@ namespace Moto
             MainWindow.sensor.AllFramesReady -= new EventHandler<AllFramesReadyEventArgs>(sensor_AllFramesReady);
             handMovements.LeftGesture -= new EventHandler<handMovements.GestureEventArgs>(handMovements_LeftGesture);
             handMovements.RightGesture -= new EventHandler<handMovements.GestureEventArgs>(handMovements_RightGesture);
+
+            KinectSensor.KinectSensors.StatusChanged -= new EventHandler<StatusChangedEventArgs>(KinectSensors_StatusChanged);
+        }
+
+        void KinectSensors_StatusChanged(object sender, StatusChangedEventArgs e)
+        {
+            if (kinectError != null)
+            {
+                MainWindow.animateSlide(kinectError, true, true);
+            }
+
+            if (initialisingSpinner != null)
+            {
+                MainWindow.animateSlide(initialisingSpinner, true);
+                initialisingSpinner = null;
+            }
+
+            if (e.Status == KinectStatus.Connected)
+            {
+                MainWindow.animateFade(imgDimmer, 0.5, 0);
+                MainWindow.animateSlide(kinectError, true);
+                kinectError = null;
+
+                MainWindow.setupKinect();
+                MainWindow.setupVoice();
+                setupVoice();
+                startScreenUserImage.Source = MainWindow.colorImageBitmap;
+            }
+            else
+            {
+                MainWindow.animateFade(imgDimmer, 0, 0.5);
+
+                kinectError = MainWindow.generateError(e.Status);
+                MainCanvas.Children.Add(kinectError);
+                MainWindow.animateSlide(kinectError);
+
+                if (e.Status == KinectStatus.Initializing)
+                {
+                    //Spinny, turny progress animation
+                    initialisingSpinner = new Image();
+                    initialisingSpinner.Source = new BitmapImage(new Uri(
+        "/Moto;component/images/loading.png", UriKind.Relative));
+                    MainCanvas.Children.Add(initialisingSpinner);
+                    initialisingSpinner.Width = 150;
+                    initialisingSpinner.Height = 150;
+                    MainWindow.animateSlide(initialisingSpinner);
+                    MainWindow.animateSpin(initialisingSpinner);
+                    Canvas.SetTop(initialisingSpinner, 230);
+                    Canvas.SetLeft(initialisingSpinner, (MainCanvas.ActualWidth/2) - (initialisingSpinner.Width/2));
+                }
+                else if (e.Status == KinectStatus.Disconnected)
+                {
+                    MainWindow.stopKinect(MainWindow.sensor);
+                }
+            }
         }
 
         //Development code
@@ -575,6 +636,10 @@ namespace Moto
                 case System.Windows.Input.Key.Escape:
                     //Close the application
                     Application.Current.Shutdown();
+                    break;
+                case System.Windows.Input.Key.R:
+                    //Restart the Application
+                    MainWindow.restartMoto();
                     break;
             }
         }

@@ -21,7 +21,6 @@ namespace Moto
             InitializeComponent();
             setupKinect();
             setupVoice();
-            KinectSensor.KinectSensors.StatusChanged += new EventHandler<StatusChangedEventArgs>(KinectSensors_StatusChanged);
             this.NavigationService.Navigate(new StartScreen());
         }
 
@@ -99,7 +98,7 @@ namespace Moto
         //Skeleton variables
         public static Skeleton[] allSkeletons = new Skeleton[6]; //Holds all skeleton data (always returns six skeletons regardless)
         
-        public void setupKinect()
+        public static void setupKinect()
         {
             if (KinectSensor.KinectSensors.Count <= 0)
             {
@@ -122,10 +121,6 @@ namespace Moto
                         colorImageBitmapRect = new Int32Rect(0, 0, sensor.ColorStream.FrameWidth, sensor.ColorStream.FrameHeight);
                         colorImageStride = sensor.ColorStream.FrameWidth * sensor.ColorStream.FrameBytesPerPixel;
 
-                        depthImageBitmap = new WriteableBitmap(sensor.DepthStream.FrameWidth, sensor.DepthStream.FrameHeight, 96, 96, PixelFormats.Bgra32, null);
-                        depthImageBitmapRect = new Int32Rect(0, 0, sensor.DepthStream.FrameWidth, sensor.DepthStream.FrameHeight);
-                        depthImageStride = sensor.DepthStream.FrameWidth * 4;
-
                         try
                         {
                             sensor.Start();
@@ -143,61 +138,19 @@ namespace Moto
             }
         }
 
-        void setupVoice()
+        public static void setupVoice()
         {
             mySpeechRecognizer = SpeechRecognizer.Create();
             mySpeechRecognizer.Start(sensor.AudioSource);
         }
 
-        void destroyVoice()
+        public static void destroyVoice()
         {
             mySpeechRecognizer.Dispose();
             mySpeechRecognizer = null;
         }
 
-        void KinectSensors_StatusChanged(object sender, StatusChangedEventArgs e)
-        {
-            switch (e.Status)
-            {
-                case KinectStatus.Connected:
-                    MessageBox.Show("Connected");
-                    setupKinect();
-                    break;
-                case KinectStatus.DeviceNotGenuine:
-                    MessageBox.Show("Device not genuine");
-                    break;
-                case KinectStatus.DeviceNotSupported:
-                    MessageBox.Show("Device not supported");
-                    break;
-                case KinectStatus.Disconnected:
-                    MessageBox.Show("Disconnected");
-                    stopKinect(sensor);
-                    break;
-                case KinectStatus.Error:
-                    MessageBox.Show("Error");
-                    break;
-                case KinectStatus.Initializing:
-                    MessageBox.Show("Initialising");
-                    break;
-                case KinectStatus.InsufficientBandwidth:
-                    MessageBox.Show("Insufficient bandwidth");
-                    break;
-                case KinectStatus.NotPowered:
-                    MessageBox.Show("No power");
-                    break;
-                case KinectStatus.NotReady:
-                    MessageBox.Show("Not ready");
-                    break;
-                case KinectStatus.Undefined:
-                    MessageBox.Show("Undefined error");
-                    break;
-                default:
-                    MessageBox.Show("Default");
-                    break;
-            }
-        }
-
-        public void stopKinect(KinectSensor theSensor)
+        public static void stopKinect(KinectSensor theSensor)
         {
             if (theSensor != null)
             {
@@ -344,6 +297,20 @@ namespace Moto
             item.BeginAnimation(FrameworkElement.OpacityProperty, fader);
         }
 
+        public static void animateSpin(FrameworkElement item)
+        {
+            RotateTransform rotation = new RotateTransform(0, item.Width/2, item.Height/2);
+            item.RenderTransform = rotation;
+
+            DoubleAnimation spinner = new DoubleAnimation();
+            spinner.From = 0;
+            spinner.To = 360;
+            spinner.Duration = TimeSpan.FromSeconds(0.75);
+            spinner.RepeatBehavior = RepeatBehavior.Forever;
+
+            rotation.BeginAnimation(RotateTransform.AngleProperty, spinner);
+        }
+
         public static void hidePlayerOverlays()
         {
             foreach (var player in MainWindow.activeSkeletons)
@@ -368,6 +335,57 @@ namespace Moto
                     overlay.Visibility = System.Windows.Visibility.Visible;
                 }
             }
+        }
+
+        public static void restartMoto()
+        {
+            stopKinect(sensor);
+            System.Diagnostics.Process.Start(Application.ResourceAssembly.Location);
+            Application.Current.Shutdown();
+        }
+
+        public static Image generateError(KinectStatus kinectStatus)
+        {
+            Image kinectError = new Image();
+            string errorUri;
+
+            switch (kinectStatus)
+            {
+                case KinectStatus.DeviceNotGenuine:
+                    errorUri = "devicenotgenuine.png";
+                    break;
+                case KinectStatus.DeviceNotSupported:
+                    errorUri = "devicenotsupported.png";
+                    break;
+                case KinectStatus.Disconnected:
+                    errorUri = "disconnected.png";
+                    break;
+                case KinectStatus.Error:
+                    errorUri = "error.png";
+                    break;
+                case KinectStatus.Initializing:
+                    errorUri = "initialising.png";
+                    break;
+                case KinectStatus.InsufficientBandwidth:
+                    errorUri = "insufficientbandwidth.png";
+                    break;
+                case KinectStatus.NotPowered:
+                    errorUri = "notpowered.png";
+                    break;
+                case KinectStatus.NotReady:
+                    errorUri = "notready.png";
+                    break;
+                case KinectStatus.Undefined:
+                default:
+                    errorUri = "undefined.png";
+                    break;
+            }
+
+            kinectError.Source = new BitmapImage(new Uri(
+        "/Moto;component/images/kinect-fault/" + errorUri, UriKind.Relative));
+            kinectError.Width = 640;
+            kinectError.Height = 480;
+            return kinectError;
         }
     }
 }

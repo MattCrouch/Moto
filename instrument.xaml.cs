@@ -35,7 +35,10 @@ namespace Moto
 
             handMovements.KinectGuideGesture += new EventHandler<handMovements.GestureEventArgs>(handMovements_KinectGuideGesture);
 
+            KinectSensor.KinectSensors.StatusChanged += new EventHandler<StatusChangedEventArgs>(KinectSensors_StatusChanged);
+
             setupVoice();
+            setupVoiceVisuals();
 
             setupKinectGuide();
 
@@ -108,6 +111,10 @@ namespace Moto
         private TextBlock uploadFeedback;
         private Image cameraUpload;
 
+        //Kinect error imagery
+        Image kinectError;
+        Image initialisingSpinner;
+
         //Housekeeping
         void processExistingSkeletons(Dictionary<int, MainWindow.Player> activeSkeletons)
         {
@@ -122,8 +129,6 @@ namespace Moto
         {
             MainWindow.mySpeechRecognizer.SaidSomething += this.RecognizerSaidSomething;
             MainWindow.mySpeechRecognizer.ListeningChanged += this.ListeningChanged;
-
-            setupVoiceVisuals();
         }
 
         private void setupVoiceVisuals()
@@ -426,10 +431,16 @@ namespace Moto
             switch (voiceCommand.Verb)
             {
                 case SpeechRecognizer.Verbs.DrumsSwitch:
-                    switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.Drums);
+                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
+                    {
+                        switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.Drums);
+                    }
                     break;
                 case SpeechRecognizer.Verbs.GuitarSwitch:
-                    switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.GuitarRight);
+                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
+                    {
+                        switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.GuitarRight);
+                    }
                     break;
                 case SpeechRecognizer.Verbs.StartMetronome:
                     currentFocus = playerFocus.Metronome;
@@ -1021,6 +1032,9 @@ namespace Moto
         private void returnToStart()
         {
             MainWindow.sensor.AllFramesReady -= new EventHandler<AllFramesReadyEventArgs>(sensor_AllFramesReady);
+
+            KinectSensor.KinectSensors.StatusChanged -= new EventHandler<StatusChangedEventArgs>(KinectSensors_StatusChanged);
+
             destroyVoice();
             metronome.destroyMetronome();
             this.NavigationService.GoBack();
@@ -1072,6 +1086,61 @@ namespace Moto
             return quotient;
         }
 
+        //Error handling
+        void KinectSensors_StatusChanged(object sender, StatusChangedEventArgs e)
+        {
+            if (kinectError != null)
+            {
+                MainWindow.animateSlide(kinectError, true, true);
+            }
+
+            if (initialisingSpinner != null)
+            {
+                MainWindow.animateSlide(initialisingSpinner, true);
+                initialisingSpinner = null;
+            }
+
+            if (e.Status == KinectStatus.Connected)
+            {
+                MainWindow.animateFade(imgDimmer, 0.5, 0);
+                MainWindow.animateSlide(kinectError, true);
+                kinectError = null;
+
+                MainWindow.setupKinect();
+                MainWindow.setupVoice();
+                setupVoice();
+                userImage.Source = MainWindow.colorImageBitmap;
+            }
+            else
+            {
+                imgDimmer.Visibility = System.Windows.Visibility.Visible;
+                MainWindow.animateFade(imgDimmer, 0, 0.5);
+
+                kinectError = MainWindow.generateError(e.Status);
+                MainCanvas.Children.Add(kinectError);
+                MainWindow.animateSlide(kinectError);
+
+                if (e.Status == KinectStatus.Initializing)
+                {
+                    //Spinny, turny progress animation
+                    initialisingSpinner = new Image();
+                    initialisingSpinner.Source = new BitmapImage(new Uri(
+        "/Moto;component/images/loading.png", UriKind.Relative));
+                    MainCanvas.Children.Add(initialisingSpinner);
+                    initialisingSpinner.Width = 150;
+                    initialisingSpinner.Height = 150;
+                    MainWindow.animateSlide(initialisingSpinner);
+                    MainWindow.animateSpin(initialisingSpinner);
+                    Canvas.SetTop(initialisingSpinner, 230);
+                    Canvas.SetLeft(initialisingSpinner, (MainCanvas.ActualWidth / 2) - (initialisingSpinner.Width / 2));
+                }
+                else if (e.Status == KinectStatus.Disconnected)
+                {
+                    MainWindow.stopKinect(MainWindow.sensor);
+                }
+            }
+        }
+
         //Development code
         private void Page_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
@@ -1108,6 +1177,10 @@ namespace Moto
                 case System.Windows.Input.Key.Escape:
                     //Close the application
                     Application.Current.Shutdown();
+                    break;
+                case System.Windows.Input.Key.R:
+                    //Restart the Application
+                    MainWindow.restartMoto();
                     break;
             }
         }

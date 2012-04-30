@@ -1,5 +1,15 @@
 CHANGELOG
 =========
+0.5.2.5 - 30/4/12
+-----------------
+- Correct fatal error handling inside Moto. Visual feedback will instruct you on what action you need to take if it ever happens
+	- There is also a new development keyboard shortcut - R - to restart Moto if these fatal errors don't correctly get handled and a manual restart is necessary
+- Drum sounds are now more responsive
+- Start screen gestures now favour the first gesture, and are now less glitchy
+- Removed any references to the depth stream. Moto should now load faster and be more responsive
+- Instruments in Band Mode and in Wall of Sound now do not show while the primary player controls the Kinect Guide
+- There are now more media slots available within the Wall of Sound
+
 0.5.2.4 - 29/4/12
 -----------------
 - Vertical scrolling menus now have nicer graphics on them
