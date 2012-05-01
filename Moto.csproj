@@ -118,8 +118,12 @@
     <Compile Include="drumSpace.cs" />
     <Compile Include="guitarSpace.cs" />
     <Compile Include="handMovements.cs" />
+    <Compile Include="keyboardSpace.cs" />
     <Compile Include="InstrumentMenu.xaml.cs">
       <DependentUpon>InstrumentMenu.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="KinectError.xaml.cs">
+      <DependentUpon>KinectError.xaml</DependentUpon>
     </Compile>
     <Compile Include="metronome.cs" />
     <Compile Include="Speech.cs" />
@@ -139,6 +143,10 @@
     <Page Include="InstrumentMenu.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="KinectError.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -197,6 +205,12 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="images\keyboard.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="images\kinect-fault\restart.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="images\kinect-fault\devicenotgenuine.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
@@ -492,6 +506,30 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="audio\guitar\guitar4.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="audio\keyboard\keyboard0.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="audio\keyboard\keyboard1.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="audio\keyboard\keyboard2.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="audio\keyboard\keyboard3.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="audio\keyboard\keyboard4.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="audio\keyboard\keyboard5.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="audio\keyboard\keyboard6.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="audio\keyboard\keyboard7.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="audio\metronome-tick.wav">

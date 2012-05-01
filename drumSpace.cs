@@ -45,53 +45,29 @@ namespace Moto
             }
 
             //Make sure the hands aren't in the drums areas in the first place
-            insideArea.Add(player.skeleton.TrackingId, createPlayerDictionary());
+            insideArea.Add(player.skeleton.TrackingId, createPlayerDictionary(7));
         }
 
-        Dictionary<JointType,Dictionary<int,bool>> createPlayerDictionary()
+        Dictionary<JointType,Dictionary<int,bool>> createPlayerDictionary(int dictCount)
         {
             Dictionary<JointType, Dictionary<int, bool>> dictionary = new Dictionary<JointType, Dictionary<int, bool>>();
 
-            dictionary.Add(JointType.HandLeft, defaultInsideAreaVals());
-            dictionary.Add(JointType.HandRight, defaultInsideAreaVals());
-            dictionary.Add(JointType.FootLeft, defaultInsideAreaVals());
-            dictionary.Add(JointType.FootRight, defaultInsideAreaVals());
-
-            /*dictionary.Add(JointType.HandLeft, new Dictionary<int, bool>());
-            dictionary.Add(JointType.HandRight, new Dictionary<int, bool>());
-            dictionary.Add(JointType.FootLeft, new Dictionary<int, bool>());
-            dictionary.Add(JointType.FootRight, new Dictionary<int, bool>());*/
-
-
-            /*dictionary[JointType.HandLeft].Add(0, false);
-            dictionary[JointType.HandLeft].Add(1, false);
-            dictionary[JointType.HandLeft].Add(2, false);
-            dictionary[JointType.HandLeft].Add(3, false);
-            dictionary[JointType.HandLeft].Add(4, false);
-            dictionary[JointType.HandLeft].Add(5, false);
-            dictionary[JointType.HandLeft].Add(6, false);
-            dictionary[JointType.HandRight].Add(0, false);
-            dictionary[JointType.HandRight].Add(1, false);
-            dictionary[JointType.HandRight].Add(2, false);
-            dictionary[JointType.HandRight].Add(3, false);
-            dictionary[JointType.HandRight].Add(4, false);
-            dictionary[JointType.HandRight].Add(5, false);
-            dictionary[JointType.HandRight].Add(6, false);*/
+            dictionary.Add(JointType.HandLeft, defaultInsideAreaVals(dictCount));
+            dictionary.Add(JointType.HandRight, defaultInsideAreaVals(dictCount));
+            dictionary.Add(JointType.FootLeft, defaultInsideAreaVals(dictCount));
+            dictionary.Add(JointType.FootRight, defaultInsideAreaVals(dictCount));
 
             return dictionary;
         }
 
-        internal Dictionary<int,bool> defaultInsideAreaVals()
+        internal Dictionary<int,bool> defaultInsideAreaVals(int dictCount)
         {
             Dictionary<int, bool> dictionary = new Dictionary<int, bool>();
 
-            dictionary.Add(0, false);
-            dictionary.Add(1, false);
-            dictionary.Add(2, false);
-            dictionary.Add(3, false);
-            dictionary.Add(4, false);
-            dictionary.Add(5, false);
-            dictionary.Add(6, false);
+            for (int i = 0; i < dictCount; i++)
+            {
+                dictionary.Add(i, false);
+            }
 
             return dictionary;
         }

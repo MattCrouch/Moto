@@ -43,6 +43,7 @@ namespace Moto.Speech
             {
                 { "Switch to Guitar", new WhatSaid { Verb = Verbs.GuitarSwitch } },
                 { "Switch to Drums", new WhatSaid { Verb = Verbs.DrumsSwitch } },
+                { "Switch to Keyboard", new WhatSaid { Verb = Verbs.KeyboardSwitch } },
                 { "Take a Picture", new WhatSaid { Verb = Verbs.Capture } },
                 { "Metronome", new WhatSaid { Verb = Verbs.StartMetronome } },
                 { "Stop Metronome", new WhatSaid { Verb = Verbs.StopMetronome } },
@@ -124,6 +125,7 @@ namespace Moto.Speech
             Instrument,
             GuitarSwitch,
             DrumsSwitch,
+            KeyboardSwitch,
             StartMetronome,
             StopMetronome,
             BackToInstruments,

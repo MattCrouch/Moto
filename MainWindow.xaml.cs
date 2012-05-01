@@ -19,9 +19,27 @@ namespace Moto
         public MainWindow()
         {
             InitializeComponent();
-            setupKinect();
-            setupVoice();
-            this.NavigationService.Navigate(new StartScreen());
+            if (KinectSensor.KinectSensors.Count > 0 && KinectSensor.KinectSensors[0].Status == KinectStatus.Connected)
+            {
+                setupKinect();
+                setupVoice();
+                this.NavigationService.Navigate(new StartScreen());
+            }
+            else
+            {
+                KinectStatus status = new KinectStatus();
+
+                if (KinectSensor.KinectSensors.Count == 0)
+                {
+                    status = KinectStatus.Disconnected;
+                }
+                else
+                {
+                    status = KinectSensor.KinectSensors[0].Status;
+                }
+
+                this.NavigationService.Navigate(new KinectError(status));
+            }
         }
 
         public static KinectSensor sensor;
@@ -100,42 +118,25 @@ namespace Moto
         
         public static void setupKinect()
         {
-            if (KinectSensor.KinectSensors.Count <= 0)
-            {
-                MessageBox.Show("No Kinect connected :(");
-            }
-            else
-            {
                 //use first Kinect
                 sensor = KinectSensor.KinectSensors[0];
+                sensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
+                sensor.SkeletonStream.Enable();
 
-                switch (sensor.Status)
+                colorImageBitmap = new WriteableBitmap(sensor.ColorStream.FrameWidth, sensor.ColorStream.FrameHeight, 96, 96, PixelFormats.Bgr32, null);
+                colorImageBitmapRect = new Int32Rect(0, 0, sensor.ColorStream.FrameWidth, sensor.ColorStream.FrameHeight);
+                colorImageStride = sensor.ColorStream.FrameWidth * sensor.ColorStream.FrameBytesPerPixel;
+
+                try
                 {
-                    case KinectStatus.Connected:
-                        sensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
-                        //sensor.ColorStream.Enable(ColorImageFormat.RgbResolution1280x960Fps12);
-                        //sensor.DepthStream.Enable();
-                        sensor.SkeletonStream.Enable();
-
-                        colorImageBitmap = new WriteableBitmap(sensor.ColorStream.FrameWidth, sensor.ColorStream.FrameHeight, 96, 96, PixelFormats.Bgr32, null);
-                        colorImageBitmapRect = new Int32Rect(0, 0, sensor.ColorStream.FrameWidth, sensor.ColorStream.FrameHeight);
-                        colorImageStride = sensor.ColorStream.FrameWidth * sensor.ColorStream.FrameBytesPerPixel;
-
-                        try
-                        {
-                            sensor.Start();
-                        }
-                        catch (System.IO.IOException)
-                        {
-                            MessageBox.Show("One program at a time, please");
-                            throw;
-                        }
-                        break;
-                    case KinectStatus.Disconnected:
-                        MessageBox.Show("No Kinect connected :(");
-                        break;
+                    sensor.Start();
                 }
-            }
+                catch (System.IO.IOException)
+                {
+                    //Another program is already using the Kinect
+                    MessageBox.Show("It looks like another program is already using your Kinect. Close it before trying to use Moto. Sorry about that.");
+                    throw;
+                }
         }
 
         public static void setupVoice()

@@ -67,6 +67,7 @@ namespace Moto
             Drums,
             GuitarLeft,
             GuitarRight,
+            Keyboard,
             WallOfSound,
         }
 
@@ -135,6 +136,7 @@ namespace Moto
         {
             voiceVisuals.Add(SpeechRecognizer.Verbs.DrumsSwitch, new BitmapImage(new Uri("/Moto;component/images/voice/switchtodrums.png", UriKind.Relative)));
             voiceVisuals.Add(SpeechRecognizer.Verbs.GuitarSwitch, new BitmapImage(new Uri("/Moto;component/images/voice/switchtoguitar.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.KeyboardSwitch, new BitmapImage(new Uri("/Moto;component/images/voice/switchtoguitar.png", UriKind.Relative)));
             voiceVisuals.Add(SpeechRecognizer.Verbs.StartMetronome, new BitmapImage(new Uri("/Moto;component/images/voice/metronome.png", UriKind.Relative)));
             voiceVisuals.Add(SpeechRecognizer.Verbs.StopMetronome, new BitmapImage(new Uri("/Moto;component/images/voice/stopmetronome.png", UriKind.Relative)));
             voiceVisuals.Add(SpeechRecognizer.Verbs.BackToInstruments, new BitmapImage(new Uri("/Moto;component/images/voice/backtoinstruments.png", UriKind.Relative)));
@@ -256,7 +258,7 @@ namespace Moto
                         MainWindow.playerRemoved(activeList[i]);
                         hitArea.Remove(activeList[i]);
                         insideArea.Remove(activeList[i]);
-
+                        keyArea.Remove(activeList[i]);
                     }
 
                     activeList = null;
@@ -303,6 +305,15 @@ namespace Moto
                         checkStrum(player, JointType.HandLeft);
                     }
                     break;
+                case instrumentList.Keyboard:
+                defineKeyAreas(player);
+                    //showReadout((skeleton.Joints[JointType.HipLeft].Position.X - skeleton.Joints[JointType.HipRight].Position.X).ToString());
+                    if (currentFocus == playerFocus.None)
+                    {
+                        checkKeyHit(player, JointType.HandLeft);
+                        checkKeyHit(player, JointType.HandRight);
+                    }
+                    break;
             }
         }
 
@@ -320,6 +331,9 @@ namespace Moto
                 case instrumentList.GuitarRight:
                 case instrumentList.GuitarLeft:
                     width = 680.35 * Math.Pow(Math.E, -0.004 * distance);
+                    break;
+                case instrumentList.Keyboard:
+                    width = 968.62 * Math.Pow(Math.E, -0.006 * distance);
                     break;
             }
 
@@ -364,6 +378,7 @@ namespace Moto
             {
                 case SpeechRecognizer.Verbs.DrumsSwitch:
                 case SpeechRecognizer.Verbs.GuitarSwitch:
+                case SpeechRecognizer.Verbs.KeyboardSwitch:
                 case SpeechRecognizer.Verbs.StartMetronome:
                 case SpeechRecognizer.Verbs.StopMetronome:
                 case SpeechRecognizer.Verbs.BackToInstruments:
@@ -442,6 +457,12 @@ namespace Moto
                         switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.GuitarRight);
                     }
                     break;
+                case SpeechRecognizer.Verbs.KeyboardSwitch:
+                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
+                    {
+                        switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.Keyboard);
+                    }
+                    break;
                 case SpeechRecognizer.Verbs.StartMetronome:
                     currentFocus = playerFocus.Metronome;
                     metronome.destroyMetronome();
@@ -502,6 +523,9 @@ namespace Moto
                     //image.Height = 225;
                     //image.Width = image.Height * 0.35;
                     break;
+                case instrumentList.Keyboard:
+                    image.Source = new BitmapImage(new Uri("images/keyboard.png", UriKind.Relative));
+                    break;
             }
 
             MainCanvas.Children.Add(image);
@@ -531,6 +555,10 @@ namespace Moto
                     case instrumentList.GuitarRight:
                         setupGuitar(MainWindow.activeSkeletons[player.skeleton.TrackingId]);
                         MainWindow.activeSkeletons[player.skeleton.TrackingId].mode = MainWindow.PlayerMode.Acoustic;
+                        break;
+                    case instrumentList.Keyboard:
+                        setupKeyboard(MainWindow.activeSkeletons[player.skeleton.TrackingId]);
+                        MainWindow.activeSkeletons[player.skeleton.TrackingId].mode = MainWindow.PlayerMode.None;
                         break;
                 }
 
