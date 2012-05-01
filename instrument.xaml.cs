@@ -89,6 +89,7 @@ namespace Moto
             Guitar,
             LeftyGuitar,
             Drum,
+            Keyboard,
         }
 
         //Metronome variables
@@ -136,7 +137,7 @@ namespace Moto
         {
             voiceVisuals.Add(SpeechRecognizer.Verbs.DrumsSwitch, new BitmapImage(new Uri("/Moto;component/images/voice/switchtodrums.png", UriKind.Relative)));
             voiceVisuals.Add(SpeechRecognizer.Verbs.GuitarSwitch, new BitmapImage(new Uri("/Moto;component/images/voice/switchtoguitar.png", UriKind.Relative)));
-            voiceVisuals.Add(SpeechRecognizer.Verbs.KeyboardSwitch, new BitmapImage(new Uri("/Moto;component/images/voice/switchtoguitar.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.KeyboardSwitch, new BitmapImage(new Uri("/Moto;component/images/voice/switchtokeyboard.png", UriKind.Relative)));
             voiceVisuals.Add(SpeechRecognizer.Verbs.StartMetronome, new BitmapImage(new Uri("/Moto;component/images/voice/metronome.png", UriKind.Relative)));
             voiceVisuals.Add(SpeechRecognizer.Verbs.StopMetronome, new BitmapImage(new Uri("/Moto;component/images/voice/stopmetronome.png", UriKind.Relative)));
             voiceVisuals.Add(SpeechRecognizer.Verbs.BackToInstruments, new BitmapImage(new Uri("/Moto;component/images/voice/backtoinstruments.png", UriKind.Relative)));
@@ -969,6 +970,9 @@ namespace Moto
                     break;
                 case menuOptions.Drum:
                     switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.Drums);
+                    break;
+                case menuOptions.Keyboard:
+                    switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.Keyboard);
                     break;
             }
         }

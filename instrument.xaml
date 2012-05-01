@@ -274,6 +274,7 @@
                 <Image Canvas.Left="0" Canvas.Top="-20" Height="41" Name="imgKinectGuide5" Stretch="Fill" Width="250" Source="/Moto;component/images/menu-items/guitar.png" />
                 <Image Canvas.Left="0" Canvas.Top="-80" Height="41" Name="imgKinectGuide6" Source="/Moto;component/images/menu-items/leftyguitar.png" Stretch="Fill" Width="250" />
                 <Image Canvas.Left="0" Canvas.Top="-140" Height="41" Name="imgKinectGuide7" Source="/Moto;component/images/menu-items/drums.png" Stretch="Fill" Width="250" />
+                <Image Canvas.Left="0" Canvas.Top="-200" Height="41" Name="imgKinectGuide8" Source="/Moto;component/images/menu-items/keyboard.png" Stretch="Fill" Width="250" />
             </Canvas>
         </Canvas>
         <Image x:Name="imgPrimaryGlowLeft" Height="76" Source="images/glowing-point.png" Stretch="Fill" Width="76" Visibility="Hidden" />

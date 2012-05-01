@@ -205,6 +205,12 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="images\voice\switchtokeyboard.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="images\menu-items\keyboard.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="images\keyboard.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
