@@ -511,6 +511,15 @@ namespace Moto
             Image image = new Image();
             //image.Name = "image" + aSkeleton.TrackingId.ToString();
 
+            //Overlay
+            if (player.instrumentOverlay.ContainsKey(0))
+            {
+                MainCanvas.Children.Remove(player.instrumentOverlay[0]);
+                player.instrumentOverlay.Remove(0);
+            }
+
+            player.instrumentOverlay.Add(0, new Image());
+
             switch (instrument)
             {
                 case instrumentList.Drums:
@@ -530,6 +539,7 @@ namespace Moto
             }
 
             MainCanvas.Children.Add(image);
+            MainCanvas.Children.Add(player.instrumentOverlay[0]);
 
             player.instrumentImage = image;
 

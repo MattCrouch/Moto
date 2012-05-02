@@ -25,7 +25,6 @@ namespace Moto
             if (!insideStrumArea.ContainsKey(player.skeleton.TrackingId)) {
                 insideStrumArea.Add(player.skeleton.TrackingId, false);
             }
-            
         }
 
         private double doPythag(double a, double b)
@@ -68,11 +67,12 @@ namespace Moto
                 fretHand = JointType.HandRight;
             }
 
-            player.instrumentImage.Source = guitarImage(player);
+            player.instrumentOverlay[0].Source = guitarImage(player);
 
             FrameworkElement image = player.instrumentImage;
 
             image.Height = scaledWidth(player, player.instrument);
+            player.instrumentOverlay[0].Height = image.Height;
 
             ColorImagePoint point = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Joints[JointType.Spine].Position, ColorImageFormat.RgbResolution640x480Fps30);
 
@@ -112,6 +112,12 @@ namespace Moto
             Canvas.SetTop(image, point.Y - centerY);
 
             image.RenderTransform = new RotateTransform(angle, centerX, centerY);
+
+            //Grab the image reference and move it to the correct place
+            Canvas.SetLeft(player.instrumentOverlay[0], point.X - centerX);
+            Canvas.SetTop(player.instrumentOverlay[0], point.Y - centerY);
+
+            player.instrumentOverlay[0].RenderTransform = new RotateTransform(angle, centerX, centerY);
         }
 
         public void checkStrum(MainWindow.Player player, JointType joint)
@@ -191,19 +197,19 @@ namespace Moto
 
             if (neckDist > 0.7)
             {
-                return new BitmapImage(new Uri("images/guitar-green.png", UriKind.Relative));
+                return new BitmapImage(new Uri("images/guitar-overlays/green.png", UriKind.Relative));
             }
             else if (neckDist > 0.55)
             {
-                return new BitmapImage(new Uri("images/guitar-red.png", UriKind.Relative));
+                return new BitmapImage(new Uri("images/guitar-overlays/red.png", UriKind.Relative));
             }
             else if (neckDist > 0.4)
             {
-                return new BitmapImage(new Uri("images/guitar-yellow.png", UriKind.Relative));
+                return new BitmapImage(new Uri("images/guitar-overlays/yellow.png", UriKind.Relative));
             }
             else
             {
-                return new BitmapImage(new Uri("images/guitar-blue.png", UriKind.Relative));
+                return new BitmapImage(new Uri("images/guitar-overlays/blue.png", UriKind.Relative));
             }
         }
     }
