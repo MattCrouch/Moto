@@ -1,5 +1,14 @@
 CHANGELOG
 =========
+0.5.2.9 - 2/5/12
+----------------
+(This update may require you to uninstall and [redownload Moto](http://mattcrouch.net/moto/download "Direct link to download file") manually)
+
+- Band Mode now has a keyboard. Select it as you would from the menu or say 'Switch to Keyboard' while Moto is listening
+- The guitar now has strings
+- The Kinect Guide gesture now has reduced amounts of false positives
+- Moto now has a newer, higher-definition icon.
+
 0.5.2.5 - 30/4/12
 -----------------
 - Correct fatal error handling inside Moto. Visual feedback will instruct you on what action you need to take if it ever happens
