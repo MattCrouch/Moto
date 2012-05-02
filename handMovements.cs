@@ -202,7 +202,7 @@ namespace Moto
 
             if (LeftSwipeRight != null)
             {
-                if (difference[skeleton.TrackingId][JointType.HandLeft].X > 0.05)
+                if (difference[skeleton.TrackingId][JointType.HandLeft].X > 0.04)
                 {
                     if (leftSwipeRightIn == null)
                     {

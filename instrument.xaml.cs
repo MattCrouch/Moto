@@ -888,20 +888,23 @@ namespace Moto
 
         private void menuTick()
         {
-            Skeleton player = MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton;
+            if (handMovements.leftSwipeRightIn == null)
+            {
+                Skeleton player = MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton;
 
-            if (menuScrollDirection == handMovements.scrollDirection.SmallDown || menuScrollDirection == handMovements.scrollDirection.LargeDown)
-            {
-                if (menuPosition > 0)
+                if (menuScrollDirection == handMovements.scrollDirection.SmallDown || menuScrollDirection == handMovements.scrollDirection.LargeDown)
                 {
-                    animateMenu(false);
+                    if (menuPosition > 0)
+                    {
+                        animateMenu(false);
+                    }
                 }
-            }
-            else if (menuScrollDirection == handMovements.scrollDirection.SmallUp || menuScrollDirection == handMovements.scrollDirection.LargeUp)
-            {
-                if (menuPosition < kinectGuideMenu.Length - 1)
+                else if (menuScrollDirection == handMovements.scrollDirection.SmallUp || menuScrollDirection == handMovements.scrollDirection.LargeUp)
                 {
-                    animateMenu(true);
+                    if (menuPosition < kinectGuideMenu.Length - 1)
+                    {
+                        animateMenu(true);
+                    }
                 }
             }
         }
