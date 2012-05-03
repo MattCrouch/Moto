@@ -9,6 +9,7 @@ using Coding4Fun.Kinect.Wpf;
 using Moto.Speech;
 using System.Windows.Media.Animation;
 using System.Collections.Generic;
+using Microsoft.Speech.Recognition;
 
 namespace Moto
 {
@@ -79,6 +80,8 @@ namespace Moto
         {
             MainWindow.mySpeechRecognizer.SaidSomething += this.RecognizerSaidSomething;
             MainWindow.mySpeechRecognizer.ListeningChanged += this.ListeningChanged;
+
+            //MainWindow.mySpeechRecognizer.switchGrammar(new Choices[] { MainWindow.mySpeechRecognizer.startScreenChoices }, true, true); 
         }
 
         private void setupVoiceVisuals()
@@ -307,7 +310,6 @@ namespace Moto
         private void RecognizerSaidSomething(object sender, SpeechRecognizer.SaidSomethingEventArgs e)
         {
             //What to do when we're pretty certain the player said something we know
-
             if (e.Verb == SpeechRecognizer.Verbs.SpeechStart || e.Verb == SpeechRecognizer.Verbs.SpeechStop || e.Verb == SpeechRecognizer.Verbs.None)
             {
                 return;
@@ -334,6 +336,7 @@ namespace Moto
 
         private void showConfirmation(SpeechRecognizer.SaidSomethingEventArgs e)
         {
+            MainWindow.mySpeechRecognizer.switchGrammar(new Choices[] { MainWindow.mySpeechRecognizer.booleanChoices }, false, false);
             voiceConfirmEvent = e;
 
             switch (voiceConfirmEvent.Verb)
@@ -364,10 +367,22 @@ namespace Moto
         private void actOnVoiceDecision(bool trigger)
         {
             removeConfirmationTime();
+            
             voicePromptVisual(false);
             if (trigger)
             {
                 voiceGoDoThis(voiceConfirmEvent);
+            }
+            else
+            {
+                if (MainWindow.mySpeechRecognizer.paused)
+                {
+                    MainWindow.mySpeechRecognizer.switchGrammar(new Choices[] { MainWindow.mySpeechRecognizer.startScreenChoices, MainWindow.mySpeechRecognizer.kinectMotorChoices }, true, true);
+                }
+                else
+                {
+                    MainWindow.mySpeechRecognizer.switchGrammar(new Choices[] { MainWindow.mySpeechRecognizer.startScreenChoices, MainWindow.mySpeechRecognizer.kinectMotorChoices }, false, false);
+                }
             }
         }
 
@@ -393,11 +408,13 @@ namespace Moto
                 confirmationVisual.Height = 50;
                 Canvas.SetTop(confirmationVisual, (MainCanvas.ActualHeight - confirmationVisual.Height - 15));
                 Canvas.SetLeft(confirmationVisual, 75);
+                MainWindow.animateSlide(imgMotoLogo, true);
             }
             else
             {
                 showingConfirmDialog = false;
                 MainWindow.animateSlide(confirmationVisual, true);
+                MainWindow.animateSlide(imgMotoLogo);
             }
         }
 
@@ -406,12 +423,12 @@ namespace Moto
             if (e.Paused)
             {
                 MainWindow.mySpeechRecognizer.stopListening(MainCanvas);
-                MainWindow.animateSlide(imgMotoLogo, false);
+                MainWindow.mySpeechRecognizer.switchGrammar(new Choices[] { MainWindow.mySpeechRecognizer.startScreenChoices, MainWindow.mySpeechRecognizer.kinectMotorChoices }, true, true);
             }
             else
             {
                 MainWindow.mySpeechRecognizer.startListening(MainCanvas);
-                MainWindow.animateSlide(imgMotoLogo, true);
+                MainWindow.mySpeechRecognizer.switchGrammar(new Choices[] { MainWindow.mySpeechRecognizer.startScreenChoices, MainWindow.mySpeechRecognizer.kinectMotorChoices, MainWindow.mySpeechRecognizer.stopListeningChoices }, false, false);
             }
         }
 
@@ -430,15 +447,19 @@ namespace Moto
                     break;
                 case SpeechRecognizer.Verbs.KinectUp:
                     MainWindow.adjustKinectAngle(8);
+                    MainWindow.mySpeechRecognizer.switchGrammar(new Choices[] { MainWindow.mySpeechRecognizer.startScreenChoices, MainWindow.mySpeechRecognizer.kinectMotorChoices }, true, true);
                     break;
                 case SpeechRecognizer.Verbs.KinectUpSmall:
                     MainWindow.adjustKinectAngle(4);
+                    MainWindow.mySpeechRecognizer.switchGrammar(new Choices[] { MainWindow.mySpeechRecognizer.startScreenChoices, MainWindow.mySpeechRecognizer.kinectMotorChoices }, true, true);
                     break;
                 case SpeechRecognizer.Verbs.KinectDown:
                     MainWindow.adjustKinectAngle(-8);
+                    MainWindow.mySpeechRecognizer.switchGrammar(new Choices[] { MainWindow.mySpeechRecognizer.startScreenChoices, MainWindow.mySpeechRecognizer.kinectMotorChoices }, true, true);
                     break;
                 case SpeechRecognizer.Verbs.KinectDownSmall:
                     MainWindow.adjustKinectAngle(-4);
+                    MainWindow.mySpeechRecognizer.switchGrammar(new Choices[] { MainWindow.mySpeechRecognizer.startScreenChoices, MainWindow.mySpeechRecognizer.kinectMotorChoices }, true, true);
                     break;
             }
         }

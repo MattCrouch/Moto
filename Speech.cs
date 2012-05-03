@@ -24,12 +24,25 @@ namespace Moto.Speech
 
     public class SpeechRecognizer : IDisposable
     {
-        private readonly Dictionary<string, WhatSaid> startScreenPhrases = new Dictionary<string, WhatSaid>
+        private readonly Dictionary<string, WhatSaid> startListeningPhrases = new Dictionary<string, WhatSaid>
             {
                 { "Kinect", new WhatSaid { Verb = Verbs.SpeechStart} },
                 { "Moto", new WhatSaid { Verb = Verbs.SpeechStart} },
                 { "Mowtow", new WhatSaid { Verb = Verbs.SpeechStart} },
+            };
+
+        private readonly Dictionary<string, WhatSaid> voicePromptPhrases = new Dictionary<string, WhatSaid>
+            {
+                { " ", new WhatSaid { Verb = Verbs.SpeechStart} },
+            };
+
+        private readonly Dictionary<string, WhatSaid> stopListeningPhrases = new Dictionary<string, WhatSaid>
+            {
                 { "Stop Listening", new WhatSaid { Verb = Verbs.SpeechStop} },
+            };
+
+        private readonly Dictionary<string, WhatSaid> startScreenPhrases = new Dictionary<string, WhatSaid>
+            {
                 { "Play an Instrument", new WhatSaid { Verb = Verbs.Instrument} },
                 { "Band Mode", new WhatSaid { Verb = Verbs.Instrument} },
                 { "Play Band Mode", new WhatSaid { Verb = Verbs.Instrument} },
@@ -49,6 +62,8 @@ namespace Moto.Speech
                 { "Stop Metronome", new WhatSaid { Verb = Verbs.StopMetronome } },
                 { "Back to Instruments", new WhatSaid { Verb = Verbs.BackToInstruments } },
                 { "Go Back", new WhatSaid { Verb = Verbs.ReturnToStart } },
+                { "Close", new WhatSaid { Verb = Verbs.Close } },
+                { "Goodbye", new WhatSaid { Verb = Verbs.Close } },
             };
 
         private readonly Dictionary<string, WhatSaid> booleanPhrases = new Dictionary<string, WhatSaid>
@@ -73,6 +88,9 @@ namespace Moto.Speech
                 { "8 Bit", new WhatSaid { Verb = Verbs.EightBitWall } },
                 { "Technologic", new WhatSaid { Verb = Verbs.TechnologicWall } },
                 { "Drum Wall", new WhatSaid { Verb = Verbs.DrumWall } },
+                { "Take a Picture", new WhatSaid { Verb = Verbs.Capture } },
+                { "Close", new WhatSaid { Verb = Verbs.Close } },
+                { "Goodbye", new WhatSaid { Verb = Verbs.Close } },
             };
 
         private readonly Dictionary<string, WhatSaid> kinectMotorPhrases = new Dictionary<string, WhatSaid>
@@ -85,7 +103,7 @@ namespace Moto.Speech
 
         private SpeechRecognitionEngine sre;
         private KinectAudioSource kinectAudioSource;
-        private bool paused = true;
+        public bool paused = true;
         private bool isDisposed;
         private bool speechEnabled = true;
 
@@ -100,6 +118,14 @@ namespace Moto.Speech
 
         public event EventHandler<SaidSomethingEventArgs> SaidSomething;
         public event EventHandler<ListeningChangedEventArgs> ListeningChanged;
+
+        public Choices startListeningChoices;
+        public Choices stopListeningChoices;
+        public Choices booleanChoices;
+        public Choices kinectMotorChoices;
+        public Choices startScreenChoices;
+        public Choices instrumentChoices;
+        public Choices wallChoices;
 
         public enum Verbs
         {
@@ -228,6 +254,37 @@ namespace Moto.Speech
             this.sre.RecognizeAsync(RecognizeMode.Multiple);
         }
 
+        public void switchGrammar(Choices[] choices, bool prefixed = true, bool startListeningKeywords = true) {
+            this.sre.UnloadAllGrammars();
+
+            if (prefixed)
+            {
+                var gb = new GrammarBuilder(startListeningChoices);
+                Choices allChoices = new Choices();
+                
+                foreach (var c in choices)
+                {
+                    allChoices.Add(c);
+                }
+
+                gb.Append(allChoices);
+
+                this.sre.LoadGrammar(new Grammar(gb));
+            }
+            else
+            {
+                foreach (var g in choices)
+                {
+                    this.sre.LoadGrammar(new Grammar(g));
+                }
+            }
+
+            if (startListeningKeywords)
+            {
+                this.sre.LoadGrammar(new Grammar(startListeningChoices));
+            }
+        }
+
         public void Stop()
         {
             this.CheckDisposed();
@@ -300,34 +357,46 @@ namespace Moto.Speech
 
         private void LoadGrammar(SpeechRecognitionEngine speechRecognitionEngine)
         {
-            var startScreen = new Choices();
-            foreach (var phrase in this.startScreenPhrases)
+            startListeningChoices = new Choices();
+            foreach (var phrase in this.startListeningPhrases)
             {
-                startScreen.Add(phrase.Key);
+                startListeningChoices.Add(phrase.Key);
             }
 
-            var boolean = new Choices();
+            stopListeningChoices = new Choices();
+            foreach (var phrase in this.stopListeningPhrases)
+            {
+                stopListeningChoices.Add(phrase.Key);
+            }
+
+            booleanChoices = new Choices();
             foreach (var phrase in this.booleanPhrases)
             {
-                boolean.Add(phrase.Key);
+                booleanChoices.Add(phrase.Key);
             }
 
-            var instrument = new Choices();
-            foreach (var phrase in this.instrumentPhrases)
-            {
-                instrument.Add(phrase.Key);
-            }
-
-            var wall = new Choices();
-            foreach (var phrase in this.wallPhrases)
-            {
-                wall.Add(phrase.Key);
-            }
-
-            var kinectMotor = new Choices();
+            kinectMotorChoices = new Choices();
             foreach (var phrase in this.kinectMotorPhrases)
             {
-                kinectMotor.Add(phrase.Key);
+                kinectMotorChoices.Add(phrase.Key);
+            }
+
+            startScreenChoices = new Choices();
+            foreach (var phrase in this.startScreenPhrases)
+            {
+                startScreenChoices.Add(phrase.Key);
+            }
+
+            instrumentChoices = new Choices();
+            foreach (var phrase in this.instrumentPhrases)
+            {
+                instrumentChoices.Add(phrase.Key);
+            }
+
+            wallChoices = new Choices();
+            foreach (var phrase in this.wallPhrases)
+            {
+                wallChoices.Add(phrase.Key);
             }
 
             /*
@@ -338,18 +407,17 @@ namespace Moto.Speech
              */
 
             var allChoices = new Choices();
-            allChoices.Add(startScreen);
-            allChoices.Add(boolean);
-            allChoices.Add(instrument);
-            allChoices.Add(wall);
-            allChoices.Add(kinectMotor);
+            allChoices.Add(startScreenChoices);
+            allChoices.Add(kinectMotorChoices);
 
             // This is needed to ensure that it will work on machines with any culture, not just en-us.
-            var gb = new GrammarBuilder { Culture = speechRecognitionEngine.RecognizerInfo.Culture };
+            var gb = new GrammarBuilder(startListeningChoices) { Culture = speechRecognitionEngine.RecognizerInfo.Culture };
             gb.Append(allChoices);
 
             var g = new Grammar(gb);
+            var g2 = new Grammar(startListeningChoices);
             speechRecognitionEngine.LoadGrammar(g);
+            speechRecognitionEngine.LoadGrammar(g2);
             speechRecognitionEngine.SpeechRecognized += this.SreSpeechRecognized;
             speechRecognitionEngine.SpeechHypothesized += this.SreSpeechHypothesized;
             speechRecognitionEngine.SpeechRecognitionRejected += this.SreSpeechRecognitionRejected;
@@ -357,17 +425,17 @@ namespace Moto.Speech
 
         private void SreSpeechRecognitionRejected(object sender, SpeechRecognitionRejectedEventArgs e)
         {
-            if (speechEnabled)
+            /*if (speechEnabled)
             {
-                /*var said = new SaidSomethingEventArgs { Verb = Verbs.None, Matched = "?" };
+                var said = new SaidSomethingEventArgs { Verb = Verbs.None, Matched = "?" };
 
                 if (this.SaidSomething != null)
                 {
                     this.SaidSomething(new object(), said);
                 }
 
-                Console.WriteLine("\nSpeech Rejected");*/
-            }
+                Console.WriteLine("\nSpeech Rejected");
+            }*/
         }
 
         private void SreSpeechHypothesized(object sender, SpeechHypothesizedEventArgs e)
@@ -384,7 +452,7 @@ namespace Moto.Speech
             {
                 Console.WriteLine("\rSpeech Recognized: \t{0} - \t{1}", e.Result.Text, e.Result.Confidence);
 
-                if ((this.SaidSomething == null) || (e.Result.Confidence < 0.3))
+                if ((this.SaidSomething == null) || (e.Result.Confidence < 0.65))
                 {
                     return;
                 }
@@ -397,14 +465,14 @@ namespace Moto.Speech
                 var said = new SaidSomethingEventArgs { Verb = 0, Phrase = e.Result.Text };
 
                 // Look for a match in the order of the lists below, first match wins.
-                List<Dictionary<string, WhatSaid>> allDicts = new List<Dictionary<string, WhatSaid>> { this.startScreenPhrases, this.booleanPhrases, this.instrumentPhrases, this.wallPhrases, this.kinectMotorPhrases };
+                List<Dictionary<string, WhatSaid>> allDicts = new List<Dictionary<string, WhatSaid>> { this.startListeningPhrases, this.stopListeningPhrases, this.booleanPhrases, this.kinectMotorPhrases, this.startScreenPhrases, this.instrumentPhrases, this.wallPhrases };
 
                 bool found = false;
                 for (int i = 0; i < allDicts.Count && !found; ++i)
                 {
                     foreach (var phrase in allDicts[i])
                     {
-                        if (e.Result.Text == phrase.Key)
+                        if (e.Result.Text.EndsWith(phrase.Key))
                         {
                             said.Verb = phrase.Value.Verb;
                             said.Matched = phrase.Key;
@@ -439,11 +507,11 @@ namespace Moto.Speech
                     {
                         toggleListening(false);
                     }
+                }
 
-                    if (this.SaidSomething != null)
-                    {
-                        this.SaidSomething(new object(), said);
-                    }
+                if (this.SaidSomething != null)
+                {
+                    this.SaidSomething(new object(), said);
                 }
             }
         }

@@ -7,6 +7,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using Microsoft.Speech.Recognition;
 using Coding4Fun.Kinect.Wpf;
 using Microsoft.Kinect;
 using Moto.Speech;
@@ -134,6 +135,8 @@ namespace Moto
         {
             MainWindow.mySpeechRecognizer.SaidSomething += this.RecognizerSaidSomething;
             MainWindow.mySpeechRecognizer.ListeningChanged += this.ListeningChanged;
+
+            MainWindow.mySpeechRecognizer.switchGrammar(new Choices[] { MainWindow.mySpeechRecognizer.instrumentChoices, MainWindow.mySpeechRecognizer.kinectMotorChoices }, true, true);
         }
 
         private void setupVoiceVisuals()
@@ -384,6 +387,7 @@ namespace Moto
 
         private void showConfirmation(SpeechRecognizer.SaidSomethingEventArgs e)
         {
+            MainWindow.mySpeechRecognizer.switchGrammar(new Choices[] { MainWindow.mySpeechRecognizer.booleanChoices }, false, false);
             voiceConfirmEvent = e;
 
             switch (voiceConfirmEvent.Verb)
@@ -421,6 +425,17 @@ namespace Moto
             {
                 voiceGoDoThis(voiceConfirmEvent);
             }
+            else
+            {
+                if (MainWindow.mySpeechRecognizer.paused)
+                {
+                    MainWindow.mySpeechRecognizer.switchGrammar(new Choices[] { MainWindow.mySpeechRecognizer.instrumentChoices, MainWindow.mySpeechRecognizer.kinectMotorChoices }, true, true);
+                }
+                else
+                {
+                    MainWindow.mySpeechRecognizer.switchGrammar(new Choices[] { MainWindow.mySpeechRecognizer.instrumentChoices, MainWindow.mySpeechRecognizer.kinectMotorChoices }, false, false);
+                }
+            }
         }
 
         private void removeConfirmationTime()
@@ -455,6 +470,11 @@ namespace Moto
 
         void voiceGoDoThis(SpeechRecognizer.SaidSomethingEventArgs voiceCommand)
         {
+            if (voiceCommand.Verb != SpeechRecognizer.Verbs.ReturnToStart || voiceCommand.Verb != SpeechRecognizer.Verbs.Close)
+            {
+                MainWindow.mySpeechRecognizer.switchGrammar(new Choices[] { MainWindow.mySpeechRecognizer.instrumentChoices, MainWindow.mySpeechRecognizer.kinectMotorChoices }, true, true);
+            }
+
             switch (voiceCommand.Verb)
             {
                 case SpeechRecognizer.Verbs.DrumsSwitch:
@@ -505,10 +525,12 @@ namespace Moto
             if (e.Paused)
             {
                 MainWindow.mySpeechRecognizer.stopListening(MainCanvas);
+                MainWindow.mySpeechRecognizer.switchGrammar(new Choices[] { MainWindow.mySpeechRecognizer.instrumentChoices, MainWindow.mySpeechRecognizer.kinectMotorChoices }, true, true);
             }
             else
             {
                 MainWindow.mySpeechRecognizer.startListening(MainCanvas);
+                MainWindow.mySpeechRecognizer.switchGrammar(new Choices[] { MainWindow.mySpeechRecognizer.instrumentChoices, MainWindow.mySpeechRecognizer.kinectMotorChoices, MainWindow.mySpeechRecognizer.stopListeningChoices }, false, false);
             }
         }
         #endregion
@@ -562,29 +584,32 @@ namespace Moto
 
         private void switchInstrument(MainWindow.Player player, instrumentList instrument)
         {
-            //Hide all the instrument-specific overlays & set the new instrument
-            if (MainWindow.activeSkeletons.ContainsKey(player.skeleton.TrackingId))
+            if (player.instrument != instrument)
             {
-                manageInstrumentImage(MainWindow.activeSkeletons[player.skeleton.TrackingId], instrument);
-
-                switch (instrument)
+                //Hide all the instrument-specific overlays & set the new instrument
+                if (MainWindow.activeSkeletons.ContainsKey(player.skeleton.TrackingId))
                 {
-                    case instrumentList.Drums:
-                        setupDrums(MainWindow.activeSkeletons[player.skeleton.TrackingId]);
-                        MainWindow.activeSkeletons[player.skeleton.TrackingId].mode = MainWindow.PlayerMode.None;
-                        break;
-                    case instrumentList.GuitarLeft:
-                    case instrumentList.GuitarRight:
-                        setupGuitar(MainWindow.activeSkeletons[player.skeleton.TrackingId]);
-                        MainWindow.activeSkeletons[player.skeleton.TrackingId].mode = MainWindow.PlayerMode.Acoustic;
-                        break;
-                    case instrumentList.Keyboard:
-                        setupKeyboard(MainWindow.activeSkeletons[player.skeleton.TrackingId]);
-                        MainWindow.activeSkeletons[player.skeleton.TrackingId].mode = MainWindow.PlayerMode.None;
-                        break;
-                }
+                    manageInstrumentImage(MainWindow.activeSkeletons[player.skeleton.TrackingId], instrument);
 
-                MainWindow.activeSkeletons[player.skeleton.TrackingId].instrument = instrument;
+                    switch (instrument)
+                    {
+                        case instrumentList.Drums:
+                            setupDrums(MainWindow.activeSkeletons[player.skeleton.TrackingId]);
+                            MainWindow.activeSkeletons[player.skeleton.TrackingId].mode = MainWindow.PlayerMode.None;
+                            break;
+                        case instrumentList.GuitarLeft:
+                        case instrumentList.GuitarRight:
+                            setupGuitar(MainWindow.activeSkeletons[player.skeleton.TrackingId]);
+                            MainWindow.activeSkeletons[player.skeleton.TrackingId].mode = MainWindow.PlayerMode.Acoustic;
+                            break;
+                        case instrumentList.Keyboard:
+                            setupKeyboard(MainWindow.activeSkeletons[player.skeleton.TrackingId]);
+                            MainWindow.activeSkeletons[player.skeleton.TrackingId].mode = MainWindow.PlayerMode.None;
+                            break;
+                    }
+
+                    MainWindow.activeSkeletons[player.skeleton.TrackingId].instrument = instrument;
+                }
             }
         }
 

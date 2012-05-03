@@ -10,6 +10,7 @@ using System.Windows.Threading;
 using System.IO;
 using System.Text;
 using System.Threading;
+using Microsoft.Speech.Recognition;
 using Microsoft.Kinect;
 using Coding4Fun.Kinect.Wpf;
 using Moto.Speech;
@@ -195,6 +196,8 @@ namespace Moto
         {
             MainWindow.mySpeechRecognizer.SaidSomething += this.RecognizerSaidSomething;
             MainWindow.mySpeechRecognizer.ListeningChanged += this.ListeningChanged;
+
+            MainWindow.mySpeechRecognizer.switchGrammar(new Choices[] { MainWindow.mySpeechRecognizer.wallChoices, MainWindow.mySpeechRecognizer.kinectMotorChoices }, true, true);
         }
 
         private void setupVoiceVisuals()
@@ -995,6 +998,8 @@ namespace Moto
 
         private void showConfirmation(SpeechRecognizer.SaidSomethingEventArgs e)
         {
+            MainWindow.mySpeechRecognizer.switchGrammar(new Choices[] { MainWindow.mySpeechRecognizer.booleanChoices }, false, false);
+
             voiceConfirmEvent = e;
 
             switch (e.Verb)
@@ -1035,6 +1040,17 @@ namespace Moto
             {
                 voiceGoDoThis(voiceConfirmEvent);
             }
+            else
+            {
+                if (MainWindow.mySpeechRecognizer.paused)
+                {
+                    MainWindow.mySpeechRecognizer.switchGrammar(new Choices[] { MainWindow.mySpeechRecognizer.wallChoices, MainWindow.mySpeechRecognizer.kinectMotorChoices }, true, true);
+                }
+                else
+                {
+                    MainWindow.mySpeechRecognizer.switchGrammar(new Choices[] { MainWindow.mySpeechRecognizer.wallChoices, MainWindow.mySpeechRecognizer.kinectMotorChoices }, false, false);
+                }
+            }
         }
 
         private void removeConfirmationTime()
@@ -1070,6 +1086,11 @@ namespace Moto
 
         void voiceGoDoThis(SpeechRecognizer.SaidSomethingEventArgs voiceCommand)
         {
+            if (voiceCommand.Verb != SpeechRecognizer.Verbs.ReturnToStart || voiceCommand.Verb != SpeechRecognizer.Verbs.Close)
+            {
+                MainWindow.mySpeechRecognizer.switchGrammar(new Choices[] { MainWindow.mySpeechRecognizer.wallChoices, MainWindow.mySpeechRecognizer.kinectMotorChoices }, true, true);
+            }
+
             switch (voiceCommand.Verb)
             {
                 case SpeechRecognizer.Verbs.CustomWall:
@@ -1128,10 +1149,12 @@ namespace Moto
             if (e.Paused)
             {
                 MainWindow.mySpeechRecognizer.stopListening(MainCanvas);
+                MainWindow.mySpeechRecognizer.switchGrammar(new Choices[] { MainWindow.mySpeechRecognizer.wallChoices, MainWindow.mySpeechRecognizer.kinectMotorChoices }, true, true);
             }
             else
             {
                 MainWindow.mySpeechRecognizer.startListening(MainCanvas);
+                MainWindow.mySpeechRecognizer.switchGrammar(new Choices[] { MainWindow.mySpeechRecognizer.wallChoices, MainWindow.mySpeechRecognizer.kinectMotorChoices }, false, false);
             }
         }
         #endregion
@@ -1606,7 +1629,7 @@ namespace Moto
             uploadPicture(captureImage((BitmapSource)userImage.Source));
             imgGetReady.Visibility = Visibility.Hidden;
             imgCamera.Visibility = Visibility.Hidden;
-            toggleRGB(ColorImageFormat.RgbResolution640x480Fps30, playerFocus.Picture, 5000);
+            toggleRGB(ColorImageFormat.RgbResolution640x480Fps30, playerFocus.None, 5000);
         }
 
         private void toggleRGB(ColorImageFormat format, playerFocus processFocus, int delay = 3000)
