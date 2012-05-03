@@ -1095,23 +1095,38 @@ namespace Moto
             {
                 case SpeechRecognizer.Verbs.CustomWall:
                     //Switch to the Custom wall
-                    wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], menuOptions.CustomWall);
+                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
+                    {
+                        wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], menuOptions.CustomWall);
+                    }
                     break;
                 case SpeechRecognizer.Verbs.CreateWall:
                     //Record new samples for the Custom wall
-                    wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], menuOptions.RecordNewWall);
+                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
+                    {
+                        wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], menuOptions.RecordNewWall);
+                    }
                     break;
                 case SpeechRecognizer.Verbs.EightBitWall:
-                    wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], menuOptions.EightBit);
+                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
+                    {
+                        wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], menuOptions.EightBit);
+                    }
                     //Switch to the 8-bit Wall
                     break;
                 case SpeechRecognizer.Verbs.TechnologicWall:
-                    wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], menuOptions.Technologic);
+                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
+                    {
+                        wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], menuOptions.Technologic);
+                    }
                     //Switch to the Technologic wall
                     break;
                 case SpeechRecognizer.Verbs.DrumWall:
                     //Switch to the Drum Samples wall
-                    wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], menuOptions.Drum);
+                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
+                    {
+                        wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], menuOptions.Drum);
+                    }
                     break;
                 case SpeechRecognizer.Verbs.KinectUp:
                     //Angle Kinect up
