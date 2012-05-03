@@ -1176,6 +1176,8 @@ namespace Moto
 
         private void wallSwitchPlayerTo(MainWindow.Player player, menuOptions option)
         {
+            removeWallInteractionVisual(player);
+
             if (MainWindow.activeSkeletons.ContainsKey(player.skeleton.TrackingId))
             {
                 switch (option)
@@ -1387,20 +1389,16 @@ namespace Moto
                     MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].mode = MainWindow.PlayerMode.Create;
                     break;
                 case menuOptions.CustomWall:
-                    MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].mode = MainWindow.PlayerMode.Custom;
-                    customAudio(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
+                    wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], menuOptions.CustomWall);
                     break;
                 case menuOptions.Technologic:
-                    MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].mode = MainWindow.PlayerMode.Technologic;
-                    technologicAudio(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
+                    wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], menuOptions.Technologic);
                     break;
                 case menuOptions.Drum:
-                    MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].mode = MainWindow.PlayerMode.Drum;
-                    drumsetAudio(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
+                    wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], menuOptions.Drum);
                     break;
                 case menuOptions.EightBit:
-                    MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].mode = MainWindow.PlayerMode.EightBit;
-                    eightBitAudio(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
+                    wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], menuOptions.EightBit);
                     break;
             }
         }
