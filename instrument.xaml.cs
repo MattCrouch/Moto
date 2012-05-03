@@ -257,12 +257,7 @@ namespace Moto
                     //Remove them
                     for (int i = 0; i < activeList.Count; i++)
                     {
-                        MainCanvas.Children.Remove(MainWindow.activeSkeletons[activeList[i]].instrumentImage);
-                        clearInstrumentRefs(MainWindow.activeSkeletons[activeList[i]]);
-                        MainWindow.playerRemoved(activeList[i]);
-                        hitArea.Remove(activeList[i]);
-                        insideArea.Remove(activeList[i]);
-                        keyArea.Remove(activeList[i]);
+                        removePlayerInstrument(MainWindow.activeSkeletons[activeList[i]]);
                     }
 
                     activeList = null;
@@ -275,6 +270,19 @@ namespace Moto
                     handMovements.listenForGestures(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton);
                 }
             }
+        }
+
+        private void removePlayerInstrument(MainWindow.Player player)
+        {
+            MainCanvas.Children.Remove(player.instrumentImage);
+            
+            foreach (var overlay in player.instrumentOverlay)
+            {
+                MainCanvas.Children.Remove(overlay.Value);
+            }
+
+            clearInstrumentRefs(player);
+            MainWindow.playerRemoved(player.skeleton.TrackingId);
         }
 
         private void instrumentUpdate(MainWindow.Player player)
@@ -1106,6 +1114,10 @@ namespace Moto
                 case instrumentList.GuitarRight:
                     strumArea.Remove(player.skeleton.TrackingId);
                     insideStrumArea.Remove(player.skeleton.TrackingId);
+                    break;
+                case instrumentList.Keyboard:
+                    keyArea.Remove(player.skeleton.TrackingId);
+                    insideKey.Remove(player.skeleton.TrackingId);
                     break;
             }
         }
