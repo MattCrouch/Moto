@@ -112,6 +112,8 @@ namespace Moto
         private DispatcherTimer imgProcessDelay;
         private TextBlock uploadFeedback;
         private Image cameraUpload;
+        private DispatcherTimer uploadFeedbackTimer;
+        private bool removeFeedback;
 
         //Kinect error imagery
         Image kinectError;
@@ -723,13 +725,18 @@ namespace Moto
                 uploadString = System.Text.Encoding.UTF8.GetString(e.Result, 0, e.Result.Length);
             }
 
+            showUploadFeedback(uploadString);
+        }
+
+        private void showUploadFeedback(string uploadString)
+        {
             //WHAT HAPPENS WHEN THE UPLOAD HAS FINISHED
             uploadFeedback = new TextBlock();
             uploadFeedback.FontFamily = new FontFamily(new Uri("pack://application:,,,/Fonts/La-chata-normal.ttf"), "La Chata");
             uploadFeedback.FontSize = 40;
             uploadFeedback.Foreground = new SolidColorBrush(Color.FromRgb(230, 229, 255));
             uploadFeedback.Text = uploadString;
-      
+
             cameraUpload = new Image();
             cameraUpload.Source = new BitmapImage(new Uri("/Moto;component/images/camera-game.png", UriKind.Relative));
             cameraUpload.Width = 70;
@@ -741,6 +748,32 @@ namespace Moto
 
             MainWindow.animateSlide(uploadFeedback);
             MainWindow.animateSlide(cameraUpload);
+
+            removeFeedback = false;
+
+            uploadFeedbackTimer = new DispatcherTimer();
+            uploadFeedbackTimer.Interval = TimeSpan.FromSeconds(5);
+            uploadFeedbackTimer.Tick += new EventHandler(uploadFeedbackTimer_Tick);
+            uploadFeedbackTimer.Start();
+        }
+
+        void uploadFeedbackTimer_Tick(object sender, EventArgs e)
+        {
+            if (!removeFeedback)
+            {
+                MainWindow.animateSlide(uploadFeedback,true);
+                MainWindow.animateSlide(cameraUpload,true);
+
+                removeFeedback = true;
+            }
+            else
+            {
+                MainCanvas.Children.Remove(uploadFeedback);
+                MainCanvas.Children.Remove(cameraUpload);
+
+                uploadFeedback = null;
+                cameraUpload = null;
+            }
         }
 
         void Client_UploadProgressChanged(object sender, System.Net.UploadProgressChangedEventArgs e)
@@ -1267,17 +1300,7 @@ namespace Moto
                 startCaptureAnim();
             }
 
-            if (uploadFeedback != null)
-            {
-                MainCanvas.Children.Remove(uploadFeedback);
-                uploadFeedback = null;
-            }
-
-            if (cameraUpload != null)
-            {
-                MainCanvas.Children.Remove(cameraUpload);
-                cameraUpload = null;
-            }
+            
         }
     }
 }

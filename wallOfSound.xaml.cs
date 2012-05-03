@@ -85,6 +85,16 @@ namespace Moto
         Dictionary<SpeechRecognizer.Verbs, BitmapImage> voiceVisuals = new Dictionary<SpeechRecognizer.Verbs, BitmapImage>();
         Image confirmationVisual = new Image();
 
+        //Camera variables
+        private Storyboard flashStoryboard;
+        private Rectangle cameraFlash;
+        private DispatcherTimer pictureCountdown;
+        private DispatcherTimer imgProcessDelay;
+        private TextBlock uploadFeedback;
+        private Image cameraUpload;
+        private DispatcherTimer uploadFeedbackTimer;
+        private bool removeFeedback;
+
         //Kinect Guide variables
         DispatcherTimer kinectGuideTimer;
         DispatcherTimer menuMovementTimer;
@@ -1243,22 +1253,25 @@ namespace Moto
 
         private void menuTick()
         {
-            if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
+            if (handMovements.leftSwipeRightIn == null)
             {
-                Skeleton player = MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton;
+                if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
+                {
+                    Skeleton player = MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton;
 
-                if (menuScrollDirection == handMovements.scrollDirection.SmallDown || menuScrollDirection == handMovements.scrollDirection.LargeDown)
-                {
-                    if (menuPosition > 0)
+                    if (menuScrollDirection == handMovements.scrollDirection.SmallDown || menuScrollDirection == handMovements.scrollDirection.LargeDown)
                     {
-                        animateMenu(false);
+                        if (menuPosition > 0)
+                        {
+                            animateMenu(false);
+                        }
                     }
-                }
-                else if (menuScrollDirection == handMovements.scrollDirection.SmallUp || menuScrollDirection == handMovements.scrollDirection.LargeUp)
-                {
-                    if (menuPosition < kinectGuideMenu.Length - 1)
+                    else if (menuScrollDirection == handMovements.scrollDirection.SmallUp || menuScrollDirection == handMovements.scrollDirection.LargeUp)
                     {
-                        animateMenu(true);
+                        if (menuPosition < kinectGuideMenu.Length - 1)
+                        {
+                            animateMenu(true);
+                        }
                     }
                 }
             }
@@ -1414,13 +1427,6 @@ namespace Moto
 
 
         #region Image Capture
-        private Storyboard flashStoryboard;
-        private Rectangle cameraFlash;
-        private DispatcherTimer pictureCountdown;
-        private DispatcherTimer imgProcessDelay;
-        private TextBlock uploadFeedback;
-        private Image cameraUpload;
-
         void takeAPicture()
         {
             currentFocus = playerFocus.Picture;
@@ -1476,6 +1482,11 @@ namespace Moto
                 uploadString = System.Text.Encoding.UTF8.GetString(e.Result, 0, e.Result.Length);
             }
 
+            showUploadFeedback(uploadString);
+        }
+
+        private void showUploadFeedback(string uploadString)
+        {
             //WHAT HAPPENS WHEN THE UPLOAD HAS FINISHED
             uploadFeedback = new TextBlock();
             uploadFeedback.FontFamily = new FontFamily(new Uri("pack://application:,,,/Fonts/La-chata-normal.ttf"), "La Chata");
@@ -1494,6 +1505,32 @@ namespace Moto
 
             MainWindow.animateSlide(uploadFeedback);
             MainWindow.animateSlide(cameraUpload);
+
+            removeFeedback = false;
+
+            uploadFeedbackTimer = new DispatcherTimer();
+            uploadFeedbackTimer.Interval = TimeSpan.FromSeconds(5);
+            uploadFeedbackTimer.Tick += new EventHandler(uploadFeedbackTimer_Tick);
+            uploadFeedbackTimer.Start();
+        }
+
+        void uploadFeedbackTimer_Tick(object sender, EventArgs e)
+        {
+            if (!removeFeedback)
+            {
+                MainWindow.animateSlide(uploadFeedback, true);
+                MainWindow.animateSlide(cameraUpload, true);
+
+                removeFeedback = true;
+            }
+            else
+            {
+                MainCanvas.Children.Remove(uploadFeedback);
+                MainCanvas.Children.Remove(cameraUpload);
+
+                uploadFeedback = null;
+                cameraUpload = null;
+            }
         }
 
         void Client_UploadProgressChanged(object sender, System.Net.UploadProgressChangedEventArgs e)
@@ -1625,18 +1662,6 @@ namespace Moto
             if (currentFocus == playerFocus.Picture)
             {
                 startCaptureAnim();
-            }
-
-            if (uploadFeedback != null)
-            {
-                MainCanvas.Children.Remove(uploadFeedback);
-                uploadFeedback = null;
-            }
-
-            if (cameraUpload != null)
-            {
-                MainCanvas.Children.Remove(cameraUpload);
-                cameraUpload = null;
             }
         }
         #endregion
