@@ -94,6 +94,7 @@ namespace Moto
         private Image cameraUpload;
         private DispatcherTimer uploadFeedbackTimer;
         private bool removeFeedback;
+        private playerFocus afterFocus;
 
         //Kinect Guide variables
         DispatcherTimer kinectGuideTimer;
@@ -1429,15 +1430,18 @@ namespace Moto
         #region Image Capture
         void takeAPicture()
         {
-            currentFocus = playerFocus.Picture;
-            toggleRGB(ColorImageFormat.RgbResolution1280x960Fps12);
+            if (currentFocus == playerFocus.None)
+            {
+                currentFocus = playerFocus.Picture;
+                toggleRGB(ColorImageFormat.RgbResolution1280x960Fps12,currentFocus);
 
-            Storyboard sb = this.FindResource("photoPrep") as Storyboard;
-            sb.AutoReverse = false;
-            sb.Begin();
+                Storyboard sb = this.FindResource("photoPrep") as Storyboard;
+                sb.AutoReverse = false;
+                sb.Begin();
 
-            Storyboard sb2 = this.FindResource("photoLoading") as Storyboard;
-            sb2.Begin();
+                Storyboard sb2 = this.FindResource("photoLoading") as Storyboard;
+                sb2.Begin();
+            }
         }
 
         void uploadPicture(string imageAddress)
@@ -1597,37 +1601,27 @@ namespace Moto
 
         void pictureCountdown_Tick(object sender, EventArgs e)
         {
-            currentFocus = playerFocus.None;
             pictureCountdown.Stop();
             pictureCountdown.Tick -= new EventHandler(pictureCountdown_Tick);
             uploadPicture(captureImage((BitmapSource)userImage.Source));
             imgGetReady.Visibility = Visibility.Hidden;
             imgCamera.Visibility = Visibility.Hidden;
-            toggleRGB(ColorImageFormat.RgbResolution640x480Fps30, 5000);
+            toggleRGB(ColorImageFormat.RgbResolution640x480Fps30, playerFocus.Picture, 5000);
         }
 
-        private void toggleRGB(ColorImageFormat format, int delay = 3000)
+        private void toggleRGB(ColorImageFormat format, playerFocus processFocus, int delay = 3000)
         {
             if (MainWindow.sensor.ColorStream.Format != format)
             {
-                foreach (var player in MainWindow.activeSkeletons)
-                {
-                    player.Value.instrumentImage.Visibility = System.Windows.Visibility.Hidden;
-                    if (player.Value.instrumentOverlay != null)
-                    {
-                        foreach (var image in player.Value.instrumentOverlay)
-                        {
-                            image.Value.Visibility = System.Windows.Visibility.Hidden;
-                        }
-                        
-                    }
-                }
+                MainWindow.hidePlayerOverlays();
 
                 MainWindow.sensor.ColorStream.Enable(format);
 
                 MainWindow.colorImageBitmap = new WriteableBitmap(MainWindow.sensor.ColorStream.FrameWidth, MainWindow.sensor.ColorStream.FrameHeight, 96, 96, PixelFormats.Bgr32, null);
                 MainWindow.colorImageBitmapRect = new Int32Rect(0, 0, MainWindow.sensor.ColorStream.FrameWidth, MainWindow.sensor.ColorStream.FrameHeight);
                 MainWindow.colorImageStride = MainWindow.sensor.ColorStream.FrameWidth * MainWindow.sensor.ColorStream.FrameBytesPerPixel;
+
+                afterFocus = processFocus;
 
                 imgProcessDelay = new DispatcherTimer();
                 imgProcessDelay.Interval = TimeSpan.FromMilliseconds(delay);
@@ -1645,19 +1639,11 @@ namespace Moto
                 imgProcessDelay = null;
             }
 
-            foreach (var player in MainWindow.activeSkeletons)
-            {
-                player.Value.instrumentImage.Visibility = System.Windows.Visibility.Visible;
-                if (player.Value.instrumentOverlay != null)
-                {
-                    foreach(var image in player.Value.instrumentOverlay) {
-                        image.Value.Visibility = System.Windows.Visibility.Hidden;
-                    }
-                }
-            }
-
+            MainWindow.showPlayerOverlays();
 
             userImage.Source = MainWindow.colorImageBitmap;
+
+            currentFocus = afterFocus;
 
             if (currentFocus == playerFocus.Picture)
             {

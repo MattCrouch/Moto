@@ -114,6 +114,7 @@ namespace Moto
         private Image cameraUpload;
         private DispatcherTimer uploadFeedbackTimer;
         private bool removeFeedback;
+        private playerFocus afterFocus;
 
         //Kinect error imagery
         Image kinectError;
@@ -676,15 +677,18 @@ namespace Moto
         
         void takeAPicture()
         {
-            currentFocus = playerFocus.Picture;
-            toggleRGB(ColorImageFormat.RgbResolution1280x960Fps12);
+            if (currentFocus == playerFocus.None)
+            {
+                currentFocus = playerFocus.Picture;
+                toggleRGB(ColorImageFormat.RgbResolution1280x960Fps12,currentFocus);
 
-            Storyboard sb = this.FindResource("photoPrep") as Storyboard;
-            sb.AutoReverse = false;
-            sb.Begin();
+                Storyboard sb = this.FindResource("photoPrep") as Storyboard;
+                sb.AutoReverse = false;
+                sb.Begin();
 
-            Storyboard sb2 = this.FindResource("photoLoading") as Storyboard;
-            sb2.Begin();
+                Storyboard sb2 = this.FindResource("photoLoading") as Storyboard;
+                sb2.Begin();
+            }
         }
 
         void uploadPicture(string imageAddress)
@@ -841,13 +845,12 @@ namespace Moto
 
         void pictureCountdown_Tick(object sender, EventArgs e)
         {
-            currentFocus = playerFocus.None;
             pictureCountdown.Stop();
             pictureCountdown.Tick -= new EventHandler(pictureCountdown_Tick);
             uploadPicture(captureImage((BitmapSource)userImage.Source));
             imgGetReady.Visibility = Visibility.Hidden;
             imgCamera.Visibility = Visibility.Hidden;
-            toggleRGB(ColorImageFormat.RgbResolution640x480Fps30, 5000);
+            toggleRGB(ColorImageFormat.RgbResolution640x480Fps30, playerFocus.None, 5000);
         }
 
         #endregion
@@ -1241,11 +1244,11 @@ namespace Moto
                     //Toggle RGB input style
                     if (MainWindow.sensor.ColorStream.Format == ColorImageFormat.RgbResolution640x480Fps30)
                     {
-                        toggleRGB(ColorImageFormat.RgbResolution1280x960Fps12);
+                        toggleRGB(ColorImageFormat.RgbResolution1280x960Fps12,playerFocus.None);
                     }
                     else
                     {
-                        toggleRGB(ColorImageFormat.RgbResolution640x480Fps30);
+                        toggleRGB(ColorImageFormat.RgbResolution640x480Fps30, playerFocus.None);
                     }
                     break;
                 case System.Windows.Input.Key.B:
@@ -1263,7 +1266,7 @@ namespace Moto
             }
         }
 
-        private void toggleRGB(ColorImageFormat format, int delay = 3000)
+        private void toggleRGB(ColorImageFormat format, playerFocus processFocus, int delay = 3000)
         {
             if (MainWindow.sensor.ColorStream.Format != format)
             {
@@ -1274,6 +1277,8 @@ namespace Moto
                 MainWindow.colorImageBitmap = new WriteableBitmap(MainWindow.sensor.ColorStream.FrameWidth, MainWindow.sensor.ColorStream.FrameHeight, 96, 96, PixelFormats.Bgr32, null);
                 MainWindow.colorImageBitmapRect = new Int32Rect(0, 0, MainWindow.sensor.ColorStream.FrameWidth, MainWindow.sensor.ColorStream.FrameHeight);
                 MainWindow.colorImageStride = MainWindow.sensor.ColorStream.FrameWidth * MainWindow.sensor.ColorStream.FrameBytesPerPixel;
+
+                afterFocus = processFocus;
 
                 imgProcessDelay = new DispatcherTimer();
                 imgProcessDelay.Interval = TimeSpan.FromMilliseconds(delay);
@@ -1294,6 +1299,8 @@ namespace Moto
             MainWindow.showPlayerOverlays();
 
             userImage.Source = MainWindow.colorImageBitmap;
+
+            currentFocus = afterFocus;
 
             if (currentFocus == playerFocus.Picture)
             {
