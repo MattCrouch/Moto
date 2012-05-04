@@ -42,6 +42,12 @@ namespace Moto
             if (kinectError != null)
             {
                 MainWindow.animateSlide(kinectError, true, true);
+
+                if (initialisingSpinner != null)
+                {
+                    MainWindow.animateSlide(initialisingSpinner, true, true);
+                    initialisingSpinner = null;
+                }
             }
 
             if (e.Status == KinectStatus.Connected)
@@ -49,7 +55,7 @@ namespace Moto
                 MainWindow.restartMoto();
             }
             else
-            {
+            {                
                 MainWindow.animateFade(imgDimmer, 0, 0.5);
 
                 kinectError = MainWindow.generateError(e.Status);

@@ -452,7 +452,7 @@ namespace Moto.Speech
             {
                 Console.WriteLine("\rSpeech Recognized: \t{0} - \t{1}", e.Result.Text, e.Result.Confidence);
 
-                if ((this.SaidSomething == null) || (e.Result.Confidence < 0.65))
+                if ((this.SaidSomething == null) || (e.Result.Confidence < 0.60))
                 {
                     return;
                 }

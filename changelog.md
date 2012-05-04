@@ -1,5 +1,16 @@
 CHANGELOG
 =========
+0.6.0.0 - 3/5/12
+----------------
+- Voice commands no longer require a visible microphone before working. To voice a command, say "Moto" or "Kinect", then a command and you will see the confirmation appear on screen as normal.
+	- In a later version, saying "Moto/Kinect Help Me" will show a list of commands available to you at that time
+- The photo upload number now is independent of the photo preview phase of the picture taking process. This allows asyncronous uploading of the photo to the website, catering for slower connections
+- The photo upload notifcation will now appear for 5 seconds, and will not stay indefinitely if the upload speed is too slow
+- You now cannot take more than one photo at a time
+- Fixed the bug where guitar overlays would stay on screen when you left it
+- The Wall of Sound no longer crashes if you use voice commands while not visible on screen
+- Fixed a crash bug that occured when you went to use an instrument you had already used
+
 0.5.2.9 - 2/5/12
 ----------------
 (This update may require you to uninstall and [redownload Moto](http://mattcrouch.net/moto/download "Direct link to download file") manually)
