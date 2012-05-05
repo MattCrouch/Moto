@@ -46,6 +46,8 @@ namespace Moto
             currentFocus = playerFocus.None;
             processExistingSkeletons(MainWindow.activeSkeletons);
 
+            checkTutorial(MainWindow.Tutorials.BandMode);
+
             this.FocusVisualStyle = null;
             this.Focus();
         }
@@ -58,7 +60,8 @@ namespace Moto
             None = 0,
             KinectGuide,
             Metronome,
-            Picture
+            Picture,
+            Tutorial,
         }
 
         //What instruments are available (USED IN WALL OF SOUND TOO)
@@ -307,6 +310,42 @@ namespace Moto
             MainWindow.playerRemoved(player.skeleton.TrackingId);
         }
 
+        private void checkTutorial(MainWindow.Tutorials tutorial)
+        {
+            if (MainWindow.availableTutorials.ContainsKey(tutorial) && !MainWindow.availableTutorials[tutorial].seen)
+            {
+                MainCanvas.Children.Add(MainWindow.availableTutorials[tutorial].tutImage);
+                MainWindow.availableTutorials[tutorial].tutImage.Width = MainCanvas.ActualWidth;
+                imgDimmer.Visibility = System.Windows.Visibility.Visible;
+                MainWindow.animateFade(imgDimmer, 0, 0.5, 0.5);
+                MainWindow.animateFade(MainWindow.availableTutorials[tutorial].tutImage, 0, 1, 0.5);
+                handMovements.LeftSwipeRight += dismissTutorial;
+
+                MainWindow.activeTutorial = tutorial;
+                MainWindow.availableTutorials[tutorial].seen = true;
+            }
+        }
+
+        void dismissTutorial(object sender, handMovements.GestureEventArgs e)
+        {
+            handMovements.LeftSwipeRight -= dismissTutorial;
+            handMovements.LeftSwipeRightStatus = false;
+
+            MainWindow.animateFade(imgDimmer, 0.5, 0, 0.5);
+            MainWindow.animateSlide(MainWindow.availableTutorials[MainWindow.activeTutorial].tutImage, true, false, 50, 0.5);
+            MainWindow.Tutorials previousTutorial = MainWindow.activeTutorial;
+
+            MainWindow.activeTutorial = MainWindow.Tutorials.None;
+            if (previousTutorial == MainWindow.Tutorials.BandMode)
+            {
+                checkTutorial(MainWindow.Tutorials.KinectGuide);
+            }
+            else if (previousTutorial == MainWindow.Tutorials.KinectGuide)
+            {
+                checkTutorial(MainWindow.Tutorials.VoiceRecognition);
+            }
+        }
+
         private void instrumentUpdate(MainWindow.Player player)
         {
             switch (player.instrument)
@@ -523,6 +562,7 @@ namespace Moto
                     metronome.destroyMetronome();
                     MainWindow.sensor.AllFramesReady -= listenForMetronome;
                     metronome.setupMetronome();
+                    checkTutorial(MainWindow.Tutorials.Metronome);
                     MainWindow.sensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(listenForMetronome);
                     break;
                 case SpeechRecognizer.Verbs.StopMetronome:
@@ -1081,6 +1121,7 @@ namespace Moto
                     MainWindow.sensor.AllFramesReady -= listenForMetronome;
                     metronome.setupMetronome();
                     MainWindow.sensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(listenForMetronome);
+                    checkTutorial(MainWindow.Tutorials.Metronome);
                     break;
                 case menuOptions.Guitar:
                     switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.GuitarRight);

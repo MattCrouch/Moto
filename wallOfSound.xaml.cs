@@ -51,6 +51,8 @@ namespace Moto
 
             processExistingSkeletons(MainWindow.activeSkeletons);
 
+            checkTutorial(MainWindow.Tutorials.WallOfSound);
+
             this.FocusVisualStyle = null;
             this.Focus();
         }
@@ -914,6 +916,34 @@ namespace Moto
             }
         }
 
+        private void checkTutorial(MainWindow.Tutorials tutorial)
+        {
+            if (MainWindow.availableTutorials.ContainsKey(tutorial) && !MainWindow.availableTutorials[tutorial].seen)
+            {
+                MainCanvas.Children.Add(MainWindow.availableTutorials[tutorial].tutImage);
+                MainWindow.availableTutorials[tutorial].tutImage.Width = MainCanvas.ActualWidth;
+                imgDimmer.Visibility = System.Windows.Visibility.Visible;
+                MainWindow.animateFade(imgDimmer, 0, 0.5, 0.5);
+                MainWindow.animateFade(MainWindow.availableTutorials[tutorial].tutImage, 0, 1, 0.5);
+                handMovements.LeftSwipeRight += dismissTutorial;
+
+                MainWindow.activeTutorial = tutorial;
+                MainWindow.availableTutorials[tutorial].seen = true;
+            }
+        }
+
+        void dismissTutorial(object sender, handMovements.GestureEventArgs e)
+        {
+            handMovements.LeftSwipeRight -= dismissTutorial;
+            handMovements.LeftSwipeRightStatus = false;
+
+            MainWindow.animateFade(imgDimmer, 0.5, 0, 0.5);
+            MainWindow.animateSlide(MainWindow.availableTutorials[MainWindow.activeTutorial].tutImage, true, false, 50, 0.5);
+            MainWindow.Tutorials previousTutorial = MainWindow.activeTutorial;
+
+            MainWindow.activeTutorial = MainWindow.Tutorials.None;
+        }
+
         private void removePlayerWall(MainWindow.Player player)
         {
             //Clean up player wall data
@@ -1186,6 +1216,7 @@ namespace Moto
                 {
                     case menuOptions.RecordNewWall:
                         player.mode = MainWindow.PlayerMode.Create;
+                        checkTutorial(MainWindow.Tutorials.RecordNewWall);
                         break;
                     case menuOptions.CustomWall:
                         player.mode = MainWindow.PlayerMode.Custom;
@@ -1388,7 +1419,7 @@ namespace Moto
                     takeAPicture();
                     break;
                 case menuOptions.RecordNewWall:
-                    MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].mode = MainWindow.PlayerMode.Create;
+                    wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], menuOptions.RecordNewWall);
                     break;
                 case menuOptions.CustomWall:
                     wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], menuOptions.CustomWall);

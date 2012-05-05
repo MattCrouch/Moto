@@ -24,6 +24,7 @@ namespace Moto
             {
                 setupKinect();
                 setupVoice();
+                checkForCommands();
                 this.NavigationService.Navigate(new StartScreen());
             }
             else
@@ -126,6 +127,34 @@ namespace Moto
         public static SoundPlayer SFXCamera = new SoundPlayer("audio/wall/8bit/1.wav");
         public static SoundPlayer SFXUpTick = new SoundPlayer("audio/ui/menu-up.wav");
         public static SoundPlayer SFXDownTick = new SoundPlayer("audio/ui/menu-down.wav");
+        
+        //Tutorials
+        public static Dictionary<Tutorials, tutorialVisuals> availableTutorials = new Dictionary<Tutorials, tutorialVisuals>();
+
+        public static Tutorials activeTutorial = Tutorials.None;
+
+        public enum Tutorials
+        {
+            None,
+            BandMode,
+            WallOfSound,
+            KinectGuide,
+            Metronome,
+            RecordNewWall,
+            VoiceRecognition,
+        }
+
+        public class tutorialVisuals
+        {
+            public tutorialVisuals(string url) {
+                tutImage = new Image();
+                tutImage.Source = new BitmapImage(new Uri("/Moto;component/images/tutorials/" + url, UriKind.Relative));
+                seen = false;
+            }
+            
+            public Image tutImage { get; set; }
+            public bool seen { get; set; }
+        }
 
         public static void setupKinect()
         {
@@ -177,6 +206,30 @@ namespace Moto
             stopKinect(sensor);
             destroyVoice();
             //StartScreen.speechRecognizer.Stop();
+        }
+
+
+        private void checkForCommands()
+        {
+            String[] arguments = Environment.GetCommandLineArgs();
+            foreach (var argument in arguments)
+            {
+                if (argument != "tutorials")
+                {
+                    //Enable the tutorials
+                    setupTutorials();
+                }
+            }
+        }
+
+        private void setupTutorials()
+        {
+            availableTutorials.Add(Tutorials.BandMode,new tutorialVisuals("band-mode.png"));
+            availableTutorials.Add(Tutorials.KinectGuide,new tutorialVisuals("kinect-guide.png"));
+            availableTutorials.Add(Tutorials.Metronome,new tutorialVisuals("metronome.png"));
+            availableTutorials.Add(Tutorials.RecordNewWall,new tutorialVisuals("record-new-wall.png"));
+            availableTutorials.Add(Tutorials.VoiceRecognition,new tutorialVisuals("voice-recognition.png"));
+            availableTutorials.Add(Tutorials.WallOfSound,new tutorialVisuals("wall-of-sound.png"));
         }
 
         public static void adjustKinectAngle(int angleDiff)
