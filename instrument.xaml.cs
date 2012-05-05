@@ -1246,6 +1246,7 @@ namespace Moto
 
             destroyVoice();
             metronome.destroyMetronome();
+            MainWindow.sensor.AllFramesReady -= listenForMetronome;
             this.NavigationService.GoBack();
         }
 
