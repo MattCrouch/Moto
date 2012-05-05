@@ -1,5 +1,13 @@
 CHANGELOG
 =========
+0.7.0.0 - 5/5/12
+----------------
+- Tutorials have been added. They aim to give you basic help on how to play Moto.
+	- To run Moto with tutorials enabled, create a shortcut to Moto and add " tutorials" to the end of the path. [See example](http://lockerz.com/s/206713785)
+- The UI now has audial feedback on the microphone start/stop and the Kinect Guide ticks
+- Wall of Sound should no longer ignore voice commands to change the angle of the Kinect
+- If you select the metronome and leave Band Mode, then re-enter, it will no longer re-enter metronome setting mode
+
 0.6.0.0 - 3/5/12
 ----------------
 - Voice commands no longer require a visible microphone before working. To voice a command, say "Moto" or "Kinect", then a command and you will see the confirmation appear on screen as normal.

@@ -214,7 +214,7 @@ namespace Moto
             String[] arguments = Environment.GetCommandLineArgs();
             foreach (var argument in arguments)
             {
-                if (argument != "tutorials")
+                if (argument == "tutorials")
                 {
                     //Enable the tutorials
                     setupTutorials();
