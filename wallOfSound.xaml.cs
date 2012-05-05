@@ -949,11 +949,19 @@ namespace Moto
             MainWindow.animateFade(imgDimmer, 0.5, 0, 0.5);
             MainWindow.animateSlide(MainWindow.availableTutorials[MainWindow.activeTutorial].tutImage, true, false, 50, 0.5);
             MainWindow.Tutorials previousTutorial = MainWindow.activeTutorial;
+            MainWindow.activeTutorial = MainWindow.Tutorials.None;
             currentFocus = playerFocus.None;
 
             MainWindow.showPlayerOverlays();
 
-            MainWindow.activeTutorial = MainWindow.Tutorials.None;
+            if (previousTutorial == MainWindow.Tutorials.WallOfSound)
+            {
+                checkTutorial(MainWindow.Tutorials.KinectGuide);
+            }
+            else if (previousTutorial == MainWindow.Tutorials.KinectGuide)
+            {
+                checkTutorial(MainWindow.Tutorials.VoiceRecognition);
+            }
         }
 
         private void removePlayerWall(MainWindow.Player player)
