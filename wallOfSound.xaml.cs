@@ -1442,12 +1442,14 @@ namespace Moto
 
             if (up)
             {
+                MainWindow.SFXUpTick.Play();
                 menuPosition++;
                 //Selection going up, move menu down
                 animation.By = animation.From + (60 * count);
             }
             else
             {
+                MainWindow.SFXDownTick.Play();
                 menuPosition--;
                 //Selection going down, move menu up
                 animation.By = animation.From + (-60 * count);

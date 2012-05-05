@@ -556,6 +556,12 @@
     <Content Include="audio\metronome-tick.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="audio\ui\menu-down.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="audio\ui\menu-up.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="audio\ui\start-listening.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
