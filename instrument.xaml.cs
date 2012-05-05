@@ -148,6 +148,10 @@ namespace Moto
             voiceVisuals.Add(SpeechRecognizer.Verbs.StopMetronome, new BitmapImage(new Uri("/Moto;component/images/voice/stopmetronome.png", UriKind.Relative)));
             voiceVisuals.Add(SpeechRecognizer.Verbs.BackToInstruments, new BitmapImage(new Uri("/Moto;component/images/voice/backtoinstruments.png", UriKind.Relative)));
             voiceVisuals.Add(SpeechRecognizer.Verbs.Capture, new BitmapImage(new Uri("/Moto;component/images/voice/takeapicture.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.KinectUp, new BitmapImage(new Uri("/Moto;component/images/voice/angleup.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.KinectUpSmall, new BitmapImage(new Uri("/Moto;component/images/voice/angleslightlyup.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.KinectDown, new BitmapImage(new Uri("/Moto;component/images/voice/angledown.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.KinectDownSmall, new BitmapImage(new Uri("/Moto;component/images/voice/angleslightlydown.png", UriKind.Relative)));
             voiceVisuals.Add(SpeechRecognizer.Verbs.ReturnToStart, new BitmapImage(new Uri("/Moto;component/images/voice/backtostart.png", UriKind.Relative)));
             voiceVisuals.Add(SpeechRecognizer.Verbs.Close, new BitmapImage(new Uri("/Moto;component/images/voice/close.png", UriKind.Relative)));
         }
@@ -397,6 +401,10 @@ namespace Moto
                 case SpeechRecognizer.Verbs.KeyboardSwitch:
                 case SpeechRecognizer.Verbs.StartMetronome:
                 case SpeechRecognizer.Verbs.StopMetronome:
+                case SpeechRecognizer.Verbs.KinectUp:
+                case SpeechRecognizer.Verbs.KinectUpSmall:
+                case SpeechRecognizer.Verbs.KinectDown:
+                case SpeechRecognizer.Verbs.KinectDownSmall:
                 case SpeechRecognizer.Verbs.BackToInstruments:
                 case SpeechRecognizer.Verbs.Capture:
                 case SpeechRecognizer.Verbs.ReturnToStart:
@@ -510,6 +518,18 @@ namespace Moto
                     break;
                 case SpeechRecognizer.Verbs.Capture:
                     takeAPicture();
+                    break;
+                case SpeechRecognizer.Verbs.KinectUp:
+                    MainWindow.adjustKinectAngle(8);
+                    break;
+                case SpeechRecognizer.Verbs.KinectUpSmall:
+                    MainWindow.adjustKinectAngle(4);
+                    break;
+                case SpeechRecognizer.Verbs.KinectDown:
+                    MainWindow.adjustKinectAngle(-8);
+                    break;
+                case SpeechRecognizer.Verbs.KinectDownSmall:
+                    MainWindow.adjustKinectAngle(-4);
                     break;
                 case SpeechRecognizer.Verbs.ReturnToStart:
                     returnToStart();
