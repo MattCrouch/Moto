@@ -424,11 +424,13 @@ namespace Moto
             {
                 MainWindow.mySpeechRecognizer.stopListening(MainCanvas);
                 MainWindow.mySpeechRecognizer.switchGrammar(new Choices[] { MainWindow.mySpeechRecognizer.startScreenChoices, MainWindow.mySpeechRecognizer.kinectMotorChoices }, true, true);
+                MainWindow.SFXNotListening.Play();
             }
             else
             {
                 MainWindow.mySpeechRecognizer.startListening(MainCanvas);
                 MainWindow.mySpeechRecognizer.switchGrammar(new Choices[] { MainWindow.mySpeechRecognizer.startScreenChoices, MainWindow.mySpeechRecognizer.kinectMotorChoices, MainWindow.mySpeechRecognizer.stopListeningChoices }, false, false);
+                MainWindow.SFXListening.Play();
             }
         }
 

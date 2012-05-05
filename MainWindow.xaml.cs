@@ -1,11 +1,12 @@
 ﻿using System;
-using System.Windows;
-using System.Windows.Navigation;
-using System.Windows.Media.Imaging;
-using System.Windows.Media;
 using System.Collections.Generic;
+using System.Media;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using Microsoft.Kinect;
 using Moto.Speech;
 
@@ -116,6 +117,14 @@ namespace Moto
         //Skeleton variables
         public static Skeleton[] allSkeletons = new Skeleton[6]; //Holds all skeleton data (always returns six skeletons regardless)
         
+        //Sound effects
+        public static SoundPlayer SFXSuccess = new SoundPlayer("audio/wall/8bit/6.wav");
+        public static SoundPlayer SFXDismiss = new SoundPlayer("audio/wall/8bit/3.wav");
+        public static SoundPlayer SFXMenu = new SoundPlayer("audio/wall/8bit/6.wav");
+        public static SoundPlayer SFXListening = new SoundPlayer("audio/ui/start-listening.wav");
+        public static SoundPlayer SFXNotListening = new SoundPlayer("audio/ui/stop-listening.wav");
+        public static SoundPlayer SFXCamera = new SoundPlayer("audio/wall/8bit/1.wav");
+
         public static void setupKinect()
         {
                 //use first Kinect

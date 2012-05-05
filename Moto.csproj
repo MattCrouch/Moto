@@ -493,6 +493,9 @@
     <Resource Include="images\wosplaceholder.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
+    <Content Include="audio\beep.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="audio\drums\drum0.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -551,6 +554,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="audio\metronome-tick.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="audio\ui\start-listening.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="audio\ui\stop-listening.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="audio\wall\8bit\0.wav">
