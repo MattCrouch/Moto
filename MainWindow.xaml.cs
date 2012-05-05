@@ -243,7 +243,7 @@ namespace Moto
         public static bool playerRemoved(int skeletonId)
         {
             //Clear out all references to the skeleton
-            Console.WriteLine("Player Removed");
+            Console.WriteLine("Player Removed" + skeletonId);
 
             if (activeSkeletons.Remove(skeletonId))
             {

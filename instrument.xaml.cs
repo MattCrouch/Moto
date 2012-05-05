@@ -264,7 +264,12 @@ namespace Moto
                     //Remove them
                     for (int i = 0; i < activeList.Count; i++)
                     {
-                        removePlayerInstrument(MainWindow.activeSkeletons[activeList[i]]);
+                        removeInstrumentVisuals(MainWindow.activeSkeletons[activeList[i]]);
+
+                        clearInstrumentRefs(MainWindow.activeSkeletons[activeList[i]]);
+
+                        MainWindow.playerRemoved(activeList[i]);
+                        //removePlayerInstrument(MainWindow.activeSkeletons[activeList[i]]);
                     }
 
                     activeList = null;
@@ -276,6 +281,16 @@ namespace Moto
                 {
                     handMovements.listenForGestures(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton);
                 }
+            }
+        }
+
+        private void removeInstrumentVisuals(MainWindow.Player player)
+        {
+            MainCanvas.Children.Remove(player.instrumentImage);
+
+            foreach (var overlay in player.instrumentOverlay)
+            {
+                MainCanvas.Children.Remove(overlay.Value);
             }
         }
 
