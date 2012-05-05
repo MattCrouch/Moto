@@ -126,7 +126,8 @@ namespace Moto
         {
             None = 0,
             KinectGuide,
-            Picture
+            Picture,
+            Tutorial
         }
 
         //Wall record variables
@@ -884,6 +885,11 @@ namespace Moto
 
             setupPlayerAudio(player);
             setupWall(player);
+
+            if (currentFocus == playerFocus.KinectGuide || currentFocus == playerFocus.Tutorial)
+            {
+                MainWindow.hidePlayerOverlays();
+            }
         }
 
         private void wallInteractionVisual(MainWindow.Player player, int box, bool recording = false)
@@ -927,7 +933,10 @@ namespace Moto
                 MainWindow.animateFade(MainWindow.availableTutorials[tutorial].tutImage, 0, 1, 0.5);
                 handMovements.LeftSwipeRight += dismissTutorial;
 
+                MainWindow.hidePlayerOverlays();
+
                 MainWindow.activeTutorial = tutorial;
+                currentFocus = playerFocus.Tutorial;
                 MainWindow.availableTutorials[tutorial].seen = true;
             }
         }
@@ -940,6 +949,9 @@ namespace Moto
             MainWindow.animateFade(imgDimmer, 0.5, 0, 0.5);
             MainWindow.animateSlide(MainWindow.availableTutorials[MainWindow.activeTutorial].tutImage, true, false, 50, 0.5);
             MainWindow.Tutorials previousTutorial = MainWindow.activeTutorial;
+            currentFocus = playerFocus.None;
+
+            MainWindow.showPlayerOverlays();
 
             MainWindow.activeTutorial = MainWindow.Tutorials.None;
         }

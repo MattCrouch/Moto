@@ -44,6 +44,7 @@ namespace Moto
             setupKinectGuide();
 
             currentFocus = playerFocus.None;
+
             processExistingSkeletons(MainWindow.activeSkeletons);
 
             checkTutorial(MainWindow.Tutorials.BandMode);
@@ -316,12 +317,17 @@ namespace Moto
             {
                 MainCanvas.Children.Add(MainWindow.availableTutorials[tutorial].tutImage);
                 MainWindow.availableTutorials[tutorial].tutImage.Width = MainCanvas.ActualWidth;
+
                 imgDimmer.Visibility = System.Windows.Visibility.Visible;
                 MainWindow.animateFade(imgDimmer, 0, 0.5, 0.5);
                 MainWindow.animateFade(MainWindow.availableTutorials[tutorial].tutImage, 0, 1, 0.5);
+
                 handMovements.LeftSwipeRight += dismissTutorial;
 
+                MainWindow.hidePlayerOverlays();
+
                 MainWindow.activeTutorial = tutorial;
+                currentFocus = playerFocus.Tutorial;
                 MainWindow.availableTutorials[tutorial].seen = true;
             }
         }
@@ -336,6 +342,10 @@ namespace Moto
             MainWindow.Tutorials previousTutorial = MainWindow.activeTutorial;
 
             MainWindow.activeTutorial = MainWindow.Tutorials.None;
+            currentFocus = playerFocus.None;
+
+            MainWindow.showPlayerOverlays();
+
             if (previousTutorial == MainWindow.Tutorials.BandMode)
             {
                 checkTutorial(MainWindow.Tutorials.KinectGuide);
@@ -653,7 +663,7 @@ namespace Moto
 
             player.instrumentImage = image;
 
-            if (currentFocus == playerFocus.KinectGuide)
+            if (currentFocus == playerFocus.KinectGuide || currentFocus == playerFocus.Tutorial)
             {
                 MainWindow.hidePlayerOverlays();
             }
