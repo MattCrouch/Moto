@@ -600,5 +600,19 @@ namespace Moto.Speech
 
             Console.WriteLine("Speech Recognition: " + speechEnabled);
         }
+
+        public void speechEnabledSwitch(bool on)
+        {
+            if (on)
+            {
+                speechEnabled = true;
+            }
+            else
+            {
+                speechEnabled = false;
+            }
+
+            Console.WriteLine("Speech Recognition: " + speechEnabled);
+        }
     }
 }

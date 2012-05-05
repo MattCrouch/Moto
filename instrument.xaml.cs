@@ -140,7 +140,10 @@ namespace Moto
             MainWindow.mySpeechRecognizer.SaidSomething += this.RecognizerSaidSomething;
             MainWindow.mySpeechRecognizer.ListeningChanged += this.ListeningChanged;
 
+            //Disable then reenable speech for less of a delay when processing grammars
+            MainWindow.mySpeechRecognizer.speechEnabledSwitch(false);
             MainWindow.mySpeechRecognizer.switchGrammar(new Choices[] { MainWindow.mySpeechRecognizer.instrumentChoices, MainWindow.mySpeechRecognizer.kinectMotorChoices }, true, true);
+            MainWindow.mySpeechRecognizer.speechEnabledSwitch(true);
         }
 
         private void setupVoiceVisuals()
@@ -723,6 +726,7 @@ namespace Moto
         {
             if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
             {
+                currentFocus = playerFocus.Metronome;
                 if (MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton != null)
                 {
                     if (Math.Abs(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandLeft].Position.X - MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandRight].Position.X) < 0.1 && !beatSet)
@@ -1243,6 +1247,8 @@ namespace Moto
             MainWindow.sensor.AllFramesReady -= new EventHandler<AllFramesReadyEventArgs>(sensor_AllFramesReady);
 
             KinectSensor.KinectSensors.StatusChanged -= new EventHandler<StatusChangedEventArgs>(KinectSensors_StatusChanged);
+
+            handMovements.LeftSwipeRight -= dismissTutorial;
 
             destroyVoice();
             metronome.destroyMetronome();
