@@ -712,8 +712,15 @@ namespace Moto
                     MainWindow.setupTutorials();
                     break;
                 case System.Windows.Input.Key.H:
-                    //Show voice commands
-                    
+                    //Toggle voice commands
+                    if (helpVisual == null)
+                    {
+                        showHelpVisual();
+                    }
+                    else
+                    {
+                        hideHelpVisual();
+                    }
                     break;
             }
         }

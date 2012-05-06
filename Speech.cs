@@ -447,7 +447,16 @@ namespace Moto.Speech
         {
             if (speechEnabled)
             {
-                Console.WriteLine("\rSpeech Hypothesized: \t{0}", e.Result.Text);
+                Console.WriteLine("\rSpeech Hypothesized: \t{0} \t{1}", e.Result.Text, e.Result.Confidence);
+
+                if (e.Result.Confidence > 0.4)
+                {
+                    //It's possible they said this, they just need to repeat it
+                    if (!this.paused)
+                    {
+                        resetSpeechTimeout();
+                    }
+                }
             }
         }
 
@@ -457,7 +466,7 @@ namespace Moto.Speech
             {
                 Console.WriteLine("\rSpeech Recognized: \t{0} - \t{1}", e.Result.Text, e.Result.Confidence);
 
-                if ((this.SaidSomething == null) || (e.Result.Confidence < 0.60))
+                if ((this.SaidSomething == null) || (e.Result.Confidence < 0.55))
                 {
                     return;
                 }
