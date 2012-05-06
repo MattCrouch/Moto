@@ -109,6 +109,7 @@ namespace Moto
 
         Dictionary<SpeechRecognizer.Verbs, BitmapImage> voiceVisuals = new Dictionary<SpeechRecognizer.Verbs, BitmapImage>();
         Image confirmationVisual = new Image();
+        Image helpVisual;
 
         //Image capture variables
         private Storyboard flashStoryboard;
@@ -458,7 +459,6 @@ namespace Moto
 
         private void showConfirmation(SpeechRecognizer.SaidSomethingEventArgs e)
         {
-            MainWindow.mySpeechRecognizer.switchGrammar(new Choices[] { MainWindow.mySpeechRecognizer.booleanChoices }, false, false);
             voiceConfirmEvent = e;
 
             switch (voiceConfirmEvent.Verb)
@@ -476,6 +476,8 @@ namespace Moto
                 case SpeechRecognizer.Verbs.Capture:
                 case SpeechRecognizer.Verbs.ReturnToStart:
                 case SpeechRecognizer.Verbs.Close:
+                    MainWindow.mySpeechRecognizer.switchGrammar(new Choices[] { MainWindow.mySpeechRecognizer.booleanChoices }, false, false);
+
                     voicePromptVisual(true);
 
                     voiceConfirmTime = new DispatcherTimer();
@@ -483,6 +485,41 @@ namespace Moto
                     voiceConfirmTime.Tick += new EventHandler(voiceConfirmTime_Tick);
                     voiceConfirmTime.Start();
                     break;
+                case SpeechRecognizer.Verbs.VoiceHelp:
+                    MainWindow.mySpeechRecognizer.resetSpeechTimeout(10);
+                    if (MainWindow.mySpeechRecognizer.paused == true)
+                    {
+                        MainWindow.mySpeechRecognizer.toggleListening(true);
+                    }
+                    showHelpVisual();
+                    break;
+            }
+        }
+
+        private void showHelpVisual()
+        {
+            if (helpVisual == null)
+            {
+                helpVisual = new Image();
+                helpVisual.Source = new BitmapImage(new Uri("/Moto;component/images/tutorials/voice-help-instrument.png", UriKind.Relative));
+                if (!MainCanvas.Children.Contains(helpVisual))
+                {
+                    MainCanvas.Children.Add(helpVisual);
+                }
+                helpVisual.Width = MainCanvas.ActualWidth;
+                imgDimmer.Visibility = System.Windows.Visibility.Visible;
+                MainWindow.animateFade(imgDimmer, 0, 0.75, 0.5);
+                MainWindow.animateSlide(helpVisual);
+            }
+        }
+
+        private void hideHelpVisual()
+        {
+            if (helpVisual != null)
+            {
+                MainWindow.animateFade(imgDimmer, 0.75, 0, 0.5);
+                MainWindow.animateSlide(helpVisual, true);
+                helpVisual = null;
             }
         }
 
@@ -606,6 +643,7 @@ namespace Moto
                     Application.Current.Shutdown();
                     break;
             }
+            hideHelpVisual();
         }
 
         private void ListeningChanged(object sender, SpeechRecognizer.ListeningChangedEventArgs e)
@@ -615,6 +653,8 @@ namespace Moto
                 MainWindow.mySpeechRecognizer.stopListening(MainCanvas);
                 MainWindow.mySpeechRecognizer.switchGrammar(new Choices[] { MainWindow.mySpeechRecognizer.instrumentChoices, MainWindow.mySpeechRecognizer.kinectMotorChoices }, true, true);
                 MainWindow.SFXNotListening.Play();
+                hideHelpVisual();
+
             }
             else
             {

@@ -361,7 +361,7 @@ namespace Moto
                     MainWindow.mySpeechRecognizer.resetSpeechTimeout(10);
                     if (MainWindow.mySpeechRecognizer.paused == true)
                     {
-                        switchListening(false);
+                        MainWindow.mySpeechRecognizer.toggleListening(true);
                     }
                     showHelpVisual();
                     break;
@@ -457,12 +457,7 @@ namespace Moto
 
         private void ListeningChanged(object sender, SpeechRecognizer.ListeningChangedEventArgs e)
         {
-            switchListening(e.Paused);
-        }
-
-        private void switchListening(bool paused)
-        {
-            if (paused)
+            if (e.Paused)
             {
                 MainWindow.mySpeechRecognizer.stopListening(MainCanvas);
                 MainWindow.mySpeechRecognizer.switchGrammar(new Choices[] { MainWindow.mySpeechRecognizer.startScreenChoices, MainWindow.mySpeechRecognizer.kinectMotorChoices }, true, true);
@@ -507,6 +502,8 @@ namespace Moto
                     MainWindow.mySpeechRecognizer.switchGrammar(new Choices[] { MainWindow.mySpeechRecognizer.startScreenChoices, MainWindow.mySpeechRecognizer.kinectMotorChoices }, true, true);
                     break;
             }
+
+            hideHelpVisual();
         }
 
         private void unlistenVoice()
