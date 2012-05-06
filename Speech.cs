@@ -50,6 +50,7 @@ namespace Moto.Speech
                 { "The Wall", new WhatSaid { Verb = Verbs.WallOfSound } },
                 { "Close", new WhatSaid { Verb = Verbs.Close } },
                 { "Goodbye", new WhatSaid { Verb = Verbs.Close } },
+                { "Help Me", new WhatSaid { Verb = Verbs.VoiceHelp } },
             };
 
         private readonly Dictionary<string, WhatSaid> instrumentPhrases = new Dictionary<string, WhatSaid>
@@ -64,6 +65,7 @@ namespace Moto.Speech
                 { "Go Back", new WhatSaid { Verb = Verbs.ReturnToStart } },
                 { "Close", new WhatSaid { Verb = Verbs.Close } },
                 { "Goodbye", new WhatSaid { Verb = Verbs.Close } },
+                { "Help Me", new WhatSaid { Verb = Verbs.VoiceHelp } },
             };
 
         private readonly Dictionary<string, WhatSaid> booleanPhrases = new Dictionary<string, WhatSaid>
@@ -91,6 +93,7 @@ namespace Moto.Speech
                 { "Take a Picture", new WhatSaid { Verb = Verbs.Capture } },
                 { "Close", new WhatSaid { Verb = Verbs.Close } },
                 { "Goodbye", new WhatSaid { Verb = Verbs.Close } },
+                { "Help Me", new WhatSaid { Verb = Verbs.VoiceHelp } },
             };
 
         private readonly Dictionary<string, WhatSaid> kinectMotorPhrases = new Dictionary<string, WhatSaid>
@@ -139,6 +142,8 @@ namespace Moto.Speech
             //Confirmation
             True,
             False,
+            //Help
+            VoiceHelp,
             //Kinect Angle
             KinectUp,
             KinectUpSmall,

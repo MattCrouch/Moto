@@ -222,7 +222,7 @@ namespace Moto
             }
         }
 
-        private void setupTutorials()
+        public static void setupTutorials()
         {
             availableTutorials.Add(Tutorials.BandMode,new tutorialVisuals("band-mode.png"));
             availableTutorials.Add(Tutorials.KinectGuide,new tutorialVisuals("kinect-guide.png"));
