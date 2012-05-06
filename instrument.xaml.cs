@@ -156,6 +156,7 @@ namespace Moto
             voiceVisuals.Add(SpeechRecognizer.Verbs.GuitarSwitch, new BitmapImage(new Uri("/Moto;component/images/voice/switchtoguitar.png", UriKind.Relative)));
             voiceVisuals.Add(SpeechRecognizer.Verbs.LeftyGuitarSwitch, new BitmapImage(new Uri("/Moto;component/images/voice/switchtoleftyguitar.png", UriKind.Relative)));
             voiceVisuals.Add(SpeechRecognizer.Verbs.KeyboardSwitch, new BitmapImage(new Uri("/Moto;component/images/voice/switchtokeyboard.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.TriangleSwitch, new BitmapImage(new Uri("/Moto;component/images/voice/switchtotriangle.png", UriKind.Relative)));
             voiceVisuals.Add(SpeechRecognizer.Verbs.StartMetronome, new BitmapImage(new Uri("/Moto;component/images/voice/metronome.png", UriKind.Relative)));
             voiceVisuals.Add(SpeechRecognizer.Verbs.StopMetronome, new BitmapImage(new Uri("/Moto;component/images/voice/stopmetronome.png", UriKind.Relative)));
             voiceVisuals.Add(SpeechRecognizer.Verbs.BackToInstruments, new BitmapImage(new Uri("/Moto;component/images/voice/backtoinstruments.png", UriKind.Relative)));
@@ -481,6 +482,7 @@ namespace Moto
                 case SpeechRecognizer.Verbs.GuitarSwitch:
                 case SpeechRecognizer.Verbs.LeftyGuitarSwitch:
                 case SpeechRecognizer.Verbs.KeyboardSwitch:
+                case SpeechRecognizer.Verbs.TriangleSwitch:
                 case SpeechRecognizer.Verbs.StartMetronome:
                 case SpeechRecognizer.Verbs.StopMetronome:
                 case SpeechRecognizer.Verbs.KinectUp:
@@ -630,6 +632,12 @@ namespace Moto
                     if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
                     {
                         switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.Keyboard);
+                    }
+                    break;
+                case SpeechRecognizer.Verbs.TriangleSwitch:
+                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
+                    {
+                        switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.Triangle);
                     }
                     break;
                 case SpeechRecognizer.Verbs.StartMetronome:
@@ -1313,6 +1321,10 @@ namespace Moto
                 case instrumentList.Keyboard:
                     keyArea.Remove(player.skeleton.TrackingId);
                     insideKey.Remove(player.skeleton.TrackingId);
+                    break;
+                case instrumentList.Triangle:
+                    triangleArea.Remove(player.skeleton.TrackingId);
+                    insideTriangleArea.Remove(player.skeleton.TrackingId);
                     break;
             }
         }
