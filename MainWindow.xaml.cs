@@ -224,12 +224,15 @@ namespace Moto
 
         public static void setupTutorials()
         {
-            availableTutorials.Add(Tutorials.BandMode,new tutorialVisuals("band-mode.png"));
-            availableTutorials.Add(Tutorials.KinectGuide,new tutorialVisuals("kinect-guide.png"));
-            availableTutorials.Add(Tutorials.Metronome,new tutorialVisuals("metronome.png"));
-            availableTutorials.Add(Tutorials.RecordNewWall,new tutorialVisuals("record-new-wall.png"));
-            availableTutorials.Add(Tutorials.VoiceRecognition,new tutorialVisuals("voice-recognition.png"));
-            availableTutorials.Add(Tutorials.WallOfSound,new tutorialVisuals("wall-of-sound.png"));
+            if (availableTutorials.Count <= 0)
+            {
+                availableTutorials.Add(Tutorials.BandMode, new tutorialVisuals("band-mode.png"));
+                availableTutorials.Add(Tutorials.KinectGuide, new tutorialVisuals("kinect-guide.png"));
+                availableTutorials.Add(Tutorials.Metronome, new tutorialVisuals("metronome.png"));
+                availableTutorials.Add(Tutorials.RecordNewWall, new tutorialVisuals("record-new-wall.png"));
+                availableTutorials.Add(Tutorials.VoiceRecognition, new tutorialVisuals("voice-recognition.png"));
+                availableTutorials.Add(Tutorials.WallOfSound, new tutorialVisuals("wall-of-sound.png"));
+            }
         }
 
         public static void adjustKinectAngle(int angleDiff)

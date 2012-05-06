@@ -128,7 +128,8 @@ namespace Moto
             None = 0,
             KinectGuide,
             Picture,
-            Tutorial
+            Tutorial,
+            VoiceHelp,
         }
 
         //Wall record variables
@@ -890,7 +891,7 @@ namespace Moto
             setupPlayerAudio(player);
             setupWall(player);
 
-            if (currentFocus == playerFocus.KinectGuide || currentFocus == playerFocus.Tutorial)
+            if (currentFocus != playerFocus.None && currentFocus != playerFocus.Picture)
             {
                 MainWindow.hidePlayerOverlays();
             }
@@ -1077,11 +1078,11 @@ namespace Moto
                     voiceConfirmTime.Start();
                     break;
                 case SpeechRecognizer.Verbs.VoiceHelp:
-                    MainWindow.mySpeechRecognizer.resetSpeechTimeout(10);
                     if (MainWindow.mySpeechRecognizer.paused == true)
                     {
                         MainWindow.mySpeechRecognizer.toggleListening(true);
                     }
+                    MainWindow.mySpeechRecognizer.resetSpeechTimeout(10);
                     showHelpVisual();
                     break;
             }
@@ -1225,6 +1226,8 @@ namespace Moto
         {
             if (helpVisual == null)
             {
+                currentFocus = playerFocus.VoiceHelp;
+                MainWindow.hidePlayerOverlays();
                 helpVisual = new Image();
                 helpVisual.Source = new BitmapImage(new Uri("/Moto;component/images/tutorials/voice-help-wos.png", UriKind.Relative));
                 if (!MainCanvas.Children.Contains(helpVisual))
@@ -1242,6 +1245,8 @@ namespace Moto
         {
             if (helpVisual != null)
             {
+                currentFocus = playerFocus.None;
+                MainWindow.showPlayerOverlays();
                 MainWindow.animateFade(imgDimmer, 0.75, 0, 0.5);
                 MainWindow.animateSlide(helpVisual, true);
                 helpVisual = null;

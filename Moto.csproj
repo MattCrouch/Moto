@@ -207,6 +207,12 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="images\voice\switchtoleftyguitar.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="images\bu.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="images\tutorials\voice-help-instrument.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>

@@ -209,5 +209,6 @@
         	</Image.RenderTransform>
         </Image>
         <Rectangle Canvas.Left="0" Canvas.Top="0" Height="480" Name="imgDimmer" Stroke="{x:Null}" Width="640" Fill="Black" Opacity="0" />
+        <Image Canvas.Left="570" Canvas.Top="408" Height="60" Name="imgBU" Stretch="Fill" Width="58" Source="/Moto;component/images/bu.png" />
     </Canvas>
 </Page>

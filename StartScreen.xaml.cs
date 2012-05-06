@@ -358,11 +358,11 @@ namespace Moto
                     voiceConfirmTime.Start();
                     break;
                 case SpeechRecognizer.Verbs.VoiceHelp:
-                    MainWindow.mySpeechRecognizer.resetSpeechTimeout(10);
                     if (MainWindow.mySpeechRecognizer.paused == true)
                     {
                         MainWindow.mySpeechRecognizer.toggleListening(true);
                     }
+                    MainWindow.mySpeechRecognizer.resetSpeechTimeout(10);
                     showHelpVisual();
                     break;
             }

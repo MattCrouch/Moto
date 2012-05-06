@@ -56,6 +56,7 @@ namespace Moto.Speech
         private readonly Dictionary<string, WhatSaid> instrumentPhrases = new Dictionary<string, WhatSaid>
             {
                 { "Switch to Guitar", new WhatSaid { Verb = Verbs.GuitarSwitch } },
+                { "Switch to Lefty Guitar", new WhatSaid { Verb = Verbs.LeftyGuitarSwitch } },
                 { "Switch to Drums", new WhatSaid { Verb = Verbs.DrumsSwitch } },
                 { "Switch to Keyboard", new WhatSaid { Verb = Verbs.KeyboardSwitch } },
                 { "Take a Picture", new WhatSaid { Verb = Verbs.Capture } },
@@ -155,6 +156,7 @@ namespace Moto.Speech
             //Band Mode
             Instrument,
             GuitarSwitch,
+            LeftyGuitarSwitch,
             DrumsSwitch,
             KeyboardSwitch,
             StartMetronome,
@@ -180,7 +182,7 @@ namespace Moto.Speech
             {
                 silenceTimer = new DispatcherTimer();
             }
-            silenceTimer.Interval = new TimeSpan(0, 0, delay);
+            silenceTimer.Interval = TimeSpan.FromSeconds(delay);
 
             if (!silenceTimer.IsEnabled)
             {

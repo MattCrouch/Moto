@@ -63,6 +63,7 @@ namespace Moto
             Metronome,
             Picture,
             Tutorial,
+            VoiceHelp,
         }
 
         //What instruments are available (USED IN WALL OF SOUND TOO)
@@ -151,6 +152,7 @@ namespace Moto
         {
             voiceVisuals.Add(SpeechRecognizer.Verbs.DrumsSwitch, new BitmapImage(new Uri("/Moto;component/images/voice/switchtodrums.png", UriKind.Relative)));
             voiceVisuals.Add(SpeechRecognizer.Verbs.GuitarSwitch, new BitmapImage(new Uri("/Moto;component/images/voice/switchtoguitar.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.LeftyGuitarSwitch, new BitmapImage(new Uri("/Moto;component/images/voice/switchtoleftyguitar.png", UriKind.Relative)));
             voiceVisuals.Add(SpeechRecognizer.Verbs.KeyboardSwitch, new BitmapImage(new Uri("/Moto;component/images/voice/switchtokeyboard.png", UriKind.Relative)));
             voiceVisuals.Add(SpeechRecognizer.Verbs.StartMetronome, new BitmapImage(new Uri("/Moto;component/images/voice/metronome.png", UriKind.Relative)));
             voiceVisuals.Add(SpeechRecognizer.Verbs.StopMetronome, new BitmapImage(new Uri("/Moto;component/images/voice/stopmetronome.png", UriKind.Relative)));
@@ -465,6 +467,7 @@ namespace Moto
             {
                 case SpeechRecognizer.Verbs.DrumsSwitch:
                 case SpeechRecognizer.Verbs.GuitarSwitch:
+                case SpeechRecognizer.Verbs.LeftyGuitarSwitch:
                 case SpeechRecognizer.Verbs.KeyboardSwitch:
                 case SpeechRecognizer.Verbs.StartMetronome:
                 case SpeechRecognizer.Verbs.StopMetronome:
@@ -486,11 +489,11 @@ namespace Moto
                     voiceConfirmTime.Start();
                     break;
                 case SpeechRecognizer.Verbs.VoiceHelp:
-                    MainWindow.mySpeechRecognizer.resetSpeechTimeout(10);
                     if (MainWindow.mySpeechRecognizer.paused == true)
                     {
                         MainWindow.mySpeechRecognizer.toggleListening(true);
                     }
+                    MainWindow.mySpeechRecognizer.resetSpeechTimeout(10);
                     showHelpVisual();
                     break;
             }
@@ -500,6 +503,8 @@ namespace Moto
         {
             if (helpVisual == null)
             {
+                currentFocus = playerFocus.VoiceHelp;
+                MainWindow.hidePlayerOverlays();
                 helpVisual = new Image();
                 helpVisual.Source = new BitmapImage(new Uri("/Moto;component/images/tutorials/voice-help-instrument.png", UriKind.Relative));
                 if (!MainCanvas.Children.Contains(helpVisual))
@@ -517,6 +522,8 @@ namespace Moto
         {
             if (helpVisual != null)
             {
+                currentFocus = playerFocus.None;
+                MainWindow.showPlayerOverlays();
                 MainWindow.animateFade(imgDimmer, 0.75, 0, 0.5);
                 MainWindow.animateSlide(helpVisual, true);
                 helpVisual = null;
@@ -599,6 +606,12 @@ namespace Moto
                     if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
                     {
                         switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.GuitarRight);
+                    }
+                    break;
+                case SpeechRecognizer.Verbs.LeftyGuitarSwitch:
+                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
+                    {
+                        switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.GuitarLeft);
                     }
                     break;
                 case SpeechRecognizer.Verbs.KeyboardSwitch:
@@ -706,7 +719,7 @@ namespace Moto
 
             player.instrumentImage = image;
 
-            if (currentFocus == playerFocus.KinectGuide || currentFocus == playerFocus.Tutorial)
+            if (currentFocus != playerFocus.None && currentFocus != playerFocus.Picture)
             {
                 MainWindow.hidePlayerOverlays();
             }
