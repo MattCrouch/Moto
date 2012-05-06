@@ -71,7 +71,7 @@ namespace Moto
 
             FrameworkElement image = player.instrumentImage;
 
-            image.Height = scaledWidth(player, player.instrument);
+            image.Height = scaledWidth(player.skeleton.Position, player.instrument);
             player.instrumentOverlay[0].Height = image.Height;
 
             ColorImagePoint point = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Joints[JointType.Spine].Position, ColorImageFormat.RgbResolution640x480Fps30);

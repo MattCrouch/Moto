@@ -74,6 +74,7 @@ namespace Moto
             GuitarLeft,
             GuitarRight,
             Keyboard,
+            Triangle,
             WallOfSound,
         }
 
@@ -96,6 +97,7 @@ namespace Moto
             LeftyGuitar,
             Drum,
             Keyboard,
+            Triangle,
         }
 
         //Metronome variables
@@ -403,13 +405,20 @@ namespace Moto
                         checkKeyHit(player, JointType.HandRight);
                     }
                     break;
+                case instrumentList.Triangle:
+                    defineTriangleArea(player);
+                    if (currentFocus == playerFocus.None)
+                    {
+                        checkTriangle(player, JointType.HandRight);
+                    }
+                    break;
             }
         }
 
-        private double scaledWidth(MainWindow.Player player, instrumentList instrument)
+        private double scaledWidth(SkeletonPoint point, instrumentList instrument)
         {
             //Player distance (Converted to centimetres)
-            double distance = player.skeleton.Position.Z * 100;
+            double distance = point.Z * 100;
             double width = 0;
 
             switch (instrument)
@@ -423,6 +432,9 @@ namespace Moto
                     break;
                 case instrumentList.Keyboard:
                     width = 968.62 * Math.Pow(Math.E, -0.006 * distance);
+                    break;
+                case instrumentList.Triangle:
+                    width = 178.74 * Math.Pow(Math.E, -0.006 * distance);
                     break;
             }
 
@@ -712,6 +724,9 @@ namespace Moto
                 case instrumentList.Keyboard:
                     image.Source = new BitmapImage(new Uri("images/keyboard.png", UriKind.Relative));
                     break;
+                case instrumentList.Triangle:
+                    image.Source = new BitmapImage(new Uri("images/triangle.png", UriKind.Relative));
+                    break;
             }
 
             MainCanvas.Children.Add(image);
@@ -748,6 +763,10 @@ namespace Moto
                             break;
                         case instrumentList.Keyboard:
                             setupKeyboard(MainWindow.activeSkeletons[player.skeleton.TrackingId]);
+                            MainWindow.activeSkeletons[player.skeleton.TrackingId].mode = MainWindow.PlayerMode.None;
+                            break;
+                        case instrumentList.Triangle:
+                            setupTriangle(MainWindow.activeSkeletons[player.skeleton.TrackingId]);
                             MainWindow.activeSkeletons[player.skeleton.TrackingId].mode = MainWindow.PlayerMode.None;
                             break;
                     }
@@ -1201,6 +1220,9 @@ namespace Moto
                     break;
                 case menuOptions.Keyboard:
                     switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.Keyboard);
+                    break;
+                case menuOptions.Triangle:
+                    switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.Triangle);
                     break;
             }
         }
