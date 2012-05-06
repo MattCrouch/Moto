@@ -503,7 +503,7 @@ namespace Moto
                     break;
             }
 
-            hideHelpVisual();
+            MainWindow.mySpeechRecognizer.toggleListening(false);
         }
 
         private void unlistenVoice()

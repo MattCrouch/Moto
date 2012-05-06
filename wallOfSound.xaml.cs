@@ -1218,7 +1218,7 @@ namespace Moto
                     Application.Current.Shutdown();
                     break;
             }
-            hideHelpVisual();
+            MainWindow.mySpeechRecognizer.toggleListening(false);
         }
 
         private void showHelpVisual()
