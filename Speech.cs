@@ -57,6 +57,9 @@ namespace Moto.Speech
             {
                 { "Switch to Guitar", new WhatSaid { Verb = Verbs.GuitarSwitch } },
                 { "Switch to Lefty Guitar", new WhatSaid { Verb = Verbs.LeftyGuitarSwitch } },
+                { "Switch to Electric Guitar", new WhatSaid { Verb = Verbs.ElectricGuitarSwitch } },
+                { "Switch to Lefty Electric", new WhatSaid { Verb = Verbs.LeftyElectricGuitarSwitch } },
+                { "Switch to Lefty Electric Guitar", new WhatSaid { Verb = Verbs.LeftyElectricGuitarSwitch } },
                 { "Switch to Drums", new WhatSaid { Verb = Verbs.DrumsSwitch } },
                 { "Switch to Keyboard", new WhatSaid { Verb = Verbs.KeyboardSwitch } },
                 { "Switch to Triangle", new WhatSaid { Verb = Verbs.TriangleSwitch } },
@@ -158,6 +161,8 @@ namespace Moto.Speech
             Instrument,
             GuitarSwitch,
             LeftyGuitarSwitch,
+            ElectricGuitarSwitch,
+            LeftyElectricGuitarSwitch,
             DrumsSwitch,
             KeyboardSwitch,
             TriangleSwitch,

@@ -265,7 +265,7 @@
                     <GradientStop Color="#00000000" Offset="1"/>
                 </LinearGradientBrush>
             </Canvas.OpacityMask>
-            <Rectangle Canvas.Left="0" Canvas.Top="-260" Height="960" Name="rectangle1" Stroke="Black" Width="640" />
+            <Rectangle Canvas.Left="0" Canvas.Top="-380" Height="1260" Name="rectangle1" Stroke="Black" Width="640" />
             <Canvas Canvas.Left="0" Canvas.Top="0" Height="480" Name="kinectGuideCanvas" Width="158" RenderTransformOrigin="0.5,0.5" Visibility="Hidden">
                 <Image Canvas.Left="0" Canvas.Top="220" Height="41" Name="imgKinectGuide1" Stretch="Fill" Width="250" Source="/Moto;component/images/menu-items/cancel.png" />
                 <Image Canvas.Left="0" Canvas.Top="160" Height="41" Name="imgKinectGuide2" Source="/Moto;component/images/menu-items/backtostart.png" Stretch="Fill" Width="250" />
@@ -273,9 +273,11 @@
                 <Image Canvas.Left="0" Canvas.Top="40" Height="41" Name="imgKinectGuide4" Source="/Moto;component/images/menu-items/metronome.png" Stretch="Fill" Width="250" />
                 <Image Canvas.Left="0" Canvas.Top="-20" Height="41" Name="imgKinectGuide5" Stretch="Fill" Width="250" Source="/Moto;component/images/menu-items/guitar.png" />
                 <Image Canvas.Left="0" Canvas.Top="-80" Height="41" Name="imgKinectGuide6" Source="/Moto;component/images/menu-items/leftyguitar.png" Stretch="Fill" Width="250" />
-                <Image Canvas.Left="0" Canvas.Top="-140" Height="41" Name="imgKinectGuide7" Source="/Moto;component/images/menu-items/drums.png" Stretch="Fill" Width="250" />
-                <Image Canvas.Left="0" Canvas.Top="-200" Height="41" Name="imgKinectGuide8" Source="/Moto;component/images/menu-items/keyboard.png" Stretch="Fill" Width="250" />
-                <Image Canvas.Left="0" Canvas.Top="-260" Height="41" Name="imgKinectGuide9" Source="/Moto;component/images/menu-items/triangle.png" Stretch="Fill" Width="250" />
+                <Image Canvas.Left="0" Canvas.Top="-140" Height="41" Name="imgKinectGuide7" Stretch="Fill" Width="250" Source="/Moto;component/images/menu-items/electricguitar.png" />
+                <Image Canvas.Left="0" Canvas.Top="-200" Height="41" Name="imgKinectGuide8" Source="/Moto;component/images/menu-items/leftyelectric.png" Stretch="Fill" Width="250" />
+                <Image Canvas.Left="0" Canvas.Top="-260" Height="41" Name="imgKinectGuide9" Source="/Moto;component/images/menu-items/drums.png" Stretch="Fill" Width="250" />
+                <Image Canvas.Left="0" Canvas.Top="-320" Height="41" Name="imgKinectGuide10" Source="/Moto;component/images/menu-items/keyboard.png" Stretch="Fill" Width="250" />
+                <Image Canvas.Left="0" Canvas.Top="-380" Height="41" Name="imgKinectGuide11" Source="/Moto;component/images/menu-items/triangle.png" Stretch="Fill" Width="250" />
             </Canvas>
         </Canvas>
         <Image x:Name="imgPrimaryGlowLeft" Height="76" Source="images/glowing-point.png" Stretch="Fill" Width="76" Visibility="Hidden" />

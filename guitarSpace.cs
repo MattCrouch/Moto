@@ -136,12 +136,12 @@ namespace Moto
                         if (player.instrument == instrumentList.GuitarRight)
                         {
                             //Normal guitar stance
-                            strumGuitar(checkNeckDist(player, JointType.HandLeft));
+                            strumGuitar(checkNeckDist(player, JointType.HandLeft), player.mode);
                         }
                         else if (player.instrument == instrumentList.GuitarLeft)
                         {
                             //Lefty stance
-                            strumGuitar(checkNeckDist(player, JointType.HandRight));
+                            strumGuitar(checkNeckDist(player, JointType.HandRight), player.mode);
                         }
                         insideStrumArea[player.skeleton.TrackingId] = true;
                     }
@@ -153,7 +153,7 @@ namespace Moto
             }
         }
 
-        void strumGuitar(double neckDist)
+        void strumGuitar(double neckDist, MainWindow.PlayerMode mode)
         {
             if (mpDictionary[(mpCounter % mpDictionary.Count)] == null)
             {
@@ -162,19 +162,47 @@ namespace Moto
 
             if (neckDist > 0.7)
             {
-                mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/guitar/guitar1.wav", UriKind.Relative));
+                if (mode == MainWindow.PlayerMode.Acoustic)
+                {
+                    mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/guitar/guitar1.wav", UriKind.Relative));
+                }
+                else
+                {
+                    mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/guitar/electric/guitar1.wav", UriKind.Relative));
+                }
             }
             else if (neckDist > 0.55)
             {
-                mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/guitar/guitar2.wav", UriKind.Relative));
+                if (mode == MainWindow.PlayerMode.Acoustic)
+                {
+                    mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/guitar/guitar2.wav", UriKind.Relative));
+                }
+                else
+                {
+                    mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/guitar/electric/guitar2.wav", UriKind.Relative));
+                }
             }
             else if (neckDist > 0.4)
             {
-                mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/guitar/guitar3.wav", UriKind.Relative));
+                if (mode == MainWindow.PlayerMode.Acoustic)
+                {
+                    mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/guitar/guitar3.wav", UriKind.Relative));
+                }
+                else
+                {
+                    mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/guitar/electric/guitar3.wav", UriKind.Relative));
+                }
             }
             else
             {
-                mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/guitar/guitar4.wav", UriKind.Relative));
+                if (mode == MainWindow.PlayerMode.Acoustic)
+                {
+                    mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/guitar/guitar4.wav", UriKind.Relative));
+                }
+                else
+                {
+                    mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/guitar/electric/guitar4.wav", UriKind.Relative));
+                }
             }
 
             mpDictionary[(mpCounter % mpDictionary.Count)].Play();

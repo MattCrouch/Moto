@@ -95,6 +95,8 @@ namespace Moto
             Metronome,
             Guitar,
             LeftyGuitar,
+            ElectricGuitar,
+            LeftyElectricGuitar,
             Drum,
             Keyboard,
             Triangle,
@@ -155,6 +157,8 @@ namespace Moto
             voiceVisuals.Add(SpeechRecognizer.Verbs.DrumsSwitch, new BitmapImage(new Uri("/Moto;component/images/voice/switchtodrums.png", UriKind.Relative)));
             voiceVisuals.Add(SpeechRecognizer.Verbs.GuitarSwitch, new BitmapImage(new Uri("/Moto;component/images/voice/switchtoguitar.png", UriKind.Relative)));
             voiceVisuals.Add(SpeechRecognizer.Verbs.LeftyGuitarSwitch, new BitmapImage(new Uri("/Moto;component/images/voice/switchtoleftyguitar.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.ElectricGuitarSwitch, new BitmapImage(new Uri("/Moto;component/images/voice/switchtoelectricguitar.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.LeftyElectricGuitarSwitch, new BitmapImage(new Uri("/Moto;component/images/voice/switchtoleftyelectric.png", UriKind.Relative)));
             voiceVisuals.Add(SpeechRecognizer.Verbs.KeyboardSwitch, new BitmapImage(new Uri("/Moto;component/images/voice/switchtokeyboard.png", UriKind.Relative)));
             voiceVisuals.Add(SpeechRecognizer.Verbs.TriangleSwitch, new BitmapImage(new Uri("/Moto;component/images/voice/switchtotriangle.png", UriKind.Relative)));
             voiceVisuals.Add(SpeechRecognizer.Verbs.StartMetronome, new BitmapImage(new Uri("/Moto;component/images/voice/metronome.png", UriKind.Relative)));
@@ -495,6 +499,8 @@ namespace Moto
                 case SpeechRecognizer.Verbs.DrumsSwitch:
                 case SpeechRecognizer.Verbs.GuitarSwitch:
                 case SpeechRecognizer.Verbs.LeftyGuitarSwitch:
+                case SpeechRecognizer.Verbs.ElectricGuitarSwitch:
+                case SpeechRecognizer.Verbs.LeftyElectricGuitarSwitch:
                 case SpeechRecognizer.Verbs.KeyboardSwitch:
                 case SpeechRecognizer.Verbs.TriangleSwitch:
                 case SpeechRecognizer.Verbs.StartMetronome:
@@ -633,13 +639,25 @@ namespace Moto
                 case SpeechRecognizer.Verbs.GuitarSwitch:
                     if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
                     {
-                        switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.GuitarRight);
+                        switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.GuitarRight, MainWindow.PlayerMode.Acoustic);
                     }
                     break;
                 case SpeechRecognizer.Verbs.LeftyGuitarSwitch:
                     if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
                     {
-                        switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.GuitarLeft);
+                        switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.GuitarLeft, MainWindow.PlayerMode.Acoustic);
+                    }
+                    break;
+                case SpeechRecognizer.Verbs.ElectricGuitarSwitch:
+                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
+                    {
+                        switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.GuitarRight, MainWindow.PlayerMode.Electric);
+                    }
+                    break;
+                case SpeechRecognizer.Verbs.LeftyElectricGuitarSwitch:
+                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
+                    {
+                        switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.GuitarLeft, MainWindow.PlayerMode.Electric);
                     }
                     break;
                 case SpeechRecognizer.Verbs.KeyboardSwitch:
@@ -739,7 +757,14 @@ namespace Moto
                     break;
                 case instrumentList.GuitarLeft:
                 case instrumentList.GuitarRight:
-                    image.Source = new BitmapImage(new Uri("images/guitar.png", UriKind.Relative));
+                    if (player.mode == MainWindow.PlayerMode.Acoustic)
+                    {
+                        image.Source = new BitmapImage(new Uri("images/guitar.png", UriKind.Relative));
+                    }
+                    else
+                    {
+                        image.Source = new BitmapImage(new Uri("images/electric-guitar.png", UriKind.Relative));
+                    }
                     //image.Height = 225;
                     //image.Width = image.Height * 0.35;
                     break;
@@ -762,16 +787,14 @@ namespace Moto
             }
         }
 
-        private void switchInstrument(MainWindow.Player player, instrumentList instrument)
+        private void switchInstrument(MainWindow.Player player, instrumentList instrument, MainWindow.PlayerMode mode = MainWindow.PlayerMode.None)
         {
-            if (player.instrument != instrument)
+            if (player.instrument != instrument || player.mode != mode)
             {
                 clearInstrumentRefs(player);
                 //Hide all the instrument-specific overlays & set the new instrument
                 if (MainWindow.activeSkeletons.ContainsKey(player.skeleton.TrackingId))
                 {
-                    manageInstrumentImage(MainWindow.activeSkeletons[player.skeleton.TrackingId], instrument);
-
                     switch (instrument)
                     {
                         case instrumentList.Drums:
@@ -781,7 +804,7 @@ namespace Moto
                         case instrumentList.GuitarLeft:
                         case instrumentList.GuitarRight:
                             setupGuitar(MainWindow.activeSkeletons[player.skeleton.TrackingId]);
-                            MainWindow.activeSkeletons[player.skeleton.TrackingId].mode = MainWindow.PlayerMode.Acoustic;
+                            MainWindow.activeSkeletons[player.skeleton.TrackingId].mode = mode;
                             break;
                         case instrumentList.Keyboard:
                             setupKeyboard(MainWindow.activeSkeletons[player.skeleton.TrackingId]);
@@ -792,6 +815,8 @@ namespace Moto
                             MainWindow.activeSkeletons[player.skeleton.TrackingId].mode = MainWindow.PlayerMode.None;
                             break;
                     }
+
+                    manageInstrumentImage(MainWindow.activeSkeletons[player.skeleton.TrackingId], instrument);
 
                     MainWindow.activeSkeletons[player.skeleton.TrackingId].instrument = instrument;
                 }
@@ -1232,10 +1257,16 @@ namespace Moto
                     checkTutorial(MainWindow.Tutorials.Metronome);
                     break;
                 case menuOptions.Guitar:
-                    switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.GuitarRight);
+                    switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.GuitarRight, MainWindow.PlayerMode.Acoustic);
                     break;
                 case menuOptions.LeftyGuitar:
-                    switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.GuitarLeft);
+                    switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.GuitarLeft, MainWindow.PlayerMode.Acoustic);
+                    break;
+                case menuOptions.ElectricGuitar:
+                    switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.GuitarRight, MainWindow.PlayerMode.Electric);
+                    break;
+                case menuOptions.LeftyElectricGuitar:
+                    switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.GuitarLeft, MainWindow.PlayerMode.Electric);
                     break;
                 case menuOptions.Drum:
                     switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.Drums);
