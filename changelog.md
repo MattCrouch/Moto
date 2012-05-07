@@ -1,5 +1,12 @@
 CHANGELOG
 =========
+0.7.1.0 - 6/5/12
+----------------
+- There are now help prompts for voice. Saying "Kinect Help Me" will bring up a list of commands you can say
+- Added a triangle to Band Mode
+- Lowered the confidence required for voice commands. May result in more false positives.
+- Moto now stops listening after a voice command. Just say "Kinect" or "Moto" and it will start listening again if you require that.
+
 0.7.0.0 - 5/5/12
 ----------------
 - Tutorials have been added. They aim to give you basic help on how to play Moto.

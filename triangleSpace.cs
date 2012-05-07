@@ -55,6 +55,21 @@ namespace Moto
             //Grab the image reference and move it to the correct place
             Canvas.SetLeft(image, point.X - (image.Width / 2));
             Canvas.SetTop(image, point.Y);
+
+            if (player.skeleton.Joints[JointType.HandLeft].TrackingState == JointTrackingState.Inferred && (Math.Abs(player.skeleton.Joints[JointType.HandLeft].Position.X) - Math.Abs(player.skeleton.Joints[JointType.HipCenter].Position.X) < 0.30 && player.skeleton.Joints[JointType.HandLeft].Position.Z > player.skeleton.Joints[JointType.HipCenter].Position.Z))
+            {
+                if (image.Visibility != System.Windows.Visibility.Hidden)
+                {
+                    image.Visibility = System.Windows.Visibility.Hidden;
+                }
+            }
+            else
+            {
+                if (image.Visibility != System.Windows.Visibility.Visible)
+                {
+                    image.Visibility = System.Windows.Visibility.Visible;
+                }
+            }
         }
 
         public void checkTriangle(MainWindow.Player player, JointType joint)

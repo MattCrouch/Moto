@@ -134,7 +134,7 @@ namespace Moto
         {
             foreach (var player in activeSkeletons)
             {
-                switchInstrument(player.Value, instrumentList.Drums);
+                switchInstrument(player.Value, chooseRandomInstrument());
                 Console.WriteLine(player.Value.skeleton.TrackingId);
             }
         }
@@ -227,7 +227,7 @@ namespace Moto
                         {
                             if (MainWindow.playerAdded(aSkeleton))
                             {
-                                switchInstrument(MainWindow.activeSkeletons[aSkeleton.TrackingId], instrumentList.GuitarLeft);
+                                switchInstrument(MainWindow.activeSkeletons[aSkeleton.TrackingId], chooseRandomInstrument());
                             }
                         }
 
@@ -295,6 +295,20 @@ namespace Moto
                     handMovements.listenForGestures(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton);
                 }
             }
+        }
+
+        private instrumentList chooseRandomInstrument()
+        {
+            instrumentList[] values = (instrumentList[])Enum.GetValues(typeof(instrumentList));
+
+            instrumentList anInstrument = values[new Random().Next(0, values.Length)];
+
+            if (anInstrument == instrumentList.WallOfSound || anInstrument == instrumentList.None)
+            {
+                anInstrument = instrumentList.Drums;
+            }
+
+            return anInstrument;
         }
 
         private void removeInstrumentVisuals(MainWindow.Player player)
