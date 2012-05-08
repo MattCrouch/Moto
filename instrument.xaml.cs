@@ -1047,6 +1047,8 @@ namespace Moto
             cameraFlash.Loaded += new RoutedEventHandler(cameraFlash_Loaded);
             MainCanvas.Children.Add(cameraFlash);
 
+            MainWindow.SFXCamera.Play();
+
             flashStoryboard.Completed += new EventHandler(flashStoryboard_Completed);
             
             string imageAddress = "moto-" + DateTime.Now.ToString("ddMMyyyy-HHmmss") + ".jpg";
@@ -1126,6 +1128,7 @@ namespace Moto
         void kinectGuideTimer_Tick(object sender, EventArgs e)
         {
             currentFocus = playerFocus.KinectGuide;
+            MainWindow.SFXMenu.Play();
 
             if (kinectGuideTimer != null)
             {
@@ -1235,6 +1238,7 @@ namespace Moto
             if (e.Trigger == handMovements.UserDecisions.Triggered)
             {
                 Console.WriteLine("Left swipe right");
+                MainWindow.SFXSuccess.Play();
 
                 exitKinectGuide();
 

@@ -1,5 +1,16 @@
 CHANGELOG
 =========
+0.8.0.0 - 7/5/12
+----------------
+- The Primary Player feature has been removed.
+	- Any player may now use any gesture. It's done on a "who shoots first" basis - ie if someone else is already selecting something, you can't
+	- Voice commands now guess who said them based on the Kinect's microphone array
+- There is now an electric guitar in Band Mode
+- New players to Band Mode now have a random instrument assigned to them
+- The Wall of Sound will now have less dead panels
+- The metronome beat is now the sound of a kickdrum
+- There are new UI sounds
+
 0.7.1.0 - 6/5/12
 ----------------
 - There are now help prompts for voice. Saying "Kinect Help Me" will bring up a list of commands you can say

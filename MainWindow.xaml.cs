@@ -47,6 +47,7 @@ namespace Moto
 
         private void setupSFX()
         {
+            SFXStartup.LoadAsync();
             SFXSuccess.LoadAsync();
             SFXDismiss.LoadAsync();
             SFXMenu.LoadAsync();
@@ -134,14 +135,15 @@ namespace Moto
         public static Skeleton[] allSkeletons = new Skeleton[6]; //Holds all skeleton data (always returns six skeletons regardless)
         
         //Sound effects
-        public static SoundPlayer SFXSuccess = new SoundPlayer();
+        public static SoundPlayer SFXStartup = new SoundPlayer("audio/ui/startup.wav");
+        public static SoundPlayer SFXSuccess = new SoundPlayer("audio/ui/confirm.wav");
         public static SoundPlayer SFXDismiss = new SoundPlayer();
-        public static SoundPlayer SFXMenu = new SoundPlayer();
-        public static SoundPlayer SFXListening = new SoundPlayer();
-        public static SoundPlayer SFXNotListening = new SoundPlayer();
+        public static SoundPlayer SFXMenu = new SoundPlayer("audio/ui/mode-selection.wav");
+        public static SoundPlayer SFXListening = new SoundPlayer("audio/ui/start-listening.wav");
+        public static SoundPlayer SFXNotListening = new SoundPlayer("audio/ui/stop-listening.wav");
         public static SoundPlayer SFXCamera = new SoundPlayer();
-        public static SoundPlayer SFXUpTick = new SoundPlayer();
-        public static SoundPlayer SFXDownTick = new SoundPlayer();
+        public static SoundPlayer SFXUpTick = new SoundPlayer("audio/ui/menu-up.wav");
+        public static SoundPlayer SFXDownTick = new SoundPlayer("audio/ui/menu-down.wav");
         
         //Tutorials
         public static Dictionary<Tutorials, tutorialVisuals> availableTutorials = new Dictionary<Tutorials, tutorialVisuals>();

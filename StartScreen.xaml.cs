@@ -27,6 +27,8 @@ namespace Moto
             Storyboard sb = this.FindResource("loadingMic") as Storyboard;
             sb.Begin();
 
+            MainWindow.SFXStartup.Play();
+
             //MainWindow.animateSlide(imgStepInToPlay);
             MainWindow.animateSlide(imgMotoLogo);
 
@@ -204,6 +206,7 @@ namespace Moto
                         modeDecision.Start();
                         modeDecision.Tick += new EventHandler(modeDecisionI_Tick);
                         sb.Begin();
+                        MainWindow.SFXMenu.Play();
                     }
                     
                     break;
@@ -241,6 +244,7 @@ namespace Moto
                         modeDecision.Start();
                         modeDecision.Tick += new EventHandler(modeDecisionWOS_Tick);
                         sb.Begin();
+                        MainWindow.SFXMenu.Play();
                     }
                     break;
                 case handMovements.UserDecisions.NotTriggered:
