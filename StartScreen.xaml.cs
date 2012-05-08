@@ -147,20 +147,6 @@ namespace Moto
                     }
                 }
 
-                if (MainWindow.activeSkeletons.Count > 0)
-                {
-                    int tempKey = MainWindow.primarySkeletonKey;
-                    MainWindow.primarySkeletonKey = MainWindow.selectPrimarySkeleton(MainWindow.activeSkeletons);
-
-                    alignPrimaryGlow(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
-
-                    if (tempKey != MainWindow.primarySkeletonKey)
-                    {
-                        //Primary Skeleton changed
-                        highlightPrimarySkeleton(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
-                    }
-                }
-
                 if (skeletonList.Count < MainWindow.activeSkeletons.Count)
                 {
                     List<int> activeList = new List<int>(MainWindow.activeSkeletons.Keys);
@@ -192,10 +178,19 @@ namespace Moto
 
                 if (MainWindow.activeSkeletons.Count > 0)
                 {
+                    int tempKey = MainWindow.primarySkeletonKey;
+                    MainWindow.primarySkeletonKey = MainWindow.selectPrimarySkeleton(MainWindow.activeSkeletons);
+
+                    alignPrimaryGlow(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
+
+                    if (tempKey != MainWindow.primarySkeletonKey)
+                    {
+                        //Primary Skeleton changed
+                        highlightPrimarySkeleton(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
+                    }
+
                     handMovements.listenForGestures(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton);
                 }
-
-                //screenVisibility();
             }
         }
 
