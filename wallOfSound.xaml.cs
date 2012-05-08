@@ -428,20 +428,20 @@ namespace Moto
                         }
 
                         //The player we're referencing at this point in the loop
-                        MainWindow.Player player = MainWindow.activeSkeletons[aSkeleton.TrackingId];
+                        //MainWindow.Player player = MainWindow.activeSkeletons[aSkeleton.TrackingId];
 
                         //Player-specific code
-                        handMovements.trackJointProgression(player.skeleton, player.skeleton.Joints[JointType.HandLeft]);
-                        handMovements.trackJointProgression(player.skeleton, player.skeleton.Joints[JointType.HandRight]);
+                        handMovements.trackJointProgression(MainWindow.activeSkeletons[aSkeleton.TrackingId].skeleton, MainWindow.activeSkeletons[aSkeleton.TrackingId].skeleton.Joints[JointType.HandLeft]);
+                        handMovements.trackJointProgression(MainWindow.activeSkeletons[aSkeleton.TrackingId].skeleton, MainWindow.activeSkeletons[aSkeleton.TrackingId].skeleton.Joints[JointType.HandRight]);
 
-                        if (player.mode != MainWindow.PlayerMode.Create)
+                        if (MainWindow.activeSkeletons[aSkeleton.TrackingId].mode != MainWindow.PlayerMode.Create)
                         {
-                            wallUpdate(player);
+                            wallUpdate(MainWindow.activeSkeletons[aSkeleton.TrackingId]);
                         }
-                        else if (player.mode == MainWindow.PlayerMode.Create)
+                        else if (MainWindow.activeSkeletons[aSkeleton.TrackingId].mode == MainWindow.PlayerMode.Create)
                         {
                             //Creation mode code
-                            wallCreateUpdate(player);
+                            wallCreateUpdate(MainWindow.activeSkeletons[aSkeleton.TrackingId]);
                         }
                     }
                 }
@@ -467,6 +467,7 @@ namespace Moto
                     }
 
                     activeList = null;
+                    
                 }
 
                 skeletonList = null;
@@ -478,13 +479,13 @@ namespace Moto
                         kinectGuideManipulation(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey]);
                         handMovements.listenForGestures(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey].skeleton);
                     }
-                }
-                else
-                {
-                    //Listen for gestures for everyone in the scene
-                    foreach (var player in MainWindow.activeSkeletons)
+                    else 
                     {
-                        handMovements.listenForGestures(player.Value.skeleton);
+                        //Listen for gestures for everyone in the scene
+                        foreach (var player in MainWindow.activeSkeletons)
+                        {
+                            handMovements.listenForGestures(player.Value.skeleton);
+                        }
                     }
                 }
             }
@@ -602,7 +603,13 @@ namespace Moto
                 recordingTimer.Tick -= recordingTimer_Tick;
                 recordingTimer = null;
 
-                removeWallInteractionVisual(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey]);
+                foreach (var player in MainWindow.activeSkeletons)
+                {
+                    if (player.Value.mode == MainWindow.PlayerMode.Create)
+                    {
+                        removeWallInteractionVisual(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey]);
+                    }
+                }
             }
         }
 
@@ -791,23 +798,27 @@ namespace Moto
 
             image.Width = scaledWidth(player);
 
-            ColorImagePoint point = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Joints[JointType.Spine].Position, ColorImageFormat.RgbResolution640x480Fps30);
-
-            //Grab the image reference and move it to the correct place
-            Canvas.SetLeft(image, point.X - (image.ActualWidth / 2));
-            Canvas.SetTop(image, point.Y - (image.ActualHeight / 2));
-
-            if (player.instrumentOverlay != null)
+            if (MainWindow.sensor.IsRunning)
             {
-                //If the player currently has an overlay to display, align that too
-                foreach (var overlay in player.instrumentOverlay)
+                ColorImagePoint point = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Joints[JointType.Spine].Position, ColorImageFormat.RgbResolution640x480Fps30);
+
+
+                //Grab the image reference and move it to the correct place
+                Canvas.SetLeft(image, point.X - (image.ActualWidth / 2));
+                Canvas.SetTop(image, point.Y - (image.ActualHeight / 2));
+
+                if (player.instrumentOverlay != null)
                 {
-                    image = overlay.Value;
+                    //If the player currently has an overlay to display, align that too
+                    foreach (var overlay in player.instrumentOverlay)
+                    {
+                        image = overlay.Value;
 
-                    image.Width = scaledWidth(player);
+                        image.Width = scaledWidth(player);
 
-                    Canvas.SetLeft(image, point.X - (image.ActualWidth / 2));
-                    Canvas.SetTop(image, point.Y - (image.ActualHeight / 2));
+                        Canvas.SetLeft(image, point.X - (image.ActualWidth / 2));
+                        Canvas.SetTop(image, point.Y - (image.ActualHeight / 2));
+                    }
                 }
             }
         }
@@ -822,20 +833,26 @@ namespace Moto
                 }
                 else
                 {
+                    mpDictionary[(mpCounter % mpDictionary.Count)].mediaPlayer.MediaFailed -= mediaPlayer_MediaFailed;
                     mpDictionary[(mpCounter % mpDictionary.Count)].mediaPlayer.MediaEnded -= wallOfSound_MediaEnded;
                     if (mpDictionary[(mpCounter % mpDictionary.Count)].box != i)
                     {
                         removeWallInteractionVisual(player, mpDictionary[(mpCounter % mpDictionary.Count)].box);
                     }
+
+                    mpDictionary[(mpCounter % mpDictionary.Count)] = new playerSound();
                 }
 
                 mpDictionary[(mpCounter % mpDictionary.Count)].skeleton = player.skeleton.TrackingId;
                 mpDictionary[(mpCounter % mpDictionary.Count)].box = i;
 
                 mpDictionary[(mpCounter % mpDictionary.Count)].mediaPlayer.Open(new Uri(wallAudio[player.skeleton.TrackingId][i], UriKind.Relative));
-                mpDictionary[(mpCounter % mpDictionary.Count)].mediaPlayer.Play();
 
                 mpDictionary[(mpCounter % mpDictionary.Count)].mediaPlayer.MediaEnded += new EventHandler(wallOfSound_MediaEnded);
+                mpDictionary[(mpCounter % mpDictionary.Count)].mediaPlayer.MediaFailed += new EventHandler<ExceptionEventArgs>(mediaPlayer_MediaFailed);
+
+                mpDictionary[(mpCounter % mpDictionary.Count)].mediaPlayer.Play();
+                Console.WriteLine("PLAY");
 
                 mpCounter++;
 
@@ -843,26 +860,39 @@ namespace Moto
             }
         }
 
+        void mediaPlayer_MediaFailed(object sender, ExceptionEventArgs e)
+        {
+            MediaPlayer player = (MediaPlayer)sender;
+
+            endMediaPlayer(ref player);
+        }
+
         void wallOfSound_MediaEnded(object sender, EventArgs e)
         {
             MediaPlayer player = (MediaPlayer)sender;
 
+            endMediaPlayer(ref player);
+        }
+
+        private void endMediaPlayer(ref MediaPlayer player)
+        {
             foreach (var entry in mpDictionary)
             {
                 if (entry.Value != null && entry.Value.mediaPlayer == player)
                 {
                     if (MainWindow.activeSkeletons.ContainsKey(mpDictionary[entry.Key].skeleton))
                     {
-                        removeWallInteractionVisual(MainWindow.activeSkeletons[mpDictionary[entry.Key].skeleton],entry.Value.box);
+                        removeWallInteractionVisual(MainWindow.activeSkeletons[mpDictionary[entry.Key].skeleton], entry.Value.box);
                     }
 
                     mpDictionary[entry.Key] = null;
                     return;
                 }
             }
-            
+
             player.Close();
-            
+
+            player.MediaFailed -= mediaPlayer_MediaFailed;
             player.MediaEnded -= wallOfSound_MediaEnded;
         }
 
@@ -1002,7 +1032,7 @@ namespace Moto
 
                     foreach (var mp in mpDictionary)
                     {
-                        if (mp.Value != null && mp.Value.box == box)
+                        if (mp.Value != null && mp.Value.box == box && mp.Value.skeleton == player.skeleton.TrackingId)
                         {
                             typeCount++;
                         }
@@ -1010,8 +1040,14 @@ namespace Moto
 
                     if (typeCount < 2)
                     {
-                        MainCanvas.Children.Remove(player.instrumentOverlay[box]);
-                        player.instrumentOverlay.Remove(box);
+                        if (player.instrumentOverlay.ContainsKey(box))
+                        {
+                            if (MainCanvas.Children.Contains(player.instrumentOverlay[box]))
+                            {
+                                MainCanvas.Children.Remove(player.instrumentOverlay[box]);
+                            }
+                            player.instrumentOverlay.Remove(box);
+                        }
                     }
                 }
             }
@@ -1467,33 +1503,42 @@ namespace Moto
 
         void handMovements_LeftSwipeRight(object sender, handMovements.GestureEventArgs e)
         {
-            Console.WriteLine("Left swipe right");
-
-            exitKinectGuide();
-
-            switch (kinectGuideMenu[menuPosition])
+            if (e.Trigger == handMovements.UserDecisions.Triggered)
             {
-                case menuOptions.GoBack:
-                    returnToStart();
-                    break;
-                case menuOptions.TakeAPicture:
-                    takeAPicture();
-                    break;
-                case menuOptions.RecordNewWall:
-                    wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], menuOptions.RecordNewWall);
-                    break;
-                case menuOptions.CustomWall:
-                    wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], menuOptions.CustomWall);
-                    break;
-                case menuOptions.Technologic:
-                    wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], menuOptions.Technologic);
-                    break;
-                case menuOptions.Drum:
-                    wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], menuOptions.Drum);
-                    break;
-                case menuOptions.EightBit:
-                    wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], menuOptions.EightBit);
-                    break;
+                Console.WriteLine("Left swipe right");
+
+                exitKinectGuide();
+
+                switch (kinectGuideMenu[menuPosition])
+                {
+                    case menuOptions.GoBack:
+                        returnToStart();
+                        break;
+                    case menuOptions.TakeAPicture:
+                        takeAPicture();
+                        break;
+                    case menuOptions.RecordNewWall:
+                        wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], menuOptions.RecordNewWall);
+                        break;
+                    case menuOptions.CustomWall:
+                        wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], menuOptions.CustomWall);
+                        break;
+                    case menuOptions.Technologic:
+                        wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], menuOptions.Technologic);
+                        break;
+                    case menuOptions.Drum:
+                        wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], menuOptions.Drum);
+                        break;
+                    case menuOptions.EightBit:
+                        wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], menuOptions.EightBit);
+                        break;
+                }
+            }
+            else
+            {
+                //Stop listening and reset the flag for next time
+                handMovements.LeftSwipeRight -= handMovements_LeftSwipeRight;
+                handMovements.LeftSwipeRightStatus[MainWindow.gestureSkeletonKey] = false;
             }
         }
 
@@ -1507,10 +1552,6 @@ namespace Moto
             MainWindow.showPlayerOverlays();
 
             currentFocus = playerFocus.None;
-
-            //Stop listening and reset the flag for next time
-            handMovements.LeftSwipeRight -= handMovements_LeftSwipeRight;
-            handMovements.LeftSwipeRightStatus[MainWindow.gestureSkeletonKey] = false;
 
             //Remove menu nav tick
             if (menuMovementTimer != null)

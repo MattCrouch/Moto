@@ -127,7 +127,6 @@ namespace Moto
 
         public static void listenForGestures(Skeleton skeleton)
         {
-            Console.WriteLine(MainWindow.gestureSkeletonKey + " - " + MainWindow.activeGesture);
             if (MainWindow.gestureSkeletonKey == skeleton.TrackingId || MainWindow.activeGesture == ActiveGesture.None)
             {
                 if (!LeftGestureStatus.ContainsKey(skeleton.TrackingId))
