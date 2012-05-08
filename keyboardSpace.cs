@@ -45,7 +45,7 @@ namespace Moto
             }
 
             //Make sure the hands aren't in the areas in the first place
-            insideKey.Add(player.skeleton.TrackingId, createPlayerDictionary(3));
+            insideKey.Add(player.skeleton.TrackingId, createPlayerDictionary(keyArea[player.skeleton.TrackingId].Count));
         }
 
         internal void defineKeyAreas(MainWindow.Player player)

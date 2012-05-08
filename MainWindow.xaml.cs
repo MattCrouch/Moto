@@ -457,6 +457,41 @@ namespace Moto
             kinectError.Height = 480;
             return kinectError;
         }
+
+
+        public static int findVoiceCommandPlayer(double angle)
+        {
+            int skeletonId = 0;
+
+            if (angle >= 0)
+            {
+                //Player is on the left of the Kinect (Right of the screen)
+                double xPos = -5;
+                foreach (var player in MainWindow.activeSkeletons)
+                {
+                    if (player.Value == null || player.Value.skeleton.Position.X > xPos)
+                    {
+                        xPos = player.Value.skeleton.Position.X;
+                        skeletonId = player.Value.skeleton.TrackingId;
+                    }
+                }
+            }
+            else
+            {
+                //Player is on the right of the Kinect (Left of the screen)
+                double xPos = 5;
+                foreach (var player in MainWindow.activeSkeletons)
+                {
+                    if (player.Value == null || player.Value.skeleton.Position.X < xPos)
+                    {
+                        xPos = player.Value.skeleton.Position.X;
+                        skeletonId = player.Value.skeleton.TrackingId;
+                    }
+                }
+            }
+            return skeletonId;
+        }
+
     }
 }
 

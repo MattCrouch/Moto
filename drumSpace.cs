@@ -45,7 +45,7 @@ namespace Moto
             }
 
             //Make sure the hands aren't in the drums areas in the first place
-            insideArea.Add(player.skeleton.TrackingId, createPlayerDictionary(7));
+            insideArea.Add(player.skeleton.TrackingId, createPlayerDictionary(8));
         }
 
         Dictionary<JointType,Dictionary<int,bool>> createPlayerDictionary(int dictCount)

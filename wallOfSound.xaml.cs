@@ -1185,41 +1185,43 @@ namespace Moto
                 MainWindow.mySpeechRecognizer.switchGrammar(new Choices[] { MainWindow.mySpeechRecognizer.wallChoices, MainWindow.mySpeechRecognizer.kinectMotorChoices }, true, true);
             }
 
+            int skeletonId = MainWindow.findVoiceCommandPlayer(MainWindow.sensor.AudioSource.SoundSourceAngle);
+
             switch (voiceCommand.Verb)
             {
                 case SpeechRecognizer.Verbs.CustomWall:
                     //Switch to the Custom wall
-                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.gestureSkeletonKey))
+                    if (MainWindow.activeSkeletons.ContainsKey(skeletonId))
                     {
-                        wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], menuOptions.CustomWall);
+                        wallSwitchPlayerTo(MainWindow.activeSkeletons[skeletonId], menuOptions.CustomWall);
                     }
                     break;
                 case SpeechRecognizer.Verbs.CreateWall:
                     //Record new samples for the Custom wall
-                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.gestureSkeletonKey))
+                    if (MainWindow.activeSkeletons.ContainsKey(skeletonId))
                     {
-                        wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], menuOptions.RecordNewWall);
+                        wallSwitchPlayerTo(MainWindow.activeSkeletons[skeletonId], menuOptions.RecordNewWall);
                     }
                     break;
                 case SpeechRecognizer.Verbs.EightBitWall:
-                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.gestureSkeletonKey))
+                    if (MainWindow.activeSkeletons.ContainsKey(skeletonId))
                     {
-                        wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], menuOptions.EightBit);
+                        wallSwitchPlayerTo(MainWindow.activeSkeletons[skeletonId], menuOptions.EightBit);
                     }
                     //Switch to the 8-bit Wall
                     break;
                 case SpeechRecognizer.Verbs.TechnologicWall:
-                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.gestureSkeletonKey))
+                    if (MainWindow.activeSkeletons.ContainsKey(skeletonId))
                     {
-                        wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], menuOptions.Technologic);
+                        wallSwitchPlayerTo(MainWindow.activeSkeletons[skeletonId], menuOptions.Technologic);
                     }
                     //Switch to the Technologic wall
                     break;
                 case SpeechRecognizer.Verbs.DrumWall:
                     //Switch to the Drum Samples wall
-                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.gestureSkeletonKey))
+                    if (MainWindow.activeSkeletons.ContainsKey(skeletonId))
                     {
-                        wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], menuOptions.Drum);
+                        wallSwitchPlayerTo(MainWindow.activeSkeletons[skeletonId], menuOptions.Drum);
                     }
                     break;
                 case SpeechRecognizer.Verbs.KinectUp:
@@ -1317,19 +1319,19 @@ namespace Moto
                         break;
                     case menuOptions.CustomWall:
                         player.mode = MainWindow.PlayerMode.Custom;
-                        customAudio(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey]);
+                        customAudio(player);
                         break;
                     case menuOptions.Technologic:
                         player.mode = MainWindow.PlayerMode.Technologic;
-                        technologicAudio(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey]);
+                        technologicAudio(player);
                         break;
                     case menuOptions.Drum:
                         player.mode = MainWindow.PlayerMode.Drum;
-                        drumsetAudio(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey]);
+                        drumsetAudio(player);
                         break;
                     case menuOptions.EightBit:
                         player.mode = MainWindow.PlayerMode.EightBit;
-                        eightBitAudio(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey]);
+                        eightBitAudio(player);
                         break;
                 }
             }

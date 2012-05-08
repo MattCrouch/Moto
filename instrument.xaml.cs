@@ -622,48 +622,50 @@ namespace Moto
                 MainWindow.mySpeechRecognizer.switchGrammar(new Choices[] { MainWindow.mySpeechRecognizer.instrumentChoices, MainWindow.mySpeechRecognizer.kinectMotorChoices }, true, true);
             }
 
+            int skeletonId = MainWindow.findVoiceCommandPlayer(MainWindow.sensor.AudioSource.SoundSourceAngle);
+
             switch (voiceCommand.Verb)
             {
                 case SpeechRecognizer.Verbs.DrumsSwitch:
-                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.gestureSkeletonKey))
+                    if (MainWindow.activeSkeletons.ContainsKey(skeletonId))
                     {
-                        switchInstrument(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], instrumentList.Drums);
+                        switchInstrument(MainWindow.activeSkeletons[skeletonId], instrumentList.Drums);
                     }
                     break;
                 case SpeechRecognizer.Verbs.GuitarSwitch:
-                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.gestureSkeletonKey))
+                    if (MainWindow.activeSkeletons.ContainsKey(skeletonId))
                     {
-                        switchInstrument(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], instrumentList.GuitarRight, MainWindow.PlayerMode.Acoustic);
+                        switchInstrument(MainWindow.activeSkeletons[skeletonId], instrumentList.GuitarRight, MainWindow.PlayerMode.Acoustic);
                     }
                     break;
                 case SpeechRecognizer.Verbs.LeftyGuitarSwitch:
-                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.gestureSkeletonKey))
+                    if (MainWindow.activeSkeletons.ContainsKey(skeletonId))
                     {
-                        switchInstrument(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], instrumentList.GuitarLeft, MainWindow.PlayerMode.Acoustic);
+                        switchInstrument(MainWindow.activeSkeletons[skeletonId], instrumentList.GuitarLeft, MainWindow.PlayerMode.Acoustic);
                     }
                     break;
                 case SpeechRecognizer.Verbs.ElectricGuitarSwitch:
-                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.gestureSkeletonKey))
+                    if (MainWindow.activeSkeletons.ContainsKey(skeletonId))
                     {
-                        switchInstrument(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], instrumentList.GuitarRight, MainWindow.PlayerMode.Electric);
+                        switchInstrument(MainWindow.activeSkeletons[skeletonId], instrumentList.GuitarRight, MainWindow.PlayerMode.Electric);
                     }
                     break;
                 case SpeechRecognizer.Verbs.LeftyElectricGuitarSwitch:
-                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.gestureSkeletonKey))
+                    if (MainWindow.activeSkeletons.ContainsKey(skeletonId))
                     {
-                        switchInstrument(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], instrumentList.GuitarLeft, MainWindow.PlayerMode.Electric);
+                        switchInstrument(MainWindow.activeSkeletons[skeletonId], instrumentList.GuitarLeft, MainWindow.PlayerMode.Electric);
                     }
                     break;
                 case SpeechRecognizer.Verbs.KeyboardSwitch:
-                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.gestureSkeletonKey))
+                    if (MainWindow.activeSkeletons.ContainsKey(skeletonId))
                     {
-                        switchInstrument(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], instrumentList.Keyboard);
+                        switchInstrument(MainWindow.activeSkeletons[skeletonId], instrumentList.Keyboard);
                     }
                     break;
                 case SpeechRecognizer.Verbs.TriangleSwitch:
-                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.gestureSkeletonKey))
+                    if (MainWindow.activeSkeletons.ContainsKey(skeletonId))
                     {
-                        switchInstrument(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], instrumentList.Triangle);
+                        switchInstrument(MainWindow.activeSkeletons[skeletonId], instrumentList.Triangle);
                     }
                     break;
                 case SpeechRecognizer.Verbs.StartMetronome:
