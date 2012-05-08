@@ -20,6 +20,16 @@ namespace Moto
             NotTriggered,
         }
 
+        public enum ActiveGesture
+        {
+            None = 0,
+            LeftGesture,
+            RightGesture,
+            KinectGuideGesture,
+            LeftSwipeRight,
+        }
+
+
         public class GestureEventArgs : EventArgs
         {
             public UserDecisions Trigger { get; set; }
@@ -30,10 +40,10 @@ namespace Moto
         public static event EventHandler<GestureEventArgs> RightGesture;
         public static event EventHandler<GestureEventArgs> LeftSwipeRight;
 
-        public static bool KinectGuideGestureStatus;
-        public static bool LeftGestureStatus;
-        public static bool RightGestureStatus;
-        public static bool LeftSwipeRightStatus;
+        public static Dictionary<int, bool> KinectGuideGestureStatus = new Dictionary<int,bool>();
+        public static Dictionary<int, bool> LeftGestureStatus = new Dictionary<int, bool>();
+        public static Dictionary<int, bool> RightGestureStatus = new Dictionary<int, bool>();
+        public static Dictionary<int, bool> LeftSwipeRightStatus = new Dictionary<int, bool>();
 
         public static bool leftSwipeRightStarted;
         public static gesturePoint leftSwipeRightIn;
@@ -117,148 +127,173 @@ namespace Moto
 
         public static void listenForGestures(Skeleton skeleton)
         {
-            int angleDrift = 15;
-            double anAngle;
-            bool failed;
-
-            //Console.WriteLine(getAngle(skeleton.Joints[JointType.ShoulderRight], skeleton.Joints[JointType.HandRight]));
-            //isLimbStraight(skeleton.Joints[JointType.ShoulderRight], skeleton.Joints[JointType.ElbowRight], skeleton.Joints[JointType.HandRight], 5);
-
-            if (LeftGesture != null)
+            Console.WriteLine(MainWindow.gestureSkeletonKey + " - " + MainWindow.activeGesture);
+            if (MainWindow.gestureSkeletonKey == skeleton.TrackingId || MainWindow.activeGesture == ActiveGesture.None)
             {
+                if (!LeftGestureStatus.ContainsKey(skeleton.TrackingId))
+                {
+                    //If this is a skeleton we haven't tracked before, add them to our gesture tracking dictionary
+                    addToGestureTracker(skeleton);
+                }
+
+                int angleDrift = 15;
+                double anAngle;
+                bool failed;
+
+                //Console.WriteLine(getAngle(skeleton.Joints[JointType.ShoulderRight], skeleton.Joints[JointType.HandRight]));
+                //isLimbStraight(skeleton.Joints[JointType.ShoulderRight], skeleton.Joints[JointType.ElbowRight], skeleton.Joints[JointType.HandRight], 5);
+
+                if (LeftGesture != null)
+                {
+                    failed = true;
+
+                    //Check if left hand stretched out
+                    anAngle = getAngle(skeleton.Joints[JointType.ShoulderLeft].Position, skeleton.Joints[JointType.HandLeft].Position);
+
+                    if (Math.Abs(anAngle - 90) < angleDrift)
+                    {
+                        if (isLimbStraight(skeleton.Joints[JointType.ShoulderLeft], skeleton.Joints[JointType.ElbowLeft], skeleton.Joints[JointType.HandLeft], 30))
+                        {
+                            failed = false;
+                            if (!LeftGestureStatus[skeleton.TrackingId])
+                            {
+                                toggleGestureStatus(skeleton, ref LeftGestureStatus, LeftGesture, true);
+                            }
+                        }
+                    }
+
+                    if (failed)
+                    {
+                        toggleGestureStatus(skeleton, ref LeftGestureStatus, LeftGesture, false);
+                    }
+                }
+
+                if (KinectGuideGesture != null)
+                {
+
+                    failed = true;
+
+                    anAngle = getAngle(skeleton.Joints[JointType.ShoulderLeft].Position, skeleton.Joints[JointType.WristLeft].Position);
+                    //Console.WriteLine(Math.Abs(anAngle - 45));
+                    //'Kinect Guide' gesture
+                    if ((Math.Abs(anAngle - 45) < angleDrift) && (skeleton.Joints[JointType.HandLeft].Position.Y < getMidpoint(skeleton.Joints[JointType.Spine], skeleton.Joints[JointType.HipCenter]).Y) && (skeleton.Joints[JointType.HandLeft].Position.X < skeleton.Joints[JointType.Spine].Position.X))
+                    {
+                        if (isLimbStraight(skeleton.Joints[JointType.ShoulderLeft], skeleton.Joints[JointType.ElbowLeft], skeleton.Joints[JointType.HandLeft], 30))
+                        {
+                            failed = false;
+                            if (!KinectGuideGestureStatus[skeleton.TrackingId])
+                            {
+                                toggleGestureStatus(skeleton, ref KinectGuideGestureStatus, KinectGuideGesture, true);
+                            }
+                        }
+                    }
+
+                    if (failed)
+                    {
+                        toggleGestureStatus(skeleton, ref KinectGuideGestureStatus, KinectGuideGesture, false);
+                    }
+                }
+
                 failed = true;
 
-                //Check if left hand stretched out
-                anAngle = getAngle(skeleton.Joints[JointType.ShoulderLeft].Position, skeleton.Joints[JointType.HandLeft].Position);
-
-                if (Math.Abs(anAngle - 90) < angleDrift)
+                if (RightGesture != null)
                 {
-                    if (isLimbStraight(skeleton.Joints[JointType.ShoulderLeft], skeleton.Joints[JointType.ElbowLeft], skeleton.Joints[JointType.HandLeft], 30))
+                    //Check if right hand stretched out
+                    anAngle = getAngle(skeleton.Joints[JointType.ShoulderRight].Position, skeleton.Joints[JointType.HandRight].Position);
+
+                    if (Math.Abs(anAngle - 90) < angleDrift)
                     {
-                        failed = false;
-                        if (!LeftGestureStatus)
+                        if (isLimbStraight(skeleton.Joints[JointType.ShoulderRight], skeleton.Joints[JointType.ElbowRight], skeleton.Joints[JointType.HandRight], 30))
                         {
-                            toggleGestureStatus(ref LeftGestureStatus, LeftGesture, true);
+                            failed = false;
+                            if (!RightGestureStatus[skeleton.TrackingId])
+                            {
+                                toggleGestureStatus(skeleton, ref RightGestureStatus, RightGesture, true);
+                            }
                         }
                     }
-                }
 
-                if (failed)
-                {
-                    toggleGestureStatus(ref LeftGestureStatus, LeftGesture, false);
-                }
-            }
-
-            if(KinectGuideGesture != null)
-            {
-
-                failed = true;
-
-                anAngle = getAngle(skeleton.Joints[JointType.ShoulderLeft].Position, skeleton.Joints[JointType.WristLeft].Position);
-                //Console.WriteLine(Math.Abs(anAngle - 45));
-                //'Kinect Guide' gesture
-                if ((Math.Abs(anAngle - 45) < angleDrift) && (skeleton.Joints[JointType.HandLeft].Position.Y < getMidpoint(skeleton.Joints[JointType.Spine],skeleton.Joints[JointType.HipCenter]).Y) && (skeleton.Joints[JointType.HandLeft].Position.X < skeleton.Joints[JointType.Spine].Position.X))
-                {
-                    if (isLimbStraight(skeleton.Joints[JointType.ShoulderLeft], skeleton.Joints[JointType.ElbowLeft], skeleton.Joints[JointType.HandLeft], 30))
+                    if (failed)
                     {
-                        failed = false;
-                        if (!KinectGuideGestureStatus)
+                        toggleGestureStatus(skeleton, ref RightGestureStatus, RightGesture, false);
+                    }
+                }
+
+                if (LeftSwipeRight != null)
+                {
+                    if (difference[skeleton.TrackingId][JointType.HandLeft].X > 0.04)
+                    {
+                        if (leftSwipeRightIn == null)
                         {
-                            toggleGestureStatus(ref KinectGuideGestureStatus, KinectGuideGesture, true);
+                            leftSwipeRightIn = new gesturePoint();
+
+                            //Create a new start point
+                            difference3 newPosition = new difference3();
+                            newPosition.X = skeleton.Joints[JointType.HandLeft].Position.X;
+                            newPosition.Y = skeleton.Joints[JointType.HandLeft].Position.Y;
+                            newPosition.Z = skeleton.Joints[JointType.HandLeft].Position.Z;
+
+                            leftSwipeRightIn.Position = newPosition;
+                            leftSwipeRightIn.Timestamp = currentTimestamp;
                         }
                     }
-                }
-
-                if (failed)
-                {
-                    toggleGestureStatus(ref KinectGuideGestureStatus, KinectGuideGesture, false);
-                }
-            }
-
-            failed = true;
-
-            if (RightGesture != null)
-            {
-                //Check if right hand stretched out
-                anAngle = getAngle(skeleton.Joints[JointType.ShoulderRight].Position, skeleton.Joints[JointType.HandRight].Position);
-
-                if (Math.Abs(anAngle - 90) < angleDrift)
-                {
-                    if (isLimbStraight(skeleton.Joints[JointType.ShoulderRight], skeleton.Joints[JointType.ElbowRight], skeleton.Joints[JointType.HandRight], 30))
+                    else
                     {
-                        failed = false;
-                        if (!RightGestureStatus)
+                        if (leftSwipeRightIn != null)
                         {
-                            toggleGestureStatus(ref RightGestureStatus, RightGesture, true);
+                            //Create a new end point, then compare
+                            //Creating the end point
+                            leftSwipeRightOut = new gesturePoint();
+
+                            difference3 newPosition = new difference3();
+                            newPosition.X = skeleton.Joints[JointType.HandLeft].Position.X;
+                            newPosition.Y = skeleton.Joints[JointType.HandLeft].Position.Y;
+                            newPosition.Z = skeleton.Joints[JointType.HandLeft].Position.Z;
+
+                            leftSwipeRightOut.Position = newPosition;
+                            leftSwipeRightOut.Timestamp = currentTimestamp;
+
+                            //Comparison
+                            if ((leftSwipeRightOut.Position.X - leftSwipeRightIn.Position.X) >= 0.2 && (leftSwipeRightOut.Timestamp - leftSwipeRightIn.Timestamp) < 4000)
+                            {
+                                //Fire the event
+                                toggleGestureStatus(skeleton, ref LeftSwipeRightStatus, LeftSwipeRight, true);
+                                toggleGestureStatus(skeleton, ref LeftSwipeRightStatus, LeftSwipeRight, false);
+                            }
+
+                            //Reset both values
+                            leftSwipeRightIn = null;
+                            leftSwipeRightOut = null;
                         }
                     }
-                }
 
-                if (failed)
-                {
-                    toggleGestureStatus(ref RightGestureStatus, RightGesture, false);
-                }
-            }
-
-            if (LeftSwipeRight != null)
-            {
-                if (difference[skeleton.TrackingId][JointType.HandLeft].X > 0.04)
-                {
-                    if (leftSwipeRightIn == null)
+                    /*if (skeleton.Joints[JointType.HandLeft].Position.X > skeleton.Joints[JointType.ElbowLeft].Position.X)
                     {
-                        leftSwipeRightIn = new gesturePoint();
-
-                        //Create a new start point
-                        difference3 newPosition = new difference3();
-                        newPosition.X = skeleton.Joints[JointType.HandLeft].Position.X;
-                        newPosition.Y = skeleton.Joints[JointType.HandLeft].Position.Y;
-                        newPosition.Z = skeleton.Joints[JointType.HandLeft].Position.Z;
-
-                        leftSwipeRightIn.Position = newPosition;
-                        leftSwipeRightIn.Timestamp = currentTimestamp;
-                    }
-                }
-                else
-                {
-                    if (leftSwipeRightIn != null)
-                    {
-                        //Create a new end point, then compare
-                        //Creating the end point
-                        leftSwipeRightOut = new gesturePoint();
-
-                        difference3 newPosition = new difference3();
-                        newPosition.X = skeleton.Joints[JointType.HandLeft].Position.X;
-                        newPosition.Y = skeleton.Joints[JointType.HandLeft].Position.Y;
-                        newPosition.Z = skeleton.Joints[JointType.HandLeft].Position.Z;
-
-                        leftSwipeRightOut.Position = newPosition;
-                        leftSwipeRightOut.Timestamp = currentTimestamp;
-
-                        //Comparison
-                        if ((leftSwipeRightOut.Position.X - leftSwipeRightIn.Position.X) >= 0.2 && (leftSwipeRightOut.Timestamp - leftSwipeRightIn.Timestamp) < 4000)
+                        //The hand has moved from left to right, was it fast enough for a swipe?
+                        Console.WriteLine(difference[skeleton.TrackingId][JointType.HandLeft].X);
+                        if (difference[skeleton.TrackingId][JointType.HandLeft].X > 0.2 && skeleton.Joints[JointType.HandLeft].TrackingState == JointTrackingState.Tracked)
                         {
-                            //Fire the event
                             toggleGestureStatus(ref LeftSwipeRightStatus, LeftSwipeRight, true);
                         }
-
-                        //Reset both values
-                        leftSwipeRightIn = null;
-                        leftSwipeRightOut = null;
-                    }
+                    }*/
                 }
-
-
-
-                /*if (skeleton.Joints[JointType.HandLeft].Position.X > skeleton.Joints[JointType.ElbowLeft].Position.X)
-                {
-                    //The hand has moved from left to right, was it fast enough for a swipe?
-                    Console.WriteLine(difference[skeleton.TrackingId][JointType.HandLeft].X);
-                    if (difference[skeleton.TrackingId][JointType.HandLeft].X > 0.2 && skeleton.Joints[JointType.HandLeft].TrackingState == JointTrackingState.Tracked)
-                    {
-                        toggleGestureStatus(ref LeftSwipeRightStatus, LeftSwipeRight, true);
-                    }
-                }*/
             }
+        }
+
+        private static void addToGestureTracker(Skeleton skeleton)
+        {
+            LeftGestureStatus.Add(skeleton.TrackingId, false);
+            RightGestureStatus.Add(skeleton.TrackingId, false);
+            KinectGuideGestureStatus.Add(skeleton.TrackingId, false);
+            LeftSwipeRightStatus.Add(skeleton.TrackingId, false);
+        }
+
+        private static void removeFromGestureTracker(Skeleton skeleton)
+        {
+            LeftGestureStatus.Remove(skeleton.TrackingId);
+            RightGestureStatus.Remove(skeleton.TrackingId);
+            KinectGuideGestureStatus.Remove(skeleton.TrackingId);
+            LeftSwipeRightStatus.Remove(skeleton.TrackingId);
         }
 
         /// <summary>
@@ -404,21 +439,51 @@ namespace Moto
             }
         }
 
-        public static void toggleGestureStatus(ref bool flag, EventHandler<GestureEventArgs> theEvent, bool on)
+        public static void toggleGestureStatus(Skeleton skeleton, ref Dictionary<int, bool> flag, EventHandler<GestureEventArgs> theEvent, bool on)
         {
-            //Takes the boolean flag of the gesture status, flicks it to 'on' value and fires the appropriate event
-            if (flag != on)
-            {
-                flag = on;
+            //Is anyone else performing a gesture at the moment?
 
-                if (flag)
+            //Takes the boolean flag of the gesture status, flicks it to 'on' value and fires the appropriate event
+            if (flag[skeleton.TrackingId] != on)
+            {
+                flag[skeleton.TrackingId] = on;
+
+                if (flag[skeleton.TrackingId])
                 {
                     theEvent(null, new GestureEventArgs { Trigger = UserDecisions.Triggered });
+                    setPlayerGesture(skeleton, flag);
                 }
                 else
                 {
                     theEvent(null, new GestureEventArgs { Trigger = UserDecisions.NotTriggered });
+                    setPlayerGesture(skeleton);
                 }
+            }
+        }
+
+        private static void setPlayerGesture(Skeleton skeleton, Dictionary<int, bool> flag = null)
+        {
+            MainWindow.gestureSkeletonKey = skeleton.TrackingId;
+
+            if (flag == null)
+            {
+                MainWindow.activeGesture = ActiveGesture.None;
+            }
+            else if (flag == LeftGestureStatus)
+            {
+                MainWindow.activeGesture = ActiveGesture.LeftGesture;
+            }
+            else if (flag == RightGestureStatus)
+            {
+                MainWindow.activeGesture = ActiveGesture.RightGesture;
+            }
+            else if (flag == KinectGuideGestureStatus)
+            {
+                MainWindow.activeGesture = ActiveGesture.KinectGuideGesture;
+            }
+            else if (flag == LeftSwipeRightStatus)
+            {
+                MainWindow.activeGesture = ActiveGesture.LeftSwipeRight;
             }
         }
 

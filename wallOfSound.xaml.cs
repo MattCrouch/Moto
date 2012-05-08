@@ -473,22 +473,18 @@ namespace Moto
 
                 if (MainWindow.activeSkeletons.Count > 0)
                 {
-                    int tempKey = MainWindow.primarySkeletonKey;
-                    MainWindow.primarySkeletonKey = MainWindow.selectPrimarySkeleton(MainWindow.activeSkeletons);
-
-                    alignPrimaryGlow(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
-
-                    handMovements.listenForGestures(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton);
-
                     if (currentFocus == playerFocus.KinectGuide)
                     {
-                        kinectGuideManipulation(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
+                        kinectGuideManipulation(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey]);
+                        handMovements.listenForGestures(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey].skeleton);
                     }
-
-                    if (tempKey != MainWindow.primarySkeletonKey)
+                }
+                else
+                {
+                    //Listen for gestures for everyone in the scene
+                    foreach (var player in MainWindow.activeSkeletons)
                     {
-                        //Primary Skeleton changed
-                        highlightPrimarySkeleton(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
+                        handMovements.listenForGestures(player.Value.skeleton);
                     }
                 }
             }
@@ -606,7 +602,7 @@ namespace Moto
                 recordingTimer.Tick -= recordingTimer_Tick;
                 recordingTimer = null;
 
-                removeWallInteractionVisual(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
+                removeWallInteractionVisual(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey]);
             }
         }
 
@@ -949,7 +945,7 @@ namespace Moto
         void dismissTutorial(object sender, handMovements.GestureEventArgs e)
         {
             handMovements.LeftSwipeRight -= dismissTutorial;
-            handMovements.LeftSwipeRightStatus = false;
+            handMovements.LeftSwipeRightStatus[MainWindow.gestureSkeletonKey] = false;
 
             MainWindow.animateFade(imgDimmer, 0.5, 0, 0.5);
             MainWindow.animateSlide(MainWindow.availableTutorials[MainWindow.activeTutorial].tutImage, true, false, 50, 0.5);
@@ -1157,37 +1153,37 @@ namespace Moto
             {
                 case SpeechRecognizer.Verbs.CustomWall:
                     //Switch to the Custom wall
-                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
+                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.gestureSkeletonKey))
                     {
-                        wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], menuOptions.CustomWall);
+                        wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], menuOptions.CustomWall);
                     }
                     break;
                 case SpeechRecognizer.Verbs.CreateWall:
                     //Record new samples for the Custom wall
-                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
+                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.gestureSkeletonKey))
                     {
-                        wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], menuOptions.RecordNewWall);
+                        wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], menuOptions.RecordNewWall);
                     }
                     break;
                 case SpeechRecognizer.Verbs.EightBitWall:
-                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
+                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.gestureSkeletonKey))
                     {
-                        wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], menuOptions.EightBit);
+                        wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], menuOptions.EightBit);
                     }
                     //Switch to the 8-bit Wall
                     break;
                 case SpeechRecognizer.Verbs.TechnologicWall:
-                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
+                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.gestureSkeletonKey))
                     {
-                        wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], menuOptions.Technologic);
+                        wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], menuOptions.Technologic);
                     }
                     //Switch to the Technologic wall
                     break;
                 case SpeechRecognizer.Verbs.DrumWall:
                     //Switch to the Drum Samples wall
-                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
+                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.gestureSkeletonKey))
                     {
-                        wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], menuOptions.Drum);
+                        wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], menuOptions.Drum);
                     }
                     break;
                 case SpeechRecognizer.Verbs.KinectUp:
@@ -1285,19 +1281,19 @@ namespace Moto
                         break;
                     case menuOptions.CustomWall:
                         player.mode = MainWindow.PlayerMode.Custom;
-                        customAudio(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
+                        customAudio(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey]);
                         break;
                     case menuOptions.Technologic:
                         player.mode = MainWindow.PlayerMode.Technologic;
-                        technologicAudio(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
+                        technologicAudio(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey]);
                         break;
                     case menuOptions.Drum:
                         player.mode = MainWindow.PlayerMode.Drum;
-                        drumsetAudio(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
+                        drumsetAudio(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey]);
                         break;
                     case menuOptions.EightBit:
                         player.mode = MainWindow.PlayerMode.EightBit;
-                        eightBitAudio(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
+                        eightBitAudio(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey]);
                         break;
                 }
             }
@@ -1394,9 +1390,9 @@ namespace Moto
         {
             if (handMovements.leftSwipeRightIn == null)
             {
-                if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
+                if (MainWindow.activeSkeletons.ContainsKey(MainWindow.gestureSkeletonKey))
                 {
-                    Skeleton player = MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton;
+                    Skeleton player = MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey].skeleton;
 
                     if (menuScrollDirection == handMovements.scrollDirection.SmallDown || menuScrollDirection == handMovements.scrollDirection.LargeDown)
                     {
@@ -1484,19 +1480,19 @@ namespace Moto
                     takeAPicture();
                     break;
                 case menuOptions.RecordNewWall:
-                    wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], menuOptions.RecordNewWall);
+                    wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], menuOptions.RecordNewWall);
                     break;
                 case menuOptions.CustomWall:
-                    wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], menuOptions.CustomWall);
+                    wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], menuOptions.CustomWall);
                     break;
                 case menuOptions.Technologic:
-                    wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], menuOptions.Technologic);
+                    wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], menuOptions.Technologic);
                     break;
                 case menuOptions.Drum:
-                    wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], menuOptions.Drum);
+                    wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], menuOptions.Drum);
                     break;
                 case menuOptions.EightBit:
-                    wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], menuOptions.EightBit);
+                    wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], menuOptions.EightBit);
                     break;
             }
         }
@@ -1514,7 +1510,7 @@ namespace Moto
 
             //Stop listening and reset the flag for next time
             handMovements.LeftSwipeRight -= handMovements_LeftSwipeRight;
-            handMovements.LeftSwipeRightStatus = false;
+            handMovements.LeftSwipeRightStatus[MainWindow.gestureSkeletonKey] = false;
 
             //Remove menu nav tick
             if (menuMovementTimer != null)

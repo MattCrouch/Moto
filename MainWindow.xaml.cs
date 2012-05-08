@@ -113,7 +113,9 @@ namespace Moto
 
         //Player data holds
         public static Dictionary<int, Player> activeSkeletons = new Dictionary<int, Player>();
-        public static int primarySkeletonKey;
+
+        public static int gestureSkeletonKey;
+        public static handMovements.ActiveGesture activeGesture;
 
         //Skeleton variables
         public static Skeleton[] allSkeletons = new Skeleton[6]; //Holds all skeleton data (always returns six skeletons regardless)
@@ -254,7 +256,7 @@ namespace Moto
             sensor.ElevationAngle = angle;
         }
 
-        public static int selectPrimarySkeleton(Dictionary<int,Player> skeletons)
+        /*public static int selectPrimarySkeleton(Dictionary<int,Player> skeletons)
         {
             int skeletonId = 0;
 
@@ -282,7 +284,7 @@ namespace Moto
 
                 return 0;
             }
-        }
+        }*/
 
         public static bool playerAdded(Skeleton skeleton)
         {

@@ -277,23 +277,20 @@ namespace Moto
 
                 if (MainWindow.activeSkeletons.Count > 0)
                 {
-                    int tempKey = MainWindow.primarySkeletonKey;
-                    MainWindow.primarySkeletonKey = MainWindow.selectPrimarySkeleton(MainWindow.activeSkeletons);
-
-                    alignPrimaryGlow(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
-
                     if (currentFocus == playerFocus.KinectGuide)
                     {
-                        kinectGuideManipulation(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
-                    }
+                        kinectGuideManipulation(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey]);
 
-                    if (tempKey != MainWindow.primarySkeletonKey)
+                        handMovements.listenForGestures(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey].skeleton);
+                    }
+                    else
                     {
-                        //Primary Skeleton changed
-                        highlightPrimarySkeleton(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey]);
+                        //Listen for gestures for everyone in the scene
+                        foreach (var player in MainWindow.activeSkeletons)
+                        {
+                            handMovements.listenForGestures(player.Value.skeleton);
+                        }
                     }
-
-                    handMovements.listenForGestures(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton);
                 }
             }
         }
@@ -359,7 +356,7 @@ namespace Moto
         void dismissTutorial(object sender, handMovements.GestureEventArgs e)
         {
             handMovements.LeftSwipeRight -= dismissTutorial;
-            handMovements.LeftSwipeRightStatus = false;
+            handMovements.LeftSwipeRightStatus[MainWindow.gestureSkeletonKey] = false;
 
             MainWindow.animateFade(imgDimmer, 0.5, 0, 0.5);
             MainWindow.animateSlide(MainWindow.availableTutorials[MainWindow.activeTutorial].tutImage, true, false, 50, 0.5);
@@ -628,45 +625,45 @@ namespace Moto
             switch (voiceCommand.Verb)
             {
                 case SpeechRecognizer.Verbs.DrumsSwitch:
-                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
+                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.gestureSkeletonKey))
                     {
-                        switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.Drums);
+                        switchInstrument(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], instrumentList.Drums);
                     }
                     break;
                 case SpeechRecognizer.Verbs.GuitarSwitch:
-                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
+                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.gestureSkeletonKey))
                     {
-                        switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.GuitarRight, MainWindow.PlayerMode.Acoustic);
+                        switchInstrument(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], instrumentList.GuitarRight, MainWindow.PlayerMode.Acoustic);
                     }
                     break;
                 case SpeechRecognizer.Verbs.LeftyGuitarSwitch:
-                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
+                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.gestureSkeletonKey))
                     {
-                        switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.GuitarLeft, MainWindow.PlayerMode.Acoustic);
+                        switchInstrument(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], instrumentList.GuitarLeft, MainWindow.PlayerMode.Acoustic);
                     }
                     break;
                 case SpeechRecognizer.Verbs.ElectricGuitarSwitch:
-                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
+                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.gestureSkeletonKey))
                     {
-                        switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.GuitarRight, MainWindow.PlayerMode.Electric);
+                        switchInstrument(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], instrumentList.GuitarRight, MainWindow.PlayerMode.Electric);
                     }
                     break;
                 case SpeechRecognizer.Verbs.LeftyElectricGuitarSwitch:
-                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
+                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.gestureSkeletonKey))
                     {
-                        switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.GuitarLeft, MainWindow.PlayerMode.Electric);
+                        switchInstrument(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], instrumentList.GuitarLeft, MainWindow.PlayerMode.Electric);
                     }
                     break;
                 case SpeechRecognizer.Verbs.KeyboardSwitch:
-                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
+                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.gestureSkeletonKey))
                     {
-                        switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.Keyboard);
+                        switchInstrument(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], instrumentList.Keyboard);
                     }
                     break;
                 case SpeechRecognizer.Verbs.TriangleSwitch:
-                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
+                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.gestureSkeletonKey))
                     {
-                        switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.Triangle);
+                        switchInstrument(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], instrumentList.Triangle);
                     }
                     break;
                 case SpeechRecognizer.Verbs.StartMetronome:
@@ -840,12 +837,12 @@ namespace Moto
         //Metronome code
         private void listenForMetronome(object sender, EventArgs e)
         {
-            if (MainWindow.activeSkeletons.ContainsKey(MainWindow.primarySkeletonKey))
+            if (MainWindow.activeSkeletons.ContainsKey(MainWindow.gestureSkeletonKey))
             {
                 currentFocus = playerFocus.Metronome;
-                if (MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton != null)
+                if (MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey].skeleton != null)
                 {
-                    if (Math.Abs(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandLeft].Position.X - MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandRight].Position.X) < 0.1 && !beatSet)
+                    if (Math.Abs(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey].skeleton.Joints[JointType.HandLeft].Position.X - MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey].skeleton.Joints[JointType.HandRight].Position.X) < 0.1 && !beatSet)
                     {
                         Console.WriteLine("#############Set the beat##########\n\n");
 
@@ -854,7 +851,7 @@ namespace Moto
 
                         resetBeatSetTimeout(metronome.theMetronome.Interval);
                     }
-                    else if (Math.Abs(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandLeft].Position.X - MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton.Joints[JointType.HandRight].Position.X) > 0.25)
+                    else if (Math.Abs(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey].skeleton.Joints[JointType.HandLeft].Position.X - MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey].skeleton.Joints[JointType.HandRight].Position.X) > 0.25)
                     {
                         beatSet = false;
                     }
@@ -1167,7 +1164,7 @@ namespace Moto
         {
             if (handMovements.leftSwipeRightIn == null)
             {
-                Skeleton player = MainWindow.activeSkeletons[MainWindow.primarySkeletonKey].skeleton;
+                Skeleton player = MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey].skeleton;
 
                 if (menuScrollDirection == handMovements.scrollDirection.SmallDown || menuScrollDirection == handMovements.scrollDirection.LargeDown)
                 {
@@ -1233,47 +1230,56 @@ namespace Moto
 
         void handMovements_LeftSwipeRight(object sender, handMovements.GestureEventArgs e)
         {
-            Console.WriteLine("Left swipe right");
-
-            exitKinectGuide();
-
-            switch (kinectGuideMenu[menuPosition])
+            if (e.Trigger == handMovements.UserDecisions.Triggered)
             {
-                case menuOptions.GoBack:
-                    returnToStart();
-                    break;
-                case menuOptions.TakeAPicture:
-                    takeAPicture();
-                    break;
-                case menuOptions.Metronome:
-                    currentFocus = playerFocus.Metronome;
-                    metronome.destroyMetronome();
-                    MainWindow.sensor.AllFramesReady -= listenForMetronome;
-                    metronome.setupMetronome();
-                    MainWindow.sensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(listenForMetronome);
-                    checkTutorial(MainWindow.Tutorials.Metronome);
-                    break;
-                case menuOptions.Guitar:
-                    switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.GuitarRight, MainWindow.PlayerMode.Acoustic);
-                    break;
-                case menuOptions.LeftyGuitar:
-                    switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.GuitarLeft, MainWindow.PlayerMode.Acoustic);
-                    break;
-                case menuOptions.ElectricGuitar:
-                    switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.GuitarRight, MainWindow.PlayerMode.Electric);
-                    break;
-                case menuOptions.LeftyElectricGuitar:
-                    switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.GuitarLeft, MainWindow.PlayerMode.Electric);
-                    break;
-                case menuOptions.Drum:
-                    switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.Drums);
-                    break;
-                case menuOptions.Keyboard:
-                    switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.Keyboard);
-                    break;
-                case menuOptions.Triangle:
-                    switchInstrument(MainWindow.activeSkeletons[MainWindow.primarySkeletonKey], instrumentList.Triangle);
-                    break;
+                Console.WriteLine("Left swipe right");
+
+                exitKinectGuide();
+
+                switch (kinectGuideMenu[menuPosition])
+                {
+                    case menuOptions.GoBack:
+                        returnToStart();
+                        break;
+                    case menuOptions.TakeAPicture:
+                        takeAPicture();
+                        break;
+                    case menuOptions.Metronome:
+                        currentFocus = playerFocus.Metronome;
+                        metronome.destroyMetronome();
+                        MainWindow.sensor.AllFramesReady -= listenForMetronome;
+                        metronome.setupMetronome();
+                        MainWindow.sensor.AllFramesReady += new EventHandler<AllFramesReadyEventArgs>(listenForMetronome);
+                        checkTutorial(MainWindow.Tutorials.Metronome);
+                        break;
+                    case menuOptions.Guitar:
+                        switchInstrument(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], instrumentList.GuitarRight, MainWindow.PlayerMode.Acoustic);
+                        break;
+                    case menuOptions.LeftyGuitar:
+                        switchInstrument(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], instrumentList.GuitarLeft, MainWindow.PlayerMode.Acoustic);
+                        break;
+                    case menuOptions.ElectricGuitar:
+                        switchInstrument(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], instrumentList.GuitarRight, MainWindow.PlayerMode.Electric);
+                        break;
+                    case menuOptions.LeftyElectricGuitar:
+                        switchInstrument(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], instrumentList.GuitarLeft, MainWindow.PlayerMode.Electric);
+                        break;
+                    case menuOptions.Drum:
+                        switchInstrument(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], instrumentList.Drums);
+                        break;
+                    case menuOptions.Keyboard:
+                        switchInstrument(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], instrumentList.Keyboard);
+                        break;
+                    case menuOptions.Triangle:
+                        switchInstrument(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], instrumentList.Triangle);
+                        break;
+                }
+            }
+            else
+            {
+                //Stop listening and reset the flag for next time
+                handMovements.LeftSwipeRight -= handMovements_LeftSwipeRight;
+                handMovements.LeftSwipeRightStatus[MainWindow.gestureSkeletonKey] = false;
             }
         }
 
@@ -1287,10 +1293,6 @@ namespace Moto
             MainWindow.showPlayerOverlays();
 
             currentFocus = playerFocus.None;
-
-            //Stop listening and reset the flag for next time
-            handMovements.LeftSwipeRight -= handMovements_LeftSwipeRight;
-            handMovements.LeftSwipeRightStatus = false;
 
             //Remove menu nav tick
             if (menuMovementTimer != null)
