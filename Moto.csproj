@@ -625,9 +625,9 @@
     <Content Include="audio\keyboard\keyboard7.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="audio\metronome-tick.wav">
+    <EmbeddedResource Include="audio\metronome-tick.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </EmbeddedResource>
     <Content Include="audio\triangle\triangle-hard.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

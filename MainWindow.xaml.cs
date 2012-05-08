@@ -25,6 +25,7 @@ namespace Moto
                 setupKinect();
                 setupVoice();
                 checkForCommands();
+                setupSFX();
                 this.NavigationService.Navigate(new StartScreen());
             }
             else
@@ -42,6 +43,18 @@ namespace Moto
 
                 this.NavigationService.Navigate(new KinectError(status));
             }
+        }
+
+        private void setupSFX()
+        {
+            SFXSuccess.LoadAsync();
+            SFXDismiss.LoadAsync();
+            SFXMenu.LoadAsync();
+            SFXListening.LoadAsync();
+            SFXNotListening.LoadAsync();
+            SFXCamera.LoadAsync();
+            SFXUpTick.LoadAsync();
+            SFXDownTick.LoadAsync();
         }
 
         public static KinectSensor sensor;

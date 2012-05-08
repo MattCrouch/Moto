@@ -25,7 +25,7 @@ namespace Moto
 
         static long timePile = 0;
 
-        static SoundPlayer metronomeTick = new SoundPlayer("audio/metronome-tick.wav");
+        static SoundPlayer metronomeTick = new SoundPlayer("audio/drums/drum6.wav");
 
         public static void setupMetronome() {
             timePile = 0;
@@ -35,6 +35,7 @@ namespace Moto
             theMetronome = new DispatcherTimer();
             theMetronome.Interval = TimeSpan.FromMilliseconds(1000);
             theMetronome.Tick += new EventHandler(metronome_Tick);
+            metronomeTick.LoadAsync();
         }
 
         static void metronome_Tick(object sender, EventArgs e)
