@@ -82,11 +82,14 @@ namespace Moto
 
             image.Width = scaledWidth(player.skeleton.Position, player.instrument);
 
-            ColorImagePoint point = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Position, ColorImageFormat.RgbResolution640x480Fps30);
+            if (MainWindow.sensor.IsRunning)
+            {
+                ColorImagePoint point = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Position, ColorImageFormat.RgbResolution640x480Fps30);
 
-            //Grab the image reference and move it to the correct place
-            Canvas.SetLeft(image, point.X - (image.ActualWidth / 2));
-            Canvas.SetTop(image, point.Y - (image.ActualHeight / 2));
+                //Grab the image reference and move it to the correct place
+                Canvas.SetLeft(image, point.X - (image.ActualWidth / 2));
+                Canvas.SetTop(image, point.Y - (image.ActualHeight / 2));
+            }
         }
 
         internal void checkKeyHit(MainWindow.Player player, JointType joint)
@@ -109,7 +112,7 @@ namespace Moto
                             if (handMovements.difference != null)
                             {
                                 //MessageBox.Show(Convert.ToString(difference["X"]));
-                                if (handMovements.difference[player.skeleton.TrackingId][joint].Y < -0.01 || ((joint == JointType.FootLeft || joint == JointType.FootRight) && handMovements.difference[player.skeleton.TrackingId][joint].Z < -0.02))
+                                if (handMovements.difference[player.skeleton.TrackingId][joint].Y < 0 && (joint != JointType.FootLeft || joint != JointType.FootRight))
                                 {
                                     hitKey("keyboard" + i);
                                     Debug.Print("HIT! " + i);
