@@ -1,6 +1,14 @@
 CHANGELOG
 =========
-0.8.0.0 - 7/5/12
+0.8.1.0 - 9/5/12
+----------------
+- Instruments now play quieter when you hit them with less of a force.
+- The Keyboard now has colour overlays to show which key you're pressing.
+- Kinect Guide now has a strength scroll effect.
+- The difference between fast and slow scrolling has been reduced.
+- The zone where you are stationary in the Kinect Guide has been increased.
+
+0.8.0.0 - 8/5/12
 ----------------
 - The Primary Player feature has been removed.
 	- Any player may now use any gesture. It's done on a "who shoots first" basis - ie if someone else is already selecting something, you can't

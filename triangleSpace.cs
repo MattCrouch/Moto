@@ -47,7 +47,6 @@ namespace Moto
             FrameworkElement image = player.instrumentImage;
 
             image.Width = scaledWidth(player.skeleton.Joints[JointType.HandLeft].Position, player.instrument);
-            player.instrumentOverlay[0].Height = image.Height;
 
             ColorImagePoint point = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Joints[JointType.HandLeft].Position, ColorImageFormat.RgbResolution640x480Fps30);
 
@@ -56,18 +55,21 @@ namespace Moto
             Canvas.SetLeft(image, point.X - (image.Width / 2));
             Canvas.SetTop(image, point.Y);
 
-            if (player.skeleton.Joints[JointType.HandLeft].TrackingState == JointTrackingState.Inferred && (Math.Abs(player.skeleton.Joints[JointType.HandLeft].Position.X) - Math.Abs(player.skeleton.Joints[JointType.HipCenter].Position.X) < 0.30 && player.skeleton.Joints[JointType.HandLeft].Position.Z > player.skeleton.Joints[JointType.HipCenter].Position.Z))
+            if (currentFocus == playerFocus.None || currentFocus == playerFocus.Picture || currentFocus == playerFocus.Metronome)
             {
-                if (image.Visibility != System.Windows.Visibility.Hidden)
+                if (player.skeleton.Joints[JointType.HandLeft].TrackingState == JointTrackingState.Inferred && (Math.Abs(player.skeleton.Joints[JointType.HandLeft].Position.X) - Math.Abs(player.skeleton.Joints[JointType.HipCenter].Position.X) < 0.30 && player.skeleton.Joints[JointType.HandLeft].Position.Z > player.skeleton.Joints[JointType.HipCenter].Position.Z))
                 {
-                    image.Visibility = System.Windows.Visibility.Hidden;
+                    if (image.Visibility != System.Windows.Visibility.Hidden)
+                    {
+                        image.Visibility = System.Windows.Visibility.Hidden;
+                    }
                 }
-            }
-            else
-            {
-                if (image.Visibility != System.Windows.Visibility.Visible)
+                else
                 {
-                    image.Visibility = System.Windows.Visibility.Visible;
+                    if (image.Visibility != System.Windows.Visibility.Visible)
+                    {
+                        image.Visibility = System.Windows.Visibility.Visible;
+                    }
                 }
             }
         }

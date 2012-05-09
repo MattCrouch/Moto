@@ -53,20 +53,20 @@ namespace Moto
             if (player.skeleton != null)
             {
                 //Drums
-                defineKey(player, 0, -0.4192496, -0.17543834, -0.3577266);
-                defineKey(player, 1, -0.2892496, -0.17543834, -0.3577266);
-                defineKey(player, 2, -0.1592496, -0.17543834, -0.3577266);
-                defineKey(player, 3, -0.0292496, -0.17543834, -0.3577266);
-                defineKey(player, 4, 0.1007504, -0.17543834, -0.3577266);
-                defineKey(player, 5, 0.2307504, -0.17543834, -0.3577266);
-                defineKey(player, 6, 0.3607504, -0.17543834, -0.3577266);
-                defineKey(player, 7, 0.4807504, -0.17543834, -0.3577266);
+                defineKey(player, 0, -0.4592496, -0.17543834, -0.3577266);
+                defineKey(player, 1, -0.3342496, -0.17543834, -0.3577266);
+                defineKey(player, 2, -0.2092496, -0.17543834, -0.3577266);
+                defineKey(player, 3, -0.0842496, -0.17543834, -0.3577266);
+                defineKey(player, 4, 0.0407504, -0.17543834, -0.3577266);
+                defineKey(player, 5, 0.1657504, -0.17543834, -0.3577266);
+                defineKey(player, 6, 0.2907504, -0.17543834, -0.3577266);
+                defineKey(player, 7, 0.4107504, -0.17543834, -0.3577266);
 
                 SetKeyboardPosition(player);
             }
         }
 
-        private void defineKey(MainWindow.Player player, int key, double X, double Y, double Z, double keyWidth = 0.1, double keyHeight = 0.2, double keyDepth = 0.2)
+        private void defineKey(MainWindow.Player player, int key, double X, double Y, double Z, double keyWidth = 0.12, double keyHeight = 0.2, double keyDepth = 0.2)
         {
             keyArea[player.skeleton.TrackingId][key].X1 = player.skeleton.Joints[JointType.HipCenter].Position.X + X;
             keyArea[player.skeleton.TrackingId][key].X2 = keyArea[player.skeleton.TrackingId][key].X1 + keyWidth;
@@ -89,6 +89,13 @@ namespace Moto
                 //Grab the image reference and move it to the correct place
                 Canvas.SetLeft(image, point.X - (image.ActualWidth / 2));
                 Canvas.SetTop(image, point.Y - (image.ActualHeight / 2));
+
+                foreach (var overlay in player.instrumentOverlay)
+                {
+                    overlay.Value.Width = image.Width;
+                    Canvas.SetLeft(overlay.Value, point.X - (image.ActualWidth / 2));
+                    Canvas.SetTop(overlay.Value, point.Y - (image.ActualHeight / 2));
+                }
             }
         }
 
@@ -117,33 +124,55 @@ namespace Moto
                                     hitKey("keyboard" + i);
                                     Debug.Print("HIT! " + i);
                                     insideKey[player.skeleton.TrackingId][joint][i] = true;
+                                    showKeyboardOverlay(player, i);
                                 }
                             }
                         }
                     }
                     else
                     {
-                        insideKey[player.skeleton.TrackingId][joint][i] = false;
+                        if (insideKey[player.skeleton.TrackingId][joint][i])
+                        {
+                            hideKeyboardOverlay(player, i);
+                            insideKey[player.skeleton.TrackingId][joint][i] = false;
+                        }
                     }
                 }
             }
         }
 
-        private void hitKey(string keyName, double strength)
+        private void showKeyboardOverlay(MainWindow.Player player, int i)
+        {
+            Image overlay = new Image();
+            overlay.Source = new BitmapImage(new Uri("images/keyboard-overlays/" + i + ".png", UriKind.Relative));
+
+            if (MainWindow.activeSkeletons[player.skeleton.TrackingId].instrumentOverlay.ContainsKey(i))
+            {
+                hideKeyboardOverlay(player, i);
+            }
+            MainWindow.activeSkeletons[player.skeleton.TrackingId].instrumentOverlay.Add(i, overlay);
+
+            MainCanvas.Children.Add(overlay);
+            Canvas.SetTop(overlay, -200);
+        }
+
+        private void hideKeyboardOverlay(MainWindow.Player player, int i)
+        {
+            if (player.instrumentOverlay.ContainsKey(i))
+            {
+                MainCanvas.Children.Remove(player.instrumentOverlay[i]);
+                player.instrumentOverlay.Remove(i);
+            }
+        }
+
+        private void hitKey(string keyName)
         {
             if (mpDictionary[(mpCounter % mpDictionary.Count)] == null)
             {
                 mpDictionary[(mpCounter % mpDictionary.Count)] = new MediaPlayer();
             }
 
-            string dir = "soft";
-
-            if (strength > 0.03)
-            {
-                dir = "hard";
-            }
-
-            mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/keyboard/" + dir + "/" + keyName + ".wav", UriKind.Relative));
+            mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/keyboard/hard/" + keyName + ".wav", UriKind.Relative));
             mpDictionary[(mpCounter % mpDictionary.Count)].Play();
 
             mpDictionary[(mpCounter % mpDictionary.Count)].MediaEnded += new EventHandler(instruments_MediaEnded);

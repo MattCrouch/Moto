@@ -736,13 +736,7 @@ namespace Moto
             //image.Name = "image" + aSkeleton.TrackingId.ToString();
 
             //Overlay
-            if (player.instrumentOverlay.ContainsKey(0))
-            {
-                MainCanvas.Children.Remove(player.instrumentOverlay[0]);
-                player.instrumentOverlay.Remove(0);
-            }
-
-            player.instrumentOverlay.Add(0, new Image());
+            player.instrumentOverlay.Clear();
 
             switch (instrument)
             {
@@ -773,13 +767,26 @@ namespace Moto
             }
 
             MainCanvas.Children.Add(image);
-            MainCanvas.Children.Add(player.instrumentOverlay[0]);
 
             player.instrumentImage = image;
 
             if (currentFocus != playerFocus.None && currentFocus != playerFocus.Picture)
             {
                 MainWindow.hidePlayerOverlays();
+            }
+
+            if (instrument == instrumentList.GuitarLeft || instrument == instrumentList.GuitarRight)
+            {
+                if (!player.instrumentOverlay.ContainsKey(0))
+                {
+                    player.instrumentOverlay.Add(0, new Image());
+                }
+                else
+                {
+                    player.instrumentOverlay[0] = new Image();
+                }
+
+                MainCanvas.Children.Add(player.instrumentOverlay[0]);
             }
         }
 

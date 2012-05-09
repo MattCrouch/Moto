@@ -25,6 +25,17 @@ namespace Moto
             if (!insideStrumArea.ContainsKey(player.skeleton.TrackingId)) {
                 insideStrumArea.Add(player.skeleton.TrackingId, false);
             }
+
+            if (!player.instrumentOverlay.ContainsKey(0))
+            {
+                player.instrumentOverlay.Add(0, new Image());
+            }
+            else
+            {
+                player.instrumentOverlay[0] = new Image();
+            }
+
+            MainCanvas.Children.Add(player.instrumentOverlay[0]);
         }
 
         private double doPythag(double a, double b)
@@ -67,7 +78,10 @@ namespace Moto
                 fretHand = JointType.HandRight;
             }
 
-            player.instrumentOverlay[0].Source = guitarImage(player);
+            if (player.instrumentOverlay.ContainsKey(0))
+            {
+                player.instrumentOverlay[0].Source = guitarImage(player);
+            }
 
             FrameworkElement image = player.instrumentImage;
 
@@ -114,10 +128,13 @@ namespace Moto
             image.RenderTransform = new RotateTransform(angle, centerX, centerY);
 
             //Grab the image reference and move it to the correct place
-            Canvas.SetLeft(player.instrumentOverlay[0], point.X - centerX);
-            Canvas.SetTop(player.instrumentOverlay[0], point.Y - centerY);
+            if (player.instrumentOverlay.ContainsKey(0))
+            {
+                Canvas.SetLeft(player.instrumentOverlay[0], point.X - centerX);
+                Canvas.SetTop(player.instrumentOverlay[0], point.Y - centerY);
 
-            player.instrumentOverlay[0].RenderTransform = new RotateTransform(angle, centerX, centerY);
+                player.instrumentOverlay[0].RenderTransform = new RotateTransform(angle, centerX, centerY);
+            }
         }
 
         public void checkStrum(MainWindow.Player player, JointType joint)
