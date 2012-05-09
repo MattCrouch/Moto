@@ -129,14 +129,21 @@ namespace Moto
             }
         }
 
-        private void hitKey(string keyName)
+        private void hitKey(string keyName, double strength)
         {
             if (mpDictionary[(mpCounter % mpDictionary.Count)] == null)
             {
                 mpDictionary[(mpCounter % mpDictionary.Count)] = new MediaPlayer();
             }
 
-            mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/keyboard/" + keyName + ".wav", UriKind.Relative));
+            string dir = "soft";
+
+            if (strength > 0.03)
+            {
+                dir = "hard";
+            }
+
+            mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/keyboard/" + dir + "/" + keyName + ".wav", UriKind.Relative));
             mpDictionary[(mpCounter % mpDictionary.Count)].Play();
 
             mpDictionary[(mpCounter % mpDictionary.Count)].MediaEnded += new EventHandler(instruments_MediaEnded);

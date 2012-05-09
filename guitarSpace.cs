@@ -133,17 +133,40 @@ namespace Moto
                 {
                     if (!insideStrumArea[player.skeleton.TrackingId])
                     {
-                        if (player.instrument == instrumentList.GuitarRight)
+                        if (handMovements.difference != null)
                         {
-                            //Normal guitar stance
-                            strumGuitar(checkNeckDist(player, JointType.HandLeft), player.mode);
+                            if (player.instrument == instrumentList.GuitarRight)
+                            {
+                                //Normal guitar stance
+                                double strength;
+                                if (handMovements.difference[player.skeleton.TrackingId][JointType.HandRight].Y > handMovements.difference[player.skeleton.TrackingId][JointType.HandRight].X)
+                                {
+                                    strength = Math.Abs(handMovements.difference[player.skeleton.TrackingId][JointType.HandRight].Y);
+                                }
+                                else
+                                {
+                                    strength = Math.Abs(handMovements.difference[player.skeleton.TrackingId][JointType.HandRight].X);
+                                }
+
+                                strumGuitar(checkNeckDist(player, JointType.HandLeft), player.mode, strength);
+                            }
+                            else if (player.instrument == instrumentList.GuitarLeft)
+                            {
+                                //Lefty stance
+                                double strength;
+                                if (handMovements.difference[player.skeleton.TrackingId][JointType.HandLeft].Y > handMovements.difference[player.skeleton.TrackingId][JointType.HandLeft].X)
+                                {
+                                    strength = Math.Abs(handMovements.difference[player.skeleton.TrackingId][JointType.HandLeft].Y);
+                                }
+                                else
+                                {
+                                    strength = Math.Abs(handMovements.difference[player.skeleton.TrackingId][JointType.HandLeft].X);
+                                }
+
+                                strumGuitar(checkNeckDist(player, JointType.HandRight), player.mode, strength);
+                            }
+                            insideStrumArea[player.skeleton.TrackingId] = true;
                         }
-                        else if (player.instrument == instrumentList.GuitarLeft)
-                        {
-                            //Lefty stance
-                            strumGuitar(checkNeckDist(player, JointType.HandRight), player.mode);
-                        }
-                        insideStrumArea[player.skeleton.TrackingId] = true;
                     }
                 }
                 else
@@ -153,55 +176,62 @@ namespace Moto
             }
         }
 
-        void strumGuitar(double neckDist, MainWindow.PlayerMode mode)
+        void strumGuitar(double neckDist, MainWindow.PlayerMode mode, double strength)
         {
             if (mpDictionary[(mpCounter % mpDictionary.Count)] == null)
             {
                 mpDictionary[(mpCounter % mpDictionary.Count)] = new MediaPlayer();
             }
 
+            string dir = "soft";
+
+            if (strength > 0.03)
+            {
+                dir = "hard";
+            }
+
             if (neckDist > 0.7)
             {
                 if (mode == MainWindow.PlayerMode.Acoustic)
                 {
-                    mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/guitar/guitar1.wav", UriKind.Relative));
+                    mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/guitar/acoustic/" + dir + "/guitar1.wav", UriKind.Relative));
                 }
                 else
                 {
-                    mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/guitar/electric/guitar1.wav", UriKind.Relative));
+                    mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/guitar/electric/" + dir + "/guitar1.wav", UriKind.Relative));
                 }
             }
             else if (neckDist > 0.55)
             {
                 if (mode == MainWindow.PlayerMode.Acoustic)
                 {
-                    mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/guitar/guitar2.wav", UriKind.Relative));
+                    mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/guitar/acoustic/" + dir + "/guitar2.wav", UriKind.Relative));
                 }
                 else
                 {
-                    mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/guitar/electric/guitar2.wav", UriKind.Relative));
+                    mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/guitar/electric/" + dir + "/guitar2.wav", UriKind.Relative));
                 }
             }
             else if (neckDist > 0.4)
             {
                 if (mode == MainWindow.PlayerMode.Acoustic)
                 {
-                    mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/guitar/guitar3.wav", UriKind.Relative));
+                    mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/guitar/acoustic/" + dir + "/guitar3.wav", UriKind.Relative));
                 }
                 else
                 {
-                    mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/guitar/electric/guitar3.wav", UriKind.Relative));
+                    mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/guitar/electric/" + dir + "/guitar3.wav", UriKind.Relative));
                 }
             }
             else
             {
                 if (mode == MainWindow.PlayerMode.Acoustic)
                 {
-                    mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/guitar/guitar4.wav", UriKind.Relative));
+                    mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/guitar/acoustic/" + dir + "/guitar4.wav", UriKind.Relative));
                 }
                 else
                 {
-                    mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/guitar/electric/guitar4.wav", UriKind.Relative));
+                    mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/guitar/electric/" + dir + "/guitar4.wav", UriKind.Relative));
                 }
             }
 

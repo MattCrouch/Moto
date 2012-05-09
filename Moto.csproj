@@ -556,73 +556,142 @@
     <Content Include="audio\beep.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="audio\drums\drum0.wav">
+    <Content Include="audio\drums\hard\drum0.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="audio\drums\drum1.wav">
+    <Content Include="audio\drums\hard\drum1.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="audio\drums\drum2.wav">
+    <Content Include="audio\drums\hard\drum2.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="audio\drums\drum3.wav">
+    <Content Include="audio\drums\hard\drum3.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="audio\drums\drum4.wav">
+    <Content Include="audio\drums\hard\drum4.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="audio\drums\drum5.wav">
+    <Content Include="audio\drums\hard\drum5.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="audio\drums\drum6.wav">
+    <Content Include="audio\drums\hard\drum6.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="audio\guitar\electric\guitar1.wav">
+    <Content Include="audio\drums\soft\drum0.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="audio\guitar\electric\guitar2.wav">
+    <Content Include="audio\drums\soft\drum1.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="audio\guitar\electric\guitar3.wav">
+    <Content Include="audio\drums\soft\drum2.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="audio\guitar\electric\guitar4.wav">
+    <Content Include="audio\drums\soft\drum3.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="audio\guitar\guitar1.wav">
+    <Content Include="audio\drums\soft\drum4.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="audio\guitar\guitar2.wav">
+    <Content Include="audio\drums\soft\drum5.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="audio\guitar\guitar3.wav">
+    <Content Include="audio\drums\soft\drum6.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="audio\guitar\guitar4.wav">
+    <Content Include="audio\guitar\acoustic\hard\guitar1.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="audio\keyboard\keyboard0.wav">
+    <Content Include="audio\guitar\acoustic\hard\guitar2.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="audio\keyboard\keyboard1.wav">
+    <Content Include="audio\guitar\acoustic\hard\guitar3.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="audio\keyboard\keyboard2.wav">
+    <Content Include="audio\guitar\acoustic\hard\guitar4.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="audio\keyboard\keyboard3.wav">
+    <Content Include="audio\guitar\acoustic\soft\guitar1.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="audio\keyboard\keyboard4.wav">
+    <Content Include="audio\guitar\acoustic\soft\guitar2.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="audio\keyboard\keyboard5.wav">
+    <Content Include="audio\guitar\acoustic\soft\guitar3.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="audio\keyboard\keyboard6.wav">
+    <Content Include="audio\guitar\acoustic\soft\guitar4.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="audio\keyboard\keyboard7.wav">
+    <Content Include="audio\guitar\electric\hard\guitar1.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="audio\guitar\electric\hard\guitar2.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="audio\guitar\electric\hard\guitar3.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="audio\guitar\electric\hard\guitar4.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="audio\guitar\electric\soft\guitar1.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="audio\guitar\electric\soft\guitar2.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="audio\guitar\electric\soft\guitar3.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="audio\guitar\electric\soft\guitar4.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="audio\keyboard\hard\keyboard0.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="audio\keyboard\hard\keyboard1.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="audio\keyboard\hard\keyboard2.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="audio\keyboard\hard\keyboard3.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="audio\keyboard\hard\keyboard4.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="audio\keyboard\hard\keyboard5.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="audio\keyboard\hard\keyboard6.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="audio\keyboard\hard\keyboard7.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="audio\keyboard\soft\keyboard0.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="audio\keyboard\soft\keyboard1.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="audio\keyboard\soft\keyboard2.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="audio\keyboard\soft\keyboard3.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="audio\keyboard\soft\keyboard4.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="audio\keyboard\soft\keyboard5.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="audio\keyboard\soft\keyboard6.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="audio\keyboard\soft\keyboard7.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="audio\metronome-tick.wav">
