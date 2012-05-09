@@ -266,7 +266,8 @@
                 </LinearGradientBrush>
             </Canvas.OpacityMask>
             <Rectangle Canvas.Left="0" Canvas.Top="-380" Height="1260" Name="rectangle1" Stroke="Black" Width="640" />
-            <Canvas Canvas.Left="0" Canvas.Top="0" Height="480" Name="kinectGuideCanvas" Width="158" RenderTransformOrigin="0.5,0.5" Visibility="Hidden">
+            <Rectangle Canvas.Left="0" Canvas.Top="250" Height="0" Name="imgMenuMovementGuide" Width="5" Fill="#FFE0DFF8" />
+            <Canvas Canvas.Left="10" Canvas.Top="0" Height="480" Name="kinectGuideCanvas" Width="158" RenderTransformOrigin="0.5,0.5" Visibility="Hidden">
                 <Image Canvas.Left="0" Canvas.Top="230" Height="41" Name="imgKinectGuide1" Stretch="Fill" Width="250" Source="/Moto;component/images/menu-items/cancel.png" />
                 <Image Canvas.Left="0" Canvas.Top="170" Height="41" Name="imgKinectGuide2" Source="/Moto;component/images/menu-items/backtostart.png" Stretch="Fill" Width="250" />
                 <Image Canvas.Left="0" Canvas.Top="110" Height="41" Name="imgKinectGuide3" Source="/Moto;component/images/menu-items/takeapicture.png" Stretch="Fill" Width="250" />

@@ -407,12 +407,12 @@ namespace Moto
                 upwards = true;
             }
 
-            if (angleValue > 75 || (player.skeleton.Joints[JointType.HandLeft].Position.X > player.skeleton.Joints[JointType.HipLeft].Position.X - 0.15))
+            if (angleValue > 70 || (player.skeleton.Joints[JointType.HandLeft].Position.X > player.skeleton.Joints[JointType.HipLeft].Position.X - 0.15))
             {
                 //No movement
                 return scrollDirection.None;
             }
-            else if (angleValue > 50)
+            else if (angleValue > 55)
             {
                 //Small increment
                 if (upwards)
@@ -527,6 +527,40 @@ namespace Moto
             }
 
             return newPoint;
+        }
+
+        /// <summary>
+        /// Returns a scaled value from between two points to between another
+        /// </summary>
+        /// <param name="unitMin">The supplied value's minimum</param>
+        /// <param name="unitMax">The supplied value's maximum</param>
+        /// <param name="playerDist">The supplied value</param>
+        /// <param name="scaleMin">The scaled value's minimum</param>
+        /// <param name="scaleMax">The scaled value's maximum</param>
+        /// <returns>The scaled number</returns>
+        public static double distQuotient(double unitMin, double unitMax, double playerDist, double scaleMin, double scaleMax)
+        {
+            double quotient;
+
+            double no1 = unitMax - unitMin;
+            double no1Pos = playerDist - unitMin;
+
+            double percent = (no1Pos / no1) * 100;
+
+            double pcDiff = (scaleMax - scaleMin) / 100;
+
+            quotient = scaleMin + (pcDiff * percent);
+
+            if (quotient > scaleMax)
+            {
+                quotient = scaleMax;
+            }
+            else if (quotient < scaleMin)
+            {
+                quotient = scaleMin;
+            }
+
+            return quotient;
         }
     }
 }

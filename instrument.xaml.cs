@@ -1141,6 +1141,7 @@ namespace Moto
 
             kinectGuideCanvas.Visibility = System.Windows.Visibility.Visible;
             imgDimmer.Visibility = System.Windows.Visibility.Visible;
+            imgMenuMovementGuide.Visibility = System.Windows.Visibility.Visible;
 
             MainWindow.animateFade(imgDimmer, 0, 0.5, 0.5);
 
@@ -1190,26 +1191,41 @@ namespace Moto
 
         private void kinectGuideManipulation(MainWindow.Player player)
         {
-            if (handMovements.leftSwipeRightIn == null)
+            if (MainWindow.activeSkeletons.ContainsKey(player.skeleton.TrackingId))
             {
-                //Manipulate the guide if we're not currently swiping to select
-                SkeletonPoint bodyMidpoint = handMovements.getMidpoint(player.skeleton.Joints[JointType.HipCenter], player.skeleton.Joints[JointType.ShoulderCenter]);
-
-                double angleValue = handMovements.getAngle(bodyMidpoint, player.skeleton.Joints[JointType.HandLeft].Position);
-
-                handMovements.scrollDirection oldDirection = menuScrollDirection;
-
-                menuScrollDirection = handMovements.sliderMenuValue(player, angleValue);
-
-                if (oldDirection != menuScrollDirection)
+                if (handMovements.leftSwipeRightIn == null)
                 {
-                    //Console.WriteLine("CHANGE IN DIRECTION: " + menuScrollDirection);
-                    adjustMenuSpeed(menuScrollDirection);
+                    //Manipulate the guide if we're not currently swiping to select
+                    SkeletonPoint bodyMidpoint = player.skeleton.Joints[JointType.Spine].Position;
 
-                    if ((oldDirection == handMovements.scrollDirection.None && menuScrollDirection == handMovements.scrollDirection.SmallUp) || (oldDirection == handMovements.scrollDirection.SmallUp && menuScrollDirection == handMovements.scrollDirection.LargeUp) || (oldDirection == handMovements.scrollDirection.None && menuScrollDirection == handMovements.scrollDirection.SmallDown) || (oldDirection == handMovements.scrollDirection.SmallDown && menuScrollDirection == handMovements.scrollDirection.LargeDown))
+                    double angleValue = handMovements.getAngle(bodyMidpoint, player.skeleton.Joints[JointType.HandLeft].Position);
+
+                    handMovements.scrollDirection oldDirection = menuScrollDirection;
+
+                    double scaledValue = handMovements.distQuotient(0, 90, Math.Abs(90 - angleValue), 0, MainCanvas.ActualHeight / 2);
+
+                    if (player.skeleton.Joints[JointType.HandLeft].Position.Y > bodyMidpoint.Y)
                     {
-                        //If we're increasing in any direction, tick when the speed changes
-                        menuTick();
+                        Canvas.SetTop(imgMenuMovementGuide, 250 - scaledValue);
+                        imgMenuMovementGuide.Height = scaledValue;
+                    }
+                    else
+                    {
+                        imgMenuMovementGuide.Height = scaledValue;
+                    }
+
+                    menuScrollDirection = handMovements.sliderMenuValue(player, angleValue);
+
+                    if (oldDirection != menuScrollDirection)
+                    {
+                        //Console.WriteLine("CHANGE IN DIRECTION: " + menuScrollDirection);
+                        adjustMenuSpeed(menuScrollDirection);
+
+                        if ((oldDirection == handMovements.scrollDirection.None && menuScrollDirection == handMovements.scrollDirection.SmallUp) || (oldDirection == handMovements.scrollDirection.SmallUp && menuScrollDirection == handMovements.scrollDirection.LargeUp) || (oldDirection == handMovements.scrollDirection.None && menuScrollDirection == handMovements.scrollDirection.SmallDown) || (oldDirection == handMovements.scrollDirection.SmallDown && menuScrollDirection == handMovements.scrollDirection.LargeDown))
+                        {
+                            //If we're increasing in any direction, tick when the speed changes
+                            menuTick();
+                        }
                     }
                 }
             }
@@ -1219,7 +1235,7 @@ namespace Moto
         {
             if (scrollDirection == handMovements.scrollDirection.SmallUp || scrollDirection == handMovements.scrollDirection.SmallDown)
             {
-                menuMovementTimer.Interval = TimeSpan.FromMilliseconds(1000);
+                menuMovementTimer.Interval = TimeSpan.FromMilliseconds(750);
                 menuMovementTimer.Start();
             }
             else if (scrollDirection == handMovements.scrollDirection.LargeUp || scrollDirection == handMovements.scrollDirection.LargeDown)
@@ -1295,6 +1311,8 @@ namespace Moto
 
             MainWindow.animateSlide(kinectGuideCanvas, true, false, -150, 0.5);
             MainWindow.animateFade(imgDimmer, 0.5, 0, 0.5);
+
+            imgMenuMovementGuide.Visibility = System.Windows.Visibility.Hidden;
 
             MainWindow.showPlayerOverlays();
 
@@ -1412,31 +1430,6 @@ namespace Moto
 
 
             return position;
-        }
-
-        public static double distQuotient(double unitMin, double unitMax, double playerDist, double scaleMin, double scaleMax)
-        {
-            double quotient;
-
-            double no1 = unitMax - unitMin;
-            double no1Pos = playerDist - unitMin;
-
-            double percent = (no1Pos / no1) * 100;
-
-            double pcDiff = (scaleMax - scaleMin) / 100;
-
-            quotient = scaleMin + (pcDiff * percent);
-
-            if (quotient > scaleMax)
-            {
-                quotient = scaleMax;
-            }
-            else if (quotient < scaleMin)
-            {
-                quotient = scaleMin;
-            }
-
-            return quotient;
         }
 
         //Error handling

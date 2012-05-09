@@ -1401,6 +1401,7 @@ namespace Moto
             
             kinectGuideCanvas.Visibility = System.Windows.Visibility.Visible;
             imgDimmer.Visibility = System.Windows.Visibility.Visible;
+            imgMenuMovementGuide.Visibility = System.Windows.Visibility.Visible;
 
             MainWindow.animateFade(imgDimmer, 0, 0.5,0.5);
 
@@ -1457,13 +1458,24 @@ namespace Moto
             {
                 if (handMovements.leftSwipeRightIn == null)
                 {
-
                     //Manipulate the guide if we're not currently swiping to select
-                    SkeletonPoint bodyMidpoint = handMovements.getMidpoint(player.skeleton.Joints[JointType.HipCenter], player.skeleton.Joints[JointType.ShoulderCenter]);
+                    SkeletonPoint bodyMidpoint = player.skeleton.Joints[JointType.Spine].Position;
 
                     double angleValue = handMovements.getAngle(bodyMidpoint, player.skeleton.Joints[JointType.HandLeft].Position);
 
                     handMovements.scrollDirection oldDirection = menuScrollDirection;
+
+                    double scaledValue = handMovements.distQuotient(0, 90, Math.Abs(90 - angleValue), 0, MainCanvas.ActualHeight / 2);
+
+                    if (player.skeleton.Joints[JointType.HandLeft].Position.Y > bodyMidpoint.Y)
+                    {
+                        Canvas.SetTop(imgMenuMovementGuide, 250 - scaledValue);
+                        imgMenuMovementGuide.Height = scaledValue;
+                    }
+                    else
+                    {
+                        imgMenuMovementGuide.Height = scaledValue;
+                    }
 
                     menuScrollDirection = handMovements.sliderMenuValue(player, angleValue);
 
@@ -1552,6 +1564,8 @@ namespace Moto
 
             MainWindow.animateSlide(kinectGuideCanvas, true, false, -150, 0.5);
             MainWindow.animateFade(imgDimmer, 0.5, 0, 0.5);
+
+            imgMenuMovementGuide.Visibility = System.Windows.Visibility.Hidden;
 
             MainWindow.showPlayerOverlays();
 
