@@ -208,6 +208,9 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="audio\ui\camera-shutter.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="audio\wall\animal\0.wav">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -144,7 +144,7 @@ namespace Moto
         public static SoundPlayer SFXMenu = new SoundPlayer("audio/ui/mode-selection.wav");
         public static SoundPlayer SFXListening = new SoundPlayer("audio/ui/start-listening.wav");
         public static SoundPlayer SFXNotListening = new SoundPlayer("audio/ui/stop-listening.wav");
-        public static SoundPlayer SFXCamera = new SoundPlayer();
+        public static SoundPlayer SFXCamera = new SoundPlayer("audio/ui/camera-shutter.wav");
         public static SoundPlayer SFXUpTick = new SoundPlayer("audio/ui/menu-up.wav");
         public static SoundPlayer SFXDownTick = new SoundPlayer("audio/ui/menu-down.wav");
         
