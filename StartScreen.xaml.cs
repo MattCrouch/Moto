@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -21,7 +22,7 @@ namespace Moto
         public StartScreen()
         {
             InitializeComponent();
-             
+
             //Show the 'loading mic' animation
             //(It's here so it only runs the once)
             Storyboard sb = this.FindResource("loadingMic") as Storyboard;
@@ -208,7 +209,7 @@ namespace Moto
                         sb.Begin();
                         MainWindow.SFXMenu.Play();
                     }
-                    
+
                     break;
                 case handMovements.UserDecisions.NotTriggered:
                     if (selectedMode == modeSelected.Instrument)
@@ -398,7 +399,7 @@ namespace Moto
         private void actOnVoiceDecision(bool trigger)
         {
             removeConfirmationTime();
-            
+
             voicePromptVisual(false);
             if (trigger)
             {
@@ -524,7 +525,9 @@ namespace Moto
                 MainWindow.animateSlide(imgLeftHand, false, true, 10, 0.5);
                 MainWindow.animateSlide(imgWallOfSound, false, true, 10, 0.5);
                 MainWindow.animateSlide(imgRightHand, false, true, 10, 0.5);
-            } else {
+            }
+            else
+            {
                 //There is now nobody visible
                 MainWindow.animateSlide(imgStepInToPlay, false, true, 10, 0.5);
                 MainWindow.animateSlide(imgBandMode, true, true, 10, 0.5);
@@ -663,7 +666,7 @@ namespace Moto
                     MainWindow.animateSlide(initialisingSpinner);
                     MainWindow.animateSpin(initialisingSpinner);
                     Canvas.SetTop(initialisingSpinner, 230);
-                    Canvas.SetLeft(initialisingSpinner, (MainCanvas.ActualWidth/2) - (initialisingSpinner.Width/2));
+                    Canvas.SetLeft(initialisingSpinner, (MainCanvas.ActualWidth / 2) - (initialisingSpinner.Width / 2));
                 }
                 else if (e.Status == KinectStatus.Disconnected)
                 {

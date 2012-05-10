@@ -268,6 +268,7 @@ namespace Moto.Speech
             this.CheckDisposed();
 
             this.kinectAudioSource = kinectSource;
+            this.kinectAudioSource.NoiseSuppression = true;
             this.kinectAudioSource.EchoCancellationMode = Microsoft.Kinect.EchoCancellationMode.CancellationAndSuppression;
             this.kinectAudioSource.AutomaticGainControlEnabled = false;
             this.kinectAudioSource.BeamAngleMode = BeamAngleMode.Adaptive;
@@ -278,7 +279,9 @@ namespace Moto.Speech
         }
 
         public void switchGrammar(Choices[] choices, bool prefixed = true, bool startListeningKeywords = true) {
+            //this.sre.RecognizeAsyncStop();
             this.sre.UnloadAllGrammars();
+            Console.WriteLine("GRAMMARLOL");
 
             if (prefixed)
             {
@@ -292,19 +295,19 @@ namespace Moto.Speech
 
                 gb.Append(allChoices);
 
-                this.sre.LoadGrammar(new Grammar(gb));
+                this.sre.LoadGrammarAsync(new Grammar(gb));
             }
             else
             {
                 foreach (var g in choices)
                 {
-                    this.sre.LoadGrammar(new Grammar(g));
+                    this.sre.LoadGrammarAsync(new Grammar(g));
                 }
             }
 
             if (startListeningKeywords)
             {
-                this.sre.LoadGrammar(new Grammar(startListeningChoices));
+                this.sre.LoadGrammarAsync(new Grammar(startListeningChoices));
             }
         }
 
@@ -439,8 +442,8 @@ namespace Moto.Speech
 
             var g = new Grammar(gb);
             var g2 = new Grammar(startListeningChoices);
-            speechRecognitionEngine.LoadGrammar(g);
-            speechRecognitionEngine.LoadGrammar(g2);
+            speechRecognitionEngine.LoadGrammarAsync(g);
+            speechRecognitionEngine.LoadGrammarAsync(g2);
             speechRecognitionEngine.SpeechRecognized += this.SreSpeechRecognized;
             speechRecognitionEngine.SpeechHypothesized += this.SreSpeechHypothesized;
             speechRecognitionEngine.SpeechRecognitionRejected += this.SreSpeechRecognitionRejected;
