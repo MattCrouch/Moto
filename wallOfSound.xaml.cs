@@ -115,9 +115,12 @@ namespace Moto
             TakeAPicture,
             RecordNewWall,
             CustomWall,
-            Technologic,
-            Drum,
+            Animal,
+            Beatbox,
             EightBit,
+            Metal,
+            Trance,
+            Sax,
         }
 
         //Player's current focus
@@ -176,14 +179,23 @@ namespace Moto
                     case MainWindow.PlayerMode.Custom:
                         customAudio(player);
                         break;
-                    case MainWindow.PlayerMode.Technologic:
-                        technologicAudio(player);
-                        break;
-                    case MainWindow.PlayerMode.Drum:
-                        drumsetAudio(player);
-                        break;
                     case MainWindow.PlayerMode.EightBit:
-                        drumsetAudio(player);
+                        eightBitAudio(player);
+                        break;
+                    case MainWindow.PlayerMode.Sax:
+                        saxAudio(player);
+                        break;
+                    case MainWindow.PlayerMode.Trance:
+                        tranceAudio(player);
+                        break;
+                    case MainWindow.PlayerMode.Metal:
+                        metalAudio(player);
+                        break;
+                    case MainWindow.PlayerMode.Animal:
+                        animalAudio(player);
+                        break;
+                    case MainWindow.PlayerMode.Beatbox:
+                        beatboxAudio(player);
                         break;
                 }
             }
@@ -213,8 +225,11 @@ namespace Moto
             voiceVisuals.Add(SpeechRecognizer.Verbs.CustomWall, new BitmapImage(new Uri("/Moto;component/images/voice/customwall.png", UriKind.Relative)));
             voiceVisuals.Add(SpeechRecognizer.Verbs.CreateWall, new BitmapImage(new Uri("/Moto;component/images/voice/createwall.png", UriKind.Relative)));
             voiceVisuals.Add(SpeechRecognizer.Verbs.EightBitWall, new BitmapImage(new Uri("/Moto;component/images/voice/eightbit.png", UriKind.Relative)));
-            voiceVisuals.Add(SpeechRecognizer.Verbs.TechnologicWall, new BitmapImage(new Uri("/Moto;component/images/voice/technologic.png", UriKind.Relative)));
-            voiceVisuals.Add(SpeechRecognizer.Verbs.DrumWall, new BitmapImage(new Uri("/Moto;component/images/voice/drumsamples.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.SaxWall, new BitmapImage(new Uri("/Moto;component/images/voice/saxophone.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.MetalWall, new BitmapImage(new Uri("/Moto;component/images/voice/metal.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.TranceWall, new BitmapImage(new Uri("/Moto;component/images/voice/trance.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.AnimalWall, new BitmapImage(new Uri("/Moto;component/images/voice/animal.png", UriKind.Relative)));
+            voiceVisuals.Add(SpeechRecognizer.Verbs.BeatboxWall, new BitmapImage(new Uri("/Moto;component/images/voice/beatbox.png", UriKind.Relative)));
 
             voiceVisuals.Add(SpeechRecognizer.Verbs.KinectUp, new BitmapImage(new Uri("/Moto;component/images/voice/angleup.png", UriKind.Relative)));
             voiceVisuals.Add(SpeechRecognizer.Verbs.KinectUpSmall, new BitmapImage(new Uri("/Moto;component/images/voice/angleslightlyup.png", UriKind.Relative)));
@@ -254,23 +269,49 @@ namespace Moto
             wallAudio[player.skeleton.TrackingId][10] = "audio/wall/create/10.wav";
         }
 
-        private void technologicAudio(MainWindow.Player player)
+        private void saxAudio(MainWindow.Player player)
         {
-            wallAudio[player.skeleton.TrackingId][0] = "audio/wall/technologic/buyit.wav";
-            wallAudio[player.skeleton.TrackingId][1] = "audio/wall/technologic/useit.wav";
-            wallAudio[player.skeleton.TrackingId][2] = "audio/wall/technologic/breakit.wav";
-            wallAudio[player.skeleton.TrackingId][3] = "audio/wall/technologic/fixit.wav";
-            wallAudio[player.skeleton.TrackingId][4] = "audio/wall/technologic/trashit.wav";
-            wallAudio[player.skeleton.TrackingId][5] = "audio/wall/technologic/changeit.wav";
-            wallAudio[player.skeleton.TrackingId][6] = "audio/wall/technologic/mail.wav";
-            wallAudio[player.skeleton.TrackingId][7] = "audio/wall/technologic/upgradeit.wav";
+            wallAudio[player.skeleton.TrackingId][0] = "audio/wall/sax/0.wav";
+            wallAudio[player.skeleton.TrackingId][1] = "audio/wall/sax/1.wav";
+            wallAudio[player.skeleton.TrackingId][2] = "audio/wall/sax/2.wav";
+            wallAudio[player.skeleton.TrackingId][3] = "audio/wall/sax/3.wav";
+            wallAudio[player.skeleton.TrackingId][4] = "audio/wall/sax/4.wav";
+            wallAudio[player.skeleton.TrackingId][5] = "audio/wall/sax/5.wav";
+            wallAudio[player.skeleton.TrackingId][6] = "audio/wall/sax/6.wav";
+            wallAudio[player.skeleton.TrackingId][7] = "audio/wall/sax/7.wav";
+            wallAudio[player.skeleton.TrackingId][8] = "audio/wall/sax/8.wav";
+            wallAudio[player.skeleton.TrackingId][9] = "audio/wall/sax/9.wav";
+            wallAudio[player.skeleton.TrackingId][10] = "audio/wall/sax/10.wav";
         }
 
-        private void drumsetAudio(MainWindow.Player player)
+        private void metalAudio(MainWindow.Player player)
         {
-            wallAudio[player.skeleton.TrackingId][0] = "audio/drums/drum0.wav";
-            wallAudio[player.skeleton.TrackingId][1] = "audio/drums/drum1.wav";
-            wallAudio[player.skeleton.TrackingId][2] = "audio/drums/drum2.wav";
+            wallAudio[player.skeleton.TrackingId][0] = "audio/wall/metal/0.wav";
+            wallAudio[player.skeleton.TrackingId][1] = "audio/wall/metal/1.wav";
+            wallAudio[player.skeleton.TrackingId][2] = "audio/wall/metal/2.wav";
+            wallAudio[player.skeleton.TrackingId][3] = "audio/wall/metal/3.wav";
+            wallAudio[player.skeleton.TrackingId][4] = "audio/wall/metal/4.wav";
+            wallAudio[player.skeleton.TrackingId][5] = "audio/wall/metal/5.wav";
+            wallAudio[player.skeleton.TrackingId][6] = "audio/wall/metal/6.wav";
+            wallAudio[player.skeleton.TrackingId][7] = "audio/wall/metal/7.wav";
+            wallAudio[player.skeleton.TrackingId][8] = "audio/wall/metal/8.wav";
+            wallAudio[player.skeleton.TrackingId][9] = "audio/wall/metal/9.wav";
+            wallAudio[player.skeleton.TrackingId][10] = "audio/wall/metal/10.wav";
+        }
+
+        private void tranceAudio(MainWindow.Player player)
+        {
+            wallAudio[player.skeleton.TrackingId][0] = "audio/wall/trance/0.wav";
+            wallAudio[player.skeleton.TrackingId][1] = "audio/wall/trance/1.wav";
+            wallAudio[player.skeleton.TrackingId][2] = "audio/wall/trance/2.wav";
+            wallAudio[player.skeleton.TrackingId][3] = "audio/wall/trance/3.wav";
+            wallAudio[player.skeleton.TrackingId][4] = "audio/wall/trance/4.wav";
+            wallAudio[player.skeleton.TrackingId][5] = "audio/wall/trance/5.wav";
+            wallAudio[player.skeleton.TrackingId][6] = "audio/wall/trance/6.wav";
+            wallAudio[player.skeleton.TrackingId][7] = "audio/wall/trance/7.wav";
+            wallAudio[player.skeleton.TrackingId][8] = "audio/wall/trance/8.wav";
+            wallAudio[player.skeleton.TrackingId][9] = "audio/wall/trance/9.wav";
+            wallAudio[player.skeleton.TrackingId][10] = "audio/wall/trance/10.wav";
         }
 
         private void eightBitAudio(MainWindow.Player player)
@@ -286,6 +327,36 @@ namespace Moto
             wallAudio[player.skeleton.TrackingId][8] = "audio/wall/8bit/8.wav";
             wallAudio[player.skeleton.TrackingId][9] = "audio/wall/8bit/9.wav";
             wallAudio[player.skeleton.TrackingId][10] = "audio/wall/8bit/10.wav";
+        }
+
+        private void beatboxAudio(MainWindow.Player player)
+        {
+            wallAudio[player.skeleton.TrackingId][0] = "audio/wall/beatbox/0.wav";
+            wallAudio[player.skeleton.TrackingId][1] = "audio/wall/beatbox/1.wav";
+            wallAudio[player.skeleton.TrackingId][2] = "audio/wall/beatbox/2.wav";
+            wallAudio[player.skeleton.TrackingId][3] = "audio/wall/beatbox/3.wav";
+            wallAudio[player.skeleton.TrackingId][4] = "audio/wall/beatbox/4.wav";
+            wallAudio[player.skeleton.TrackingId][5] = "audio/wall/beatbox/5.wav";
+            wallAudio[player.skeleton.TrackingId][6] = "audio/wall/beatbox/6.wav";
+            wallAudio[player.skeleton.TrackingId][7] = "audio/wall/beatbox/7.wav";
+            wallAudio[player.skeleton.TrackingId][8] = "audio/wall/beatbox/8.wav";
+            wallAudio[player.skeleton.TrackingId][9] = "audio/wall/beatbox/9.wav";
+            wallAudio[player.skeleton.TrackingId][10] = "audio/wall/beatbox/10.wav";
+        }
+
+        private void animalAudio(MainWindow.Player player)
+        {
+            wallAudio[player.skeleton.TrackingId][0] = "audio/wall/animal/0.wav";
+            wallAudio[player.skeleton.TrackingId][1] = "audio/wall/animal/1.wav";
+            wallAudio[player.skeleton.TrackingId][2] = "audio/wall/animal/2.wav";
+            wallAudio[player.skeleton.TrackingId][3] = "audio/wall/animal/3.wav";
+            wallAudio[player.skeleton.TrackingId][4] = "audio/wall/animal/4.wav";
+            wallAudio[player.skeleton.TrackingId][5] = "audio/wall/animal/5.wav";
+            wallAudio[player.skeleton.TrackingId][6] = "audio/wall/animal/6.wav";
+            wallAudio[player.skeleton.TrackingId][7] = "audio/wall/animal/7.wav";
+            wallAudio[player.skeleton.TrackingId][8] = "audio/wall/animal/8.wav";
+            wallAudio[player.skeleton.TrackingId][9] = "audio/wall/animal/9.wav";
+            wallAudio[player.skeleton.TrackingId][10] = "audio/wall/animal/10.wav";
         }
         #endregion
 
@@ -900,7 +971,7 @@ namespace Moto
         {
             //Set up a new player with their Wall
             player.instrument = instrument.instrumentList.WallOfSound;
-            player.mode = MainWindow.PlayerMode.Drum;
+            player.mode = chooseRandomPlayerWall();
             
             Image image = new Image();
             image.Source = new BitmapImage(new Uri("images/wall-sample.png", UriKind.Relative));
@@ -909,11 +980,6 @@ namespace Moto
 
             player.instrumentImage = image;
 
-            if (currentFocus == playerFocus.KinectGuide)
-            {
-                MainWindow.hidePlayerOverlays();
-            }
-
             setupPlayerAudio(player);
             setupWall(player);
 
@@ -921,6 +987,15 @@ namespace Moto
             {
                 MainWindow.hidePlayerOverlays();
             }
+        }
+
+        private MainWindow.PlayerMode chooseRandomPlayerWall()
+        {
+            MainWindow.PlayerMode[] values = { MainWindow.PlayerMode.Sax, MainWindow.PlayerMode.Metal, MainWindow.PlayerMode.Trance, MainWindow.PlayerMode.EightBit, MainWindow.PlayerMode.Animal, MainWindow.PlayerMode.Beatbox };
+
+            MainWindow.PlayerMode aWall = values[new Random().Next(0, values.Length)];
+
+            return aWall;
         }
 
         private void wallInteractionVisual(MainWindow.Player player, int box, bool recording = false)
@@ -1092,8 +1167,11 @@ namespace Moto
                 case SpeechRecognizer.Verbs.CustomWall:
                 case SpeechRecognizer.Verbs.CreateWall:
                 case SpeechRecognizer.Verbs.EightBitWall:
-                case SpeechRecognizer.Verbs.TechnologicWall:
-                case SpeechRecognizer.Verbs.DrumWall:
+                case SpeechRecognizer.Verbs.TranceWall:
+                case SpeechRecognizer.Verbs.MetalWall:
+                case SpeechRecognizer.Verbs.SaxWall:
+                case SpeechRecognizer.Verbs.AnimalWall:
+                case SpeechRecognizer.Verbs.BeatboxWall:
                 case SpeechRecognizer.Verbs.KinectUp:
                 case SpeechRecognizer.Verbs.KinectUpSmall:
                 case SpeechRecognizer.Verbs.KinectDown:
@@ -1210,18 +1288,39 @@ namespace Moto
                     }
                     //Switch to the 8-bit Wall
                     break;
-                case SpeechRecognizer.Verbs.TechnologicWall:
+                case SpeechRecognizer.Verbs.TranceWall:
+                    //Switch to the Trance wall
                     if (MainWindow.activeSkeletons.ContainsKey(skeletonId))
                     {
-                        wallSwitchPlayerTo(MainWindow.activeSkeletons[skeletonId], menuOptions.Technologic);
+                        wallSwitchPlayerTo(MainWindow.activeSkeletons[skeletonId], menuOptions.Trance);
                     }
-                    //Switch to the Technologic wall
                     break;
-                case SpeechRecognizer.Verbs.DrumWall:
-                    //Switch to the Drum Samples wall
+                case SpeechRecognizer.Verbs.MetalWall:
+                    //Switch to the Metal wall
                     if (MainWindow.activeSkeletons.ContainsKey(skeletonId))
                     {
-                        wallSwitchPlayerTo(MainWindow.activeSkeletons[skeletonId], menuOptions.Drum);
+                        wallSwitchPlayerTo(MainWindow.activeSkeletons[skeletonId], menuOptions.Metal);
+                    }
+                    break;
+                case SpeechRecognizer.Verbs.SaxWall:
+                    //Switch to the Sax wall
+                    if (MainWindow.activeSkeletons.ContainsKey(skeletonId))
+                    {
+                        wallSwitchPlayerTo(MainWindow.activeSkeletons[skeletonId], menuOptions.Sax);
+                    }
+                    break;
+                case SpeechRecognizer.Verbs.AnimalWall:
+                    //Switch to the Sax wall
+                    if (MainWindow.activeSkeletons.ContainsKey(skeletonId))
+                    {
+                        wallSwitchPlayerTo(MainWindow.activeSkeletons[skeletonId], menuOptions.Animal);
+                    }
+                    break;
+                case SpeechRecognizer.Verbs.BeatboxWall:
+                    //Switch to the Sax wall
+                    if (MainWindow.activeSkeletons.ContainsKey(skeletonId))
+                    {
+                        wallSwitchPlayerTo(MainWindow.activeSkeletons[skeletonId], menuOptions.Beatbox);
                     }
                     break;
                 case SpeechRecognizer.Verbs.KinectUp:
@@ -1321,17 +1420,29 @@ namespace Moto
                         player.mode = MainWindow.PlayerMode.Custom;
                         customAudio(player);
                         break;
-                    case menuOptions.Technologic:
-                        player.mode = MainWindow.PlayerMode.Technologic;
-                        technologicAudio(player);
+                    case menuOptions.Sax:
+                        player.mode = MainWindow.PlayerMode.Sax;
+                        saxAudio(player);
                         break;
-                    case menuOptions.Drum:
-                        player.mode = MainWindow.PlayerMode.Drum;
-                        drumsetAudio(player);
+                    case menuOptions.Trance:
+                        player.mode = MainWindow.PlayerMode.Trance;
+                        tranceAudio(player);
+                        break;
+                    case menuOptions.Metal:
+                        player.mode = MainWindow.PlayerMode.Metal;
+                        metalAudio(player);
                         break;
                     case menuOptions.EightBit:
                         player.mode = MainWindow.PlayerMode.EightBit;
                         eightBitAudio(player);
+                        break;
+                    case menuOptions.Animal:
+                        player.mode = MainWindow.PlayerMode.Animal;
+                        animalAudio(player);
+                        break;
+                    case menuOptions.Beatbox:
+                        player.mode = MainWindow.PlayerMode.Beatbox;
+                        beatboxAudio(player);
                         break;
                 }
             }
@@ -1534,19 +1645,14 @@ namespace Moto
                         takeAPicture();
                         break;
                     case menuOptions.RecordNewWall:
-                        wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], menuOptions.RecordNewWall);
-                        break;
                     case menuOptions.CustomWall:
-                        wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], menuOptions.CustomWall);
-                        break;
-                    case menuOptions.Technologic:
-                        wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], menuOptions.Technologic);
-                        break;
-                    case menuOptions.Drum:
-                        wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], menuOptions.Drum);
-                        break;
+                    case menuOptions.Sax:
+                    case menuOptions.Trance:
+                    case menuOptions.Metal:
                     case menuOptions.EightBit:
-                        wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], menuOptions.EightBit);
+                    case menuOptions.Animal:
+                    case menuOptions.Beatbox:
+                        wallSwitchPlayerTo(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey], kinectGuideMenu[menuPosition]);
                         break;
                 }
             }

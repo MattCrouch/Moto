@@ -97,8 +97,11 @@ namespace Moto
             Acoustic,
             Electric,
             //Wall of Sound
-            Technologic,
-            Drum,
+            Animal,
+            Beatbox,
+            Sax,
+            Trance,
+            Metal,
             EightBit,
             Custom,
             Create,

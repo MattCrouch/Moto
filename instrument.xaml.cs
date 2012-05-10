@@ -794,6 +794,8 @@ namespace Moto
         {
             if (player.instrument != instrument || player.mode != mode)
             {
+                removeInstrumentVisuals(player);
+
                 clearInstrumentRefs(player);
                 //Hide all the instrument-specific overlays & set the new instrument
                 if (MainWindow.activeSkeletons.ContainsKey(player.skeleton.TrackingId))

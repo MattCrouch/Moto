@@ -53,14 +53,14 @@ namespace Moto
             if (player.skeleton != null)
             {
                 //Drums
-                defineKey(player, 0, -0.4592496, -0.17543834, -0.3577266);
-                defineKey(player, 1, -0.3342496, -0.17543834, -0.3577266);
-                defineKey(player, 2, -0.2092496, -0.17543834, -0.3577266);
-                defineKey(player, 3, -0.0842496, -0.17543834, -0.3577266);
-                defineKey(player, 4, 0.0407504, -0.17543834, -0.3577266);
-                defineKey(player, 5, 0.1657504, -0.17543834, -0.3577266);
-                defineKey(player, 6, 0.2907504, -0.17543834, -0.3577266);
-                defineKey(player, 7, 0.4107504, -0.17543834, -0.3577266);
+                defineKey(player, 0, -0.4592496, -0.14543834, -0.3577266);
+                defineKey(player, 1, -0.3342496, -0.14543834, -0.3577266);
+                defineKey(player, 2, -0.2092496, -0.14543834, -0.3577266);
+                defineKey(player, 3, -0.0842496, -0.14543834, -0.3577266);
+                defineKey(player, 4, 0.0407504, -0.14543834, -0.3577266);
+                defineKey(player, 5, 0.1657504, -0.14543834, -0.3577266);
+                defineKey(player, 6, 0.2907504, -0.14543834, -0.3577266);
+                defineKey(player, 7, 0.4107504, -0.14543834, -0.3577266);
 
                 SetKeyboardPosition(player);
             }
@@ -80,21 +80,21 @@ namespace Moto
         {
             FrameworkElement image = player.instrumentImage;
 
-            image.Width = scaledWidth(player.skeleton.Position, player.instrument);
+            image.Width = scaledWidth(player.skeleton.Joints[JointType.Spine].Position, player.instrument);
 
             if (MainWindow.sensor.IsRunning)
             {
-                ColorImagePoint point = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Position, ColorImageFormat.RgbResolution640x480Fps30);
+                ColorImagePoint point = MainWindow.sensor.MapSkeletonPointToColor(player.skeleton.Joints[JointType.Spine].Position, ColorImageFormat.RgbResolution640x480Fps30);
 
                 //Grab the image reference and move it to the correct place
                 Canvas.SetLeft(image, point.X - (image.ActualWidth / 2));
-                Canvas.SetTop(image, point.Y - (image.ActualHeight / 2));
+                Canvas.SetTop(image, point.Y);
 
                 foreach (var overlay in player.instrumentOverlay)
                 {
                     overlay.Value.Width = image.Width;
                     Canvas.SetLeft(overlay.Value, point.X - (image.ActualWidth / 2));
-                    Canvas.SetTop(overlay.Value, point.Y - (image.ActualHeight / 2));
+                    Canvas.SetTop(overlay.Value, point.Y);
                 }
             }
         }
