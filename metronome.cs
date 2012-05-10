@@ -25,7 +25,7 @@ namespace Moto
 
         static long timePile = 0;
 
-        static SoundPlayer metronomeTick = new SoundPlayer("audio/drums/drum6.wav");
+        static MediaPlayer metronomeTick = new MediaPlayer();
 
         public static void setupMetronome() {
             timePile = 0;
@@ -35,11 +35,12 @@ namespace Moto
             theMetronome = new DispatcherTimer();
             theMetronome.Interval = TimeSpan.FromMilliseconds(1000);
             theMetronome.Tick += new EventHandler(metronome_Tick);
-            metronomeTick.LoadAsync();
+            metronomeTick.Open(new Uri("audio/drums/hard/drum6.wav", UriKind.Relative));
         }
 
         static void metronome_Tick(object sender, EventArgs e)
         {
+            metronomeTick.Position = TimeSpan.FromMilliseconds(0);
             metronomeTick.Play();
         }
 
@@ -73,6 +74,7 @@ namespace Moto
             theMetronome.Interval = TimeSpan.FromMilliseconds(milSec);
             theMetronome.Start();
 
+            metronomeTick.Position = TimeSpan.FromMilliseconds(0);
             metronomeTick.Play();
         }
 

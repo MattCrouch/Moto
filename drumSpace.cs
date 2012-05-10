@@ -83,24 +83,24 @@ namespace Moto
                 defineDrum(player, 3, 0.2913417, -0.15812907, -0.2434439);
 
                 //Cymbal
-                defineDrum(player, 4, -0.4074842, 0.2215563, -0.4976295);
-                defineDrum(player, 5, 0.17892, 0.2215563, -0.4976295);
+                defineDrum(player, 4, -0.5374842, 0.2215563, -0.6076295, 0.3, 0.1, 0.5);
+                defineDrum(player, 5, 0.30892, 0.2215563, -0.6076295, 0.3, 0.1, 0.5);
 
                 //Kick drum
-                defineDrum(player, 6, -0.3076267, -0.7402052, -0.8686381,0.4);
+                defineDrum(player, 6, -0.3076267, -0.7402052, -0.8686381,0.6, 0.5, 0.6);
 
                 SetDrumPosition(player);
             }
         }
 
-        private void defineDrum(MainWindow.Player player, int drum, double X, double Y, double Z, double drumSize = 0.2)
+        private void defineDrum(MainWindow.Player player, int drum, double X, double Y, double Z, double drumWidth = 0.2, double drumHeight = 0.2, double drumDepth = 0.2)
         {
             hitArea[player.skeleton.TrackingId][drum].X1 = player.skeleton.Joints[JointType.HipCenter].Position.X + X;
-            hitArea[player.skeleton.TrackingId][drum].X2 = hitArea[player.skeleton.TrackingId][drum].X1 + drumSize;
+            hitArea[player.skeleton.TrackingId][drum].X2 = hitArea[player.skeleton.TrackingId][drum].X1 + drumWidth;
             hitArea[player.skeleton.TrackingId][drum].Y1 = player.skeleton.Joints[JointType.HipCenter].Position.Y + Y;
-            hitArea[player.skeleton.TrackingId][drum].Y2 = hitArea[player.skeleton.TrackingId][drum].Y1 + drumSize;
+            hitArea[player.skeleton.TrackingId][drum].Y2 = hitArea[player.skeleton.TrackingId][drum].Y1 + drumHeight;
             hitArea[player.skeleton.TrackingId][drum].Z1 = player.skeleton.Joints[JointType.HipCenter].Position.Z + Z;
-            hitArea[player.skeleton.TrackingId][drum].Z2 = hitArea[player.skeleton.TrackingId][drum].Z1 + drumSize;
+            hitArea[player.skeleton.TrackingId][drum].Z2 = hitArea[player.skeleton.TrackingId][drum].Z1 + drumDepth;
         }
 
         internal void checkDrumHit(MainWindow.Player player, JointType joint)
