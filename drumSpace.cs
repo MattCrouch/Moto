@@ -122,10 +122,9 @@ namespace Moto
                         {
                             if (handMovements.difference != null)
                             {
-                                //MessageBox.Show(Convert.ToString(difference["X"]));
                                 if (handMovements.difference[player.skeleton.TrackingId][joint].Y < -0.01 || ((joint == JointType.FootLeft || joint == JointType.FootRight) && handMovements.difference[player.skeleton.TrackingId][joint].Z < -0.02))
                                 {
-                                    hitDrum("drum" + i, Math.Abs(handMovements.difference[player.skeleton.TrackingId][joint].Y));
+                                    hitDrum("drum" + i);
                                     Debug.Print("HIT! " + i);
                                     insideArea[player.skeleton.TrackingId][joint][i] = true;
                                 }
@@ -140,21 +139,14 @@ namespace Moto
             }
         }
 
-        private void hitDrum(string drumName, double strength)
+        private void hitDrum(string drumName)
         {
             if (mpDictionary[(mpCounter % mpDictionary.Count)] == null)
             {
                 mpDictionary[(mpCounter % mpDictionary.Count)] = new MediaPlayer();
             }
 
-            if (strength > 0.04)
-            {
-                mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/drums/hard/" + drumName + ".wav", UriKind.Relative));
-            }
-            else
-            {
-                mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/drums/soft/" + drumName + ".wav", UriKind.Relative));
-            }
+            mpDictionary[(mpCounter % mpDictionary.Count)].Open(new Uri("audio/drums/hard/" + drumName + ".wav", UriKind.Relative));
             
             mpDictionary[(mpCounter % mpDictionary.Count)].Play();
 
