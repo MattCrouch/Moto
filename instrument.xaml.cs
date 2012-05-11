@@ -136,7 +136,6 @@ namespace Moto
             foreach (var player in activeSkeletons)
             {
                 switchInstrument(player.Value, chooseRandomInstrument());
-                Console.WriteLine(player.Value.skeleton.TrackingId);
             }
         }
 
