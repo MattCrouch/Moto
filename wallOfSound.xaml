@@ -215,7 +215,7 @@
         </Image>
         <Image x:Name="imgPrimaryGlowLeft" Height="76" Source="images/glowing-point.png" Stretch="Fill" Width="76" Visibility="Hidden" />
         <Image x:Name="imgPrimaryGlowRight" Height="76" Source="images/glowing-point.png" Stretch="Fill" Width="76" Visibility="Hidden" />
-        <Image x:Name="imgKinectGuide" Height="100" Source="/Moto;component/images/kinect-guide.png" Stretch="Fill" Canvas.Top="380" Width="100" Visibility="Hidden" />
+        <Image x:Name="imgKinectGuide" Height="50" Source="/Moto;component/images/kinect-guide.png" Stretch="Fill" Canvas.Top="415" Width="50" Visibility="Hidden" />
         <Rectangle x:Name="imgDimmer" Fill="Black" Height="480" Stroke="#00000000" Width="640" Opacity="0.495" Visibility="Hidden" />
         <Canvas ClipToBounds="True"  Width="640" Height="480" Canvas.Left="0" Canvas.Top="0" MaxHeight="480" MinHeight="480">
             <Canvas.OpacityMask>
