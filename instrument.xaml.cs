@@ -124,7 +124,6 @@ namespace Moto
         private TextBlock uploadFeedback;
         private Image cameraUpload;
         private DispatcherTimer uploadFeedbackTimer;
-        private bool removeFeedback;
         private playerFocus afterFocus;
 
         //Kinect error imagery
@@ -1001,8 +1000,6 @@ namespace Moto
             MainWindow.animateSlide(uploadFeedback);
             MainWindow.animateSlide(cameraUpload);
 
-            removeFeedback = false;
-
             uploadFeedbackTimer = new DispatcherTimer();
             uploadFeedbackTimer.Interval = TimeSpan.FromSeconds(5);
             uploadFeedbackTimer.Tick += new EventHandler(uploadFeedbackTimer_Tick);
@@ -1011,21 +1008,12 @@ namespace Moto
 
         void uploadFeedbackTimer_Tick(object sender, EventArgs e)
         {
-            if (!removeFeedback)
-            {
-                MainWindow.animateSlide(uploadFeedback,true);
-                MainWindow.animateSlide(cameraUpload,true);
+            MainWindow.animateSlide(uploadFeedback,true);
+            MainWindow.animateSlide(cameraUpload,true);
 
-                removeFeedback = true;
-            }
-            else
-            {
-                MainCanvas.Children.Remove(uploadFeedback);
-                MainCanvas.Children.Remove(cameraUpload);
-
-                uploadFeedback = null;
-                cameraUpload = null;
-            }
+            uploadFeedbackTimer.Stop();
+            uploadFeedbackTimer.Tick -= uploadFeedbackTimer_Tick;
+            uploadFeedbackTimer = null;
         }
 
         void Client_UploadProgressChanged(object sender, System.Net.UploadProgressChangedEventArgs e)
