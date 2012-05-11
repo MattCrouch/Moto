@@ -266,7 +266,6 @@ namespace Moto
                         clearInstrumentRefs(MainWindow.activeSkeletons[activeList[i]]);
 
                         MainWindow.playerRemoved(activeList[i]);
-                        //removePlayerInstrument(MainWindow.activeSkeletons[activeList[i]]);
                     }
 
                     activeList = null;
@@ -383,7 +382,6 @@ namespace Moto
                 case instrumentList.Drums:
                     //DRUMS
                     defineHitAreas(player);
-                    //showReadout((skeleton.Joints[JointType.HipLeft].Position.X - skeleton.Joints[JointType.HipRight].Position.X).ToString());
                     if (currentFocus == playerFocus.None)
                     {
                         checkDrumHit(player, JointType.HandLeft);
@@ -740,8 +738,6 @@ namespace Moto
             {
                 case instrumentList.Drums:
                     image.Source = new BitmapImage(new Uri("images/drums.png", UriKind.Relative));
-                    //image.Width = 360;
-                    //image.Height = image.Width * 0.80;
                     break;
                 case instrumentList.GuitarLeft:
                 case instrumentList.GuitarRight:
@@ -753,8 +749,6 @@ namespace Moto
                     {
                         image.Source = new BitmapImage(new Uri("images/electric-guitar.png", UriKind.Relative));
                     }
-                    //image.Height = 225;
-                    //image.Width = image.Height * 0.35;
                     break;
                 case instrumentList.Keyboard:
                     image.Source = new BitmapImage(new Uri("images/keyboard.png", UriKind.Relative));
@@ -853,8 +847,7 @@ namespace Moto
                 {
                     if (Math.Abs(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey].skeleton.Joints[JointType.HandLeft].Position.X - MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey].skeleton.Joints[JointType.HandRight].Position.X) < 0.1 && !beatSet)
                     {
-                        Console.WriteLine("#############Set the beat##########\n\n");
-
+                        //Set the beat
                         beatSet = true;
                         metronome.metronomeBeat();
 
@@ -1057,8 +1050,6 @@ namespace Moto
 
         private void startCaptureAnim()
         {
-            //MainWindow.animateSlide(preparingImg, true, true, 5, 0.5);
-
             Storyboard sb2 = this.FindResource("photoPrep") as Storyboard;
             sb2.AutoReverse = true;
             sb2.Begin(this, true);
@@ -1227,7 +1218,6 @@ namespace Moto
 
                     if (oldDirection != menuScrollDirection)
                     {
-                        //Console.WriteLine("CHANGE IN DIRECTION: " + menuScrollDirection);
                         adjustMenuSpeed(menuScrollDirection);
 
                         if ((oldDirection == handMovements.scrollDirection.None && menuScrollDirection == handMovements.scrollDirection.SmallUp) || (oldDirection == handMovements.scrollDirection.SmallUp && menuScrollDirection == handMovements.scrollDirection.LargeUp) || (oldDirection == handMovements.scrollDirection.None && menuScrollDirection == handMovements.scrollDirection.SmallDown) || (oldDirection == handMovements.scrollDirection.SmallDown && menuScrollDirection == handMovements.scrollDirection.LargeDown))
@@ -1262,7 +1252,6 @@ namespace Moto
         {
             if (e.Trigger == handMovements.UserDecisions.Triggered)
             {
-                Console.WriteLine("Left swipe right");
                 MainWindow.SFXSuccess.Play();
 
                 exitKinectGuide();
@@ -1340,7 +1329,6 @@ namespace Moto
         {
 
             Canvas.SetTop(kinectGuideCanvas, 60 * menuPosition);
-            //Canvas.SetTop(rectangle1, 60 * -menuPosition);
 
             DoubleAnimation animation = new DoubleAnimation();
 

@@ -497,9 +497,6 @@ namespace Moto
                             }
                         }
 
-                        //The player we're referencing at this point in the loop
-                        //MainWindow.Player player = MainWindow.activeSkeletons[aSkeleton.TrackingId];
-
                         //Player-specific code
                         handMovements.trackJointProgression(MainWindow.activeSkeletons[aSkeleton.TrackingId].skeleton, MainWindow.activeSkeletons[aSkeleton.TrackingId].skeleton.Joints[JointType.HandLeft]);
                         handMovements.trackJointProgression(MainWindow.activeSkeletons[aSkeleton.TrackingId].skeleton, MainWindow.activeSkeletons[aSkeleton.TrackingId].skeleton.Joints[JointType.HandRight]);
@@ -564,7 +561,6 @@ namespace Moto
         internal void checkBoxHit(MainWindow.Player player, JointType joint)
         {
             //checkDrumHit code
-            //MessageBox.Show(Convert.ToString(hitAreaStart[0][1]));
             if (player.skeleton != null)
             {
 
@@ -600,7 +596,6 @@ namespace Moto
         internal void checkBoxRecordHit(MainWindow.Player player, JointType joint)
         {
             //checkDrumHit code
-            //MessageBox.Show(Convert.ToString(hitAreaStart[0][1]));
             if (player.skeleton != null)
             {
 
@@ -749,7 +744,6 @@ namespace Moto
             boxRecording = false;
             boxToRecord = null;
 
-            //TODO: Surely there's a better way than reinitialising the speech recogniser?
             MainWindow.mySpeechRecognizer.Start(MainWindow.sensor.AudioSource);
         }
         #region .wav creation code
@@ -1613,7 +1607,6 @@ namespace Moto
 
                     if (oldDirection != menuScrollDirection)
                     {
-                        //Console.WriteLine("CHANGE IN DIRECTION: " + menuScrollDirection);
                         adjustMenuSpeed(menuScrollDirection);
 
                         if ((oldDirection == handMovements.scrollDirection.None && menuScrollDirection == handMovements.scrollDirection.SmallUp) || (oldDirection == handMovements.scrollDirection.SmallUp && menuScrollDirection == handMovements.scrollDirection.LargeUp) || (oldDirection == handMovements.scrollDirection.None && menuScrollDirection == handMovements.scrollDirection.SmallDown) || (oldDirection == handMovements.scrollDirection.SmallDown && menuScrollDirection == handMovements.scrollDirection.LargeDown))
@@ -1652,7 +1645,6 @@ namespace Moto
         {
             if (e.Trigger == handMovements.UserDecisions.Triggered)
             {
-                Console.WriteLine("Left swipe right");
                 MainWindow.SFXSuccess.Play();
 
                 exitKinectGuide();
@@ -1711,7 +1703,6 @@ namespace Moto
         {
 
             Canvas.SetTop(kinectGuideCanvas, 60 * menuPosition);
-            //Canvas.SetTop(rectangle1, 60 * -menuPosition);
 
             DoubleAnimation animation = new DoubleAnimation();
 
@@ -1774,10 +1765,6 @@ namespace Moto
 
             Client.UploadProgressChanged += new System.Net.UploadProgressChangedEventHandler(Client_UploadProgressChanged);
             Client.UploadFileCompleted += new System.Net.UploadFileCompletedEventHandler(Client_UploadFileCompleted);
-
-
-            //string s = System.Text.Encoding.UTF8.GetString(result, 0, result.Length);
-            //MessageBox.Show(s);
         }
 
         void cameraFlash_Loaded(object sender, RoutedEventArgs e)

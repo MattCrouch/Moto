@@ -274,36 +274,6 @@ namespace Moto
             sensor.ElevationAngle = angle;
         }
 
-        /*public static int selectPrimarySkeleton(Dictionary<int,Player> skeletons)
-        {
-            int skeletonId = 0;
-
-            if (skeletons.Count > 0)
-            {
-                foreach (var player in skeletons)
-                {
-                    if (skeletonId == 0)
-                    {
-                        skeletonId = player.Key;
-                    }
-                    else
-                    {
-                        if (player.Value.skeleton.Position.Z < skeletons[skeletonId].skeleton.Position.Z)
-                        {
-                            skeletonId = player.Key;
-                        }
-                    }
-                }
-
-                return skeletonId;
-            }
-            else
-            {
-
-                return 0;
-            }
-        }*/
-
         public static bool playerAdded(Skeleton skeleton)
         {
             Console.WriteLine("Player added");

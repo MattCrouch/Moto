@@ -30,7 +30,6 @@ namespace Moto
 
             MainWindow.SFXStartup.Play();
 
-            //MainWindow.animateSlide(imgStepInToPlay);
             MainWindow.animateSlide(imgMotoLogo);
 
             setupVoiceVisuals();
@@ -85,7 +84,6 @@ namespace Moto
             MainWindow.mySpeechRecognizer.SaidSomething += this.RecognizerSaidSomething;
             MainWindow.mySpeechRecognizer.ListeningChanged += this.ListeningChanged;
 
-            //MainWindow.mySpeechRecognizer.switchGrammar(new Choices[] { MainWindow.mySpeechRecognizer.startScreenChoices }, true, true); 
         }
 
         private void setupVoiceVisuals()
@@ -178,11 +176,6 @@ namespace Moto
                 }
 
                 skeletonList = null;
-
-                if (MainWindow.activeSkeletons.Count > 0)
-                {
-                    //alignPrimaryGlow(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey]);
-                }
 
                 //Listen for gestures for everyone in the scene
                 foreach (var player in MainWindow.activeSkeletons)
@@ -543,7 +536,6 @@ namespace Moto
             {
                 imgStepInToPlay.Visibility = Visibility.Hidden;
 
-                //drumSlider.Visibility = Visibility.Visible;
                 lblHoldOutLeftHand.Visibility = Visibility.Visible;
                 lblPlayInstrument.Visibility = Visibility.Visible;
 
@@ -554,11 +546,9 @@ namespace Moto
             {
                 imgStepInToPlay.Visibility = Visibility.Visible;
 
-                //imgInstrumentLoader.Visibility = Visibility.Hidden;
                 lblHoldOutLeftHand.Visibility = Visibility.Hidden;
                 lblPlayInstrument.Visibility = Visibility.Hidden;
 
-                //imgWallOfSoundLoader.Visibility = Visibility.Hidden;
                 lblHoldOutRightHand.Visibility = Visibility.Hidden;
                 lblPlayWallOfSound.Visibility = Visibility.Hidden;
             }
