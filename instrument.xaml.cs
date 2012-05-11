@@ -411,7 +411,6 @@ namespace Moto
                     break;
                 case instrumentList.Keyboard:
                 defineKeyAreas(player);
-                    //showReadout((skeleton.Joints[JointType.HipLeft].Position.X - skeleton.Joints[JointType.HipRight].Position.X).ToString());
                     if (currentFocus == playerFocus.None)
                     {
                         checkKeyHit(player, JointType.HandLeft);

@@ -55,7 +55,7 @@ namespace Moto
             Canvas.SetLeft(image, point.X - (image.Width / 2));
             Canvas.SetTop(image, point.Y);
 
-            if (currentFocus == playerFocus.None || currentFocus == playerFocus.Picture || currentFocus == playerFocus.Metronome)
+            if (currentFocus == playerFocus.None || currentFocus == playerFocus.Metronome)
             {
                 if (player.skeleton.Joints[JointType.HandLeft].TrackingState == JointTrackingState.Inferred && (Math.Abs(player.skeleton.Joints[JointType.HandLeft].Position.X) - Math.Abs(player.skeleton.Joints[JointType.HipCenter].Position.X) < 0.30 && player.skeleton.Joints[JointType.HandLeft].Position.Z > player.skeleton.Joints[JointType.HipCenter].Position.Z))
                 {
