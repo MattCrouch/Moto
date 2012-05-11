@@ -401,18 +401,19 @@ namespace Moto
 
         public static scrollDirection sliderMenuValue(MainWindow.Player player, double angleValue)
         {
+            Console.WriteLine(angleValue);
             bool upwards = false;
-            if (player.skeleton.Joints[JointType.ShoulderLeft].Position.Y < player.skeleton.Joints[JointType.HandLeft].Position.Y)
+            if (player.skeleton.Joints[JointType.Spine].Position.Y < player.skeleton.Joints[JointType.HandLeft].Position.Y)
             {
                 upwards = true;
             }
 
-            if (angleValue > 70 || (player.skeleton.Joints[JointType.HandLeft].Position.X > player.skeleton.Joints[JointType.HipLeft].Position.X - 0.15))
+            if (angleValue > 75 || (player.skeleton.Joints[JointType.HandLeft].Position.X > player.skeleton.Joints[JointType.HipLeft].Position.X - 0.15))
             {
                 //No movement
                 return scrollDirection.None;
             }
-            else if (angleValue > 55)
+            else if (angleValue > 50)
             {
                 //Small increment
                 if (upwards)

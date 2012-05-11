@@ -1225,6 +1225,19 @@ namespace Moto
 
                     menuScrollDirection = handMovements.sliderMenuValue(player, angleValue);
 
+                    if (menuScrollDirection == handMovements.scrollDirection.None)
+                    {
+                        imgMenuMovementGuide.Opacity = 0.3;
+                    }
+                    else if (menuScrollDirection == handMovements.scrollDirection.SmallUp || menuScrollDirection == handMovements.scrollDirection.SmallDown)
+                    {
+                        imgMenuMovementGuide.Opacity = 0.6;
+                    }
+                    else
+                    {
+                        imgMenuMovementGuide.Opacity = 1;
+                    }
+
                     if (oldDirection != menuScrollDirection)
                     {
                         //Console.WriteLine("CHANGE IN DIRECTION: " + menuScrollDirection);

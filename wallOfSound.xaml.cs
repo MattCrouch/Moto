@@ -678,7 +678,7 @@ namespace Moto
                 {
                     if (player.Value.mode == MainWindow.PlayerMode.Create)
                     {
-                        removeWallInteractionVisual(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey]);
+                        removeWallInteractionVisual(MainWindow.activeSkeletons[player.Value.skeleton.TrackingId]);
                     }
                 }
             }
@@ -1544,8 +1544,6 @@ namespace Moto
         void menuMovementTimer_Tick(object sender, EventArgs e)
         {
             menuTick();
-
-            Console.WriteLine(kinectGuideMenu[menuPosition]);
         }
 
         private void menuTick()
@@ -1576,7 +1574,7 @@ namespace Moto
 
         private void kinectGuideManipulation(MainWindow.Player player)
         {
-            if (MainWindow.activeSkeletons.Count > 0)
+            if (MainWindow.activeSkeletons.ContainsKey(player.skeleton.TrackingId))
             {
                 if (handMovements.leftSwipeRightIn == null)
                 {
@@ -1600,6 +1598,19 @@ namespace Moto
                     }
 
                     menuScrollDirection = handMovements.sliderMenuValue(player, angleValue);
+
+                    if (menuScrollDirection == handMovements.scrollDirection.None)
+                    {
+                        imgMenuMovementGuide.Opacity = 0.3;
+                    }
+                    else if (menuScrollDirection == handMovements.scrollDirection.SmallUp || menuScrollDirection == handMovements.scrollDirection.SmallDown)
+                    {
+                        imgMenuMovementGuide.Opacity = 0.6;
+                    }
+                    else
+                    {
+                        imgMenuMovementGuide.Opacity = 1;
+                    }
 
                     if (oldDirection != menuScrollDirection)
                     {
