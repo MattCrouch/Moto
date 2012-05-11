@@ -279,9 +279,7 @@ namespace Moto.Speech
         }
 
         public void switchGrammar(Choices[] choices, bool prefixed = true, bool startListeningKeywords = true) {
-            //this.sre.RecognizeAsyncStop();
             this.sre.UnloadAllGrammars();
-            Console.WriteLine("GRAMMARLOL");
 
             if (prefixed)
             {

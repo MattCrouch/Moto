@@ -1413,8 +1413,19 @@ namespace Moto
                 switch (option)
                 {
                     case menuOptions.RecordNewWall:
-                        player.mode = MainWindow.PlayerMode.Create;
-                        checkTutorial(MainWindow.Tutorials.RecordNewWall);
+                        bool stop = false;
+                        foreach (var person in MainWindow.activeSkeletons)
+                        {
+                            if (person.Value.mode == MainWindow.PlayerMode.Create)
+                            {
+                                stop = true;
+                            }
+                        }
+                        if (!stop)
+                        {
+                            player.mode = MainWindow.PlayerMode.Create;
+                            checkTutorial(MainWindow.Tutorials.RecordNewWall);
+                        }
                         break;
                     case menuOptions.CustomWall:
                         player.mode = MainWindow.PlayerMode.Custom;
