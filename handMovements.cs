@@ -8,10 +8,8 @@ namespace Moto
     public partial class handMovements
     {
 
-        //static Dictionary<string, Dictionary<string, double>> jointPosition = new Dictionary<string, Dictionary<string, double>>();
         public static Dictionary<int, Dictionary<JointType, SkeletonPoint>> jointPosition = new Dictionary<int, Dictionary<JointType, SkeletonPoint>>();
 
-        //public static Dictionary<Joint, Dictionary<string, double>> difference = new Dictionary<Joint, Dictionary<string, double>>();
         public static Dictionary<int, Dictionary<JointType, difference3>> difference = new Dictionary<int, Dictionary<JointType, difference3>>();
 
         public enum UserDecisions
@@ -84,12 +82,6 @@ namespace Moto
 
         public static void trackJointProgression(Skeleton skeleton, Joint joint)
         {
-            //Pick up the position of provided joint
-            /*Dictionary<string, double> newPos = new Dictionary<string, double>();
-            newPos.Add("X", joint.Position.X);
-            newPos.Add("Y", joint.Position.Y);
-            newPos.Add("Z", joint.Position.Z);*/
-
             if (!jointPosition.ContainsKey(skeleton.TrackingId)) {
                 jointPosition.Add(skeleton.TrackingId, new Dictionary<JointType,SkeletonPoint>());
             }
@@ -139,9 +131,6 @@ namespace Moto
                 double anAngle;
                 bool failed;
 
-                //Console.WriteLine(getAngle(skeleton.Joints[JointType.ShoulderRight], skeleton.Joints[JointType.HandRight]));
-                //isLimbStraight(skeleton.Joints[JointType.ShoulderRight], skeleton.Joints[JointType.ElbowRight], skeleton.Joints[JointType.HandRight], 5);
-
                 if (LeftGesture != null)
                 {
                     failed = true;
@@ -149,7 +138,7 @@ namespace Moto
                     //Check if left hand stretched out
                     anAngle = getAngle(skeleton.Joints[JointType.ShoulderLeft].Position, skeleton.Joints[JointType.HandLeft].Position);
 
-                    if (Math.Abs(anAngle - 90) < angleDrift)
+                    if (Math.Abs(anAngle - 90) < angleDrift && skeleton.Joints[JointType.HandLeft].Position.X < skeleton.Joints[JointType.ShoulderLeft].Position.X)
                     {
                         if (isLimbStraight(skeleton.Joints[JointType.ShoulderLeft], skeleton.Joints[JointType.ElbowLeft], skeleton.Joints[JointType.HandLeft], 30))
                         {
@@ -173,7 +162,7 @@ namespace Moto
                     failed = true;
 
                     anAngle = getAngle(skeleton.Joints[JointType.ShoulderLeft].Position, skeleton.Joints[JointType.WristLeft].Position);
-                    //Console.WriteLine(Math.Abs(anAngle - 45));
+
                     //'Kinect Guide' gesture
                     if ((Math.Abs(anAngle - 45) < angleDrift) && (skeleton.Joints[JointType.HandLeft].Position.Y < getMidpoint(skeleton.Joints[JointType.Spine], skeleton.Joints[JointType.HipCenter]).Y) && (skeleton.Joints[JointType.HandLeft].Position.X < skeleton.Joints[JointType.Spine].Position.X))
                     {
@@ -200,7 +189,7 @@ namespace Moto
                     //Check if right hand stretched out
                     anAngle = getAngle(skeleton.Joints[JointType.ShoulderRight].Position, skeleton.Joints[JointType.HandRight].Position);
 
-                    if (Math.Abs(anAngle - 90) < angleDrift)
+                    if (Math.Abs(anAngle - 90) < angleDrift && skeleton.Joints[JointType.HandRight].Position.X > skeleton.Joints[JointType.ShoulderRight].Position.X)
                     {
                         if (isLimbStraight(skeleton.Joints[JointType.ShoulderRight], skeleton.Joints[JointType.ElbowRight], skeleton.Joints[JointType.HandRight], 30))
                         {
@@ -220,7 +209,7 @@ namespace Moto
 
                 if (LeftSwipeRight != null)
                 {
-                    if (difference[skeleton.TrackingId][JointType.HandLeft].X > 0.04)
+                    if (difference[skeleton.TrackingId][JointType.HandLeft].X > 0.06)
                     {
                         if (leftSwipeRightIn == null)
                         {
@@ -265,16 +254,6 @@ namespace Moto
                             leftSwipeRightOut = null;
                         }
                     }
-
-                    /*if (skeleton.Joints[JointType.HandLeft].Position.X > skeleton.Joints[JointType.ElbowLeft].Position.X)
-                    {
-                        //The hand has moved from left to right, was it fast enough for a swipe?
-                        Console.WriteLine(difference[skeleton.TrackingId][JointType.HandLeft].X);
-                        if (difference[skeleton.TrackingId][JointType.HandLeft].X > 0.2 && skeleton.Joints[JointType.HandLeft].TrackingState == JointTrackingState.Tracked)
-                        {
-                            toggleGestureStatus(ref LeftSwipeRightStatus, LeftSwipeRight, true);
-                        }
-                    }*/
                 }
             }
         }
