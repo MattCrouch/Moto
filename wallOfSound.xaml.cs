@@ -1474,29 +1474,32 @@ namespace Moto
         //Kinect Guide code
         void handMovements_KinectGuideGesture(object sender, handMovements.GestureEventArgs e)
         {
-            Storyboard sb = this.FindResource("kinectGuideStart") as Storyboard;
-            Console.WriteLine("Kinect Guide: " + e.Trigger);
-            switch (e.Trigger)
+            if (currentFocus != playerFocus.Tutorial)
             {
-                case handMovements.UserDecisions.Triggered:
-                    if (currentFocus != playerFocus.KinectGuide)
-                    {
-                        sb.Begin();
-                        kinectGuideTimer = new DispatcherTimer();
-                        kinectGuideTimer.Interval = TimeSpan.FromSeconds(3);
-                        kinectGuideTimer.Tick += new EventHandler(kinectGuideTimer_Tick);
-                        kinectGuideTimer.Start();
-                    }
-                    break;
-                case handMovements.UserDecisions.NotTriggered:
-                    sb.Stop();
-                    if (kinectGuideTimer != null)
-                    {
-                        kinectGuideTimer.Stop();
-                        kinectGuideTimer.Tick -= kinectGuideTimer_Tick;
-                        kinectGuideTimer = null;
-                    }
-                    break;
+                Storyboard sb = this.FindResource("kinectGuideStart") as Storyboard;
+                Console.WriteLine("Kinect Guide: " + e.Trigger);
+                switch (e.Trigger)
+                {
+                    case handMovements.UserDecisions.Triggered:
+                        if (currentFocus != playerFocus.KinectGuide)
+                        {
+                            sb.Begin();
+                            kinectGuideTimer = new DispatcherTimer();
+                            kinectGuideTimer.Interval = TimeSpan.FromSeconds(3);
+                            kinectGuideTimer.Tick += new EventHandler(kinectGuideTimer_Tick);
+                            kinectGuideTimer.Start();
+                        }
+                        break;
+                    case handMovements.UserDecisions.NotTriggered:
+                        sb.Stop();
+                        if (kinectGuideTimer != null)
+                        {
+                            kinectGuideTimer.Stop();
+                            kinectGuideTimer.Tick -= kinectGuideTimer_Tick;
+                            kinectGuideTimer = null;
+                        }
+                        break;
+                }
             }
         }
 

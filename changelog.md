@@ -1,5 +1,16 @@
 CHANGELOG
 =========
+1.0.0.0 - 11/5/12
+-----------------
+- **V1!** *fanfare* (The minimum build requirement is now v1)
+- There's now a bunch of new walls to play with! Be a drum and bass master with the Trance wall, or mix it up with the Animal wall full of animal sounds. 
+- Voice commands are now a little less finnicky in certain situations. 
+- Instruments now no longer need to be prefixed with "Switch to" to switch to them
+- Instrument velocity was removed due to causing more problems than it was solving
+- Pictures now have a picture shutter sound effect
+- Vertical scrolling menus now have arrows showing which way to swipe
+- Other, small graphical improvements
+
 0.8.1.0 - 9/5/12
 ----------------
 - Instruments now play quieter when you hit them with less of a force.

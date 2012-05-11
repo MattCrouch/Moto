@@ -253,6 +253,15 @@ namespace Moto
                 availableTutorials.Add(Tutorials.VoiceRecognition, new tutorialVisuals("voice-recognition.png"));
                 availableTutorials.Add(Tutorials.WallOfSound, new tutorialVisuals("wall-of-sound.png"));
             }
+            else
+            {
+                availableTutorials[Tutorials.BandMode] = new tutorialVisuals("band-mode.png");
+                availableTutorials[Tutorials.KinectGuide] = new tutorialVisuals("kinect-guide.png");
+                availableTutorials[Tutorials.Metronome] = new tutorialVisuals("metronome.png");
+                availableTutorials[Tutorials.RecordNewWall] = new tutorialVisuals("record-new-wall.png");
+                availableTutorials[Tutorials.VoiceRecognition] = new tutorialVisuals("voice-recognition.png");
+                availableTutorials[Tutorials.WallOfSound] = new tutorialVisuals("wall-of-sound.png");
+            }
         }
 
         public static void adjustKinectAngle(int angleDiff)
