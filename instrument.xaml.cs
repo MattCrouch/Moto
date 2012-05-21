@@ -1157,23 +1157,30 @@ namespace Moto
 
         private void menuTick()
         {
-            if (handMovements.leftSwipeRightIn == null)
+            if (MainWindow.activeSkeletons.ContainsKey(MainWindow.gestureSkeletonKey))
             {
-                Skeleton player = MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey].skeleton;
-
-                if (menuScrollDirection == handMovements.scrollDirection.SmallDown || menuScrollDirection == handMovements.scrollDirection.LargeDown)
+                if (handMovements.leftSwipeRightIn == null)
                 {
-                    if (menuPosition > 0)
+                    Skeleton player = MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey].skeleton;
+
+                    if (menuScrollDirection == handMovements.scrollDirection.SmallDown || menuScrollDirection == handMovements.scrollDirection.LargeDown)
                     {
-                        animateMenu(false);
+                        if (menuPosition > 0)
+                        {
+                            animateMenu(false);
+                        }
+                    }
+                    else if (menuScrollDirection == handMovements.scrollDirection.SmallUp || menuScrollDirection == handMovements.scrollDirection.LargeUp)
+                    {
+                        if (menuPosition < kinectGuideMenu.Length - 1)
+                        {
+                            animateMenu(true);
+                        }
                     }
                 }
-                else if (menuScrollDirection == handMovements.scrollDirection.SmallUp || menuScrollDirection == handMovements.scrollDirection.LargeUp)
+                else
                 {
-                    if (menuPosition < kinectGuideMenu.Length - 1)
-                    {
-                        animateMenu(true);
-                    }
+                    exitKinectGuide();
                 }
             }
         }
@@ -1526,6 +1533,17 @@ namespace Moto
                 case System.Windows.Input.Key.R:
                     //Restart the Application
                     MainWindow.restartMoto();
+                    break;
+                case System.Windows.Input.Key.H:
+                    //Toggle voice commands
+                    if (helpVisual == null)
+                    {
+                        showHelpVisual();
+                    }
+                    else
+                    {
+                        hideHelpVisual();
+                    }
                     break;
             }
         }

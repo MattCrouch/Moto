@@ -1544,27 +1544,34 @@ namespace Moto
 
         private void menuTick()
         {
-            if (handMovements.leftSwipeRightIn == null)
+            if (MainWindow.activeSkeletons.ContainsKey(MainWindow.gestureSkeletonKey))
             {
-                if (MainWindow.activeSkeletons.ContainsKey(MainWindow.gestureSkeletonKey))
+                if (handMovements.leftSwipeRightIn == null)
                 {
-                    Skeleton player = MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey].skeleton;
+                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.gestureSkeletonKey))
+                    {
+                        Skeleton player = MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey].skeleton;
 
-                    if (menuScrollDirection == handMovements.scrollDirection.SmallDown || menuScrollDirection == handMovements.scrollDirection.LargeDown)
-                    {
-                        if (menuPosition > 0)
+                        if (menuScrollDirection == handMovements.scrollDirection.SmallDown || menuScrollDirection == handMovements.scrollDirection.LargeDown)
                         {
-                            animateMenu(false);
+                            if (menuPosition > 0)
+                            {
+                                animateMenu(false);
+                            }
                         }
-                    }
-                    else if (menuScrollDirection == handMovements.scrollDirection.SmallUp || menuScrollDirection == handMovements.scrollDirection.LargeUp)
-                    {
-                        if (menuPosition < kinectGuideMenu.Length - 1)
+                        else if (menuScrollDirection == handMovements.scrollDirection.SmallUp || menuScrollDirection == handMovements.scrollDirection.LargeUp)
                         {
-                            animateMenu(true);
+                            if (menuPosition < kinectGuideMenu.Length - 1)
+                            {
+                                animateMenu(true);
+                            }
                         }
                     }
                 }
+            }
+            else
+            {
+                exitKinectGuide();
             }
         }
 
@@ -2082,6 +2089,17 @@ namespace Moto
                 case System.Windows.Input.Key.R:
                     //Restart the Application
                     MainWindow.restartMoto();
+                    break;
+                case System.Windows.Input.Key.H:
+                    //Toggle voice commands
+                    if (helpVisual == null)
+                    {
+                        showHelpVisual();
+                    }
+                    else
+                    {
+                        hideHelpVisual();
+                    }
                     break;
             }
         }
