@@ -276,9 +276,12 @@ namespace Moto
                 {
                     if (currentFocus == playerFocus.KinectGuide)
                     {
-                        kinectGuideManipulation(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey]);
+                        if (MainWindow.activeSkeletons.ContainsKey(MainWindow.gestureSkeletonKey))
+                        {
+                            kinectGuideManipulation(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey]);
 
-                        handMovements.listenForGestures(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey].skeleton);
+                            handMovements.listenForGestures(MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey].skeleton);
+                        }
                     }
                     else
                     {
@@ -287,6 +290,13 @@ namespace Moto
                         {
                             handMovements.listenForGestures(player.Value.skeleton);
                         }
+                    }
+                }
+                else
+                {
+                    if (currentFocus == playerFocus.KinectGuide)
+                    {
+                        exitKinectGuide();
                     }
                 }
             }
@@ -318,6 +328,11 @@ namespace Moto
 
         private void removePlayerInstrument(MainWindow.Player player)
         {
+            if (MainWindow.gestureSkeletonKey == player.skeleton.TrackingId && currentFocus == playerFocus.KinectGuide)
+            {
+                exitKinectGuide();
+            }
+
             MainCanvas.Children.Remove(player.instrumentImage);
             
             foreach (var overlay in player.instrumentOverlay)
@@ -1157,10 +1172,12 @@ namespace Moto
 
         private void menuTick()
         {
-            if (MainWindow.activeSkeletons.ContainsKey(MainWindow.gestureSkeletonKey))
-            {
+            Console.WriteLine(MainWindow.gestureSkeletonKey);
+            
                 if (handMovements.leftSwipeRightIn == null)
                 {
+                    if (MainWindow.activeSkeletons.ContainsKey(MainWindow.gestureSkeletonKey))
+            {
                     Skeleton player = MainWindow.activeSkeletons[MainWindow.gestureSkeletonKey].skeleton;
 
                     if (menuScrollDirection == handMovements.scrollDirection.SmallDown || menuScrollDirection == handMovements.scrollDirection.LargeDown)
@@ -1177,12 +1194,8 @@ namespace Moto
                             animateMenu(true);
                         }
                     }
+                        }
                 }
-                else
-                {
-                    exitKinectGuide();
-                }
-            }
         }
 
         private void kinectGuideManipulation(MainWindow.Player player)
@@ -1314,23 +1327,26 @@ namespace Moto
 
         private void exitKinectGuide()
         {
-            Canvas.SetTop(kinectGuideCanvas, 60 * menuPosition);
-
-            MainWindow.animateSlide(kinectGuideCanvas, true, false, -150, 0.5);
-            MainWindow.animateFade(imgDimmer, 0.5, 0, 0.5);
-
-            imgMenuMovementGuide.Visibility = System.Windows.Visibility.Hidden;
-
-            MainWindow.showPlayerOverlays();
-
-            currentFocus = playerFocus.None;
-
-            //Remove menu nav tick
-            if (menuMovementTimer != null)
+            if (currentFocus == playerFocus.KinectGuide)
             {
-                menuMovementTimer.Stop();
-                menuMovementTimer.Tick -= menuMovementTimer_Tick;
-                menuMovementTimer = null;
+                Canvas.SetTop(kinectGuideCanvas, 60 * menuPosition);
+
+                MainWindow.animateSlide(kinectGuideCanvas, true, false, -150, 0.5);
+                MainWindow.animateFade(imgDimmer, 0.5, 0, 0.5);
+
+                imgMenuMovementGuide.Visibility = System.Windows.Visibility.Hidden;
+
+                MainWindow.showPlayerOverlays();
+
+                currentFocus = playerFocus.None;
+
+                //Remove menu nav tick
+                if (menuMovementTimer != null)
+                {
+                    menuMovementTimer.Stop();
+                    menuMovementTimer.Tick -= menuMovementTimer_Tick;
+                    menuMovementTimer = null;
+                }
             }
         }
 

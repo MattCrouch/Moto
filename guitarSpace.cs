@@ -57,7 +57,7 @@ namespace Moto
         }
         
         internal void defineStrumArea(MainWindow.Player player) {
-             double strumSize = 0.15; //Size of strum area edges (in metres)
+             double strumSize = 0.25; //Size of strum area edges (in metres)
 
             strumArea[player.skeleton.TrackingId].X1 = player.skeleton.Joints[JointType.Spine].Position.X - (strumSize / 2);
             strumArea[player.skeleton.TrackingId].X2 = player.skeleton.Joints[JointType.Spine].Position.X + (strumSize / 2);

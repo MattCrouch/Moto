@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+1.0.1.3 - 24/5/12
+-----------------
+- Fixed a couple of crashing bugs
+
 1.0.0.1 - 11/5/12
 -----------------
 - Trimming some dead code and files. Moto should be a chunk smaller now!
